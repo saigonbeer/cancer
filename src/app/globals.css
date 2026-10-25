@@ -1,0 +1,130 @@
+:root {
+  --ink: #1c2321;
+  --ink-soft: #5b6663;
+  --line: #dce3e1;
+  --line-soft: #e9eeec;
+  --bg: #f5f7f6;
+  --card: #ffffff;
+  --teal: #0e6e66;
+  --teal-deep: #0a534d;
+  --teal-tint: #e6f2f0;
+  --amber: #c8743a;
+  --amber-tint: #fbeee4;
+  --red: #b8433b;
+  --red-tint: #fbeae8;
+  --purple: #6b5ca5;
+  --purple-tint: #ece9f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+a {
+  color: var(--teal);
+  text-decoration: none;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  outline: none;
+  width: 100%;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-tint);
+}
+
+label.field-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.sec-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.addbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.addbtn:hover {
+  background: var(--teal-deep);
+}
+
+.ghostbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #cfe6e2;
+}
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+.nav-link:hover {
+  color: #fff;
+}

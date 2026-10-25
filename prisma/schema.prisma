@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  DOCTOR
+  PATIENT
+  ADMIN
+}
+
+enum VisitType {
+  FIRST
+  FOLLOWUP
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AppointmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SCHEDULED
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  dob          String?
+  email        String?  @unique
+  phone        String?
+  username     String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  patientProfile PatientProfile?
+  doctorProfile  DoctorProfile?
+
+  appointmentsAsPatient Appointment[] @relation("PatientAppointments")
+  appointmentsAsDoctor  Appointment[] @relation("DoctorAppointments")
+
+  sentNotifications     Notification[]            @relation("NotificationSender")
+  receivedNotifications NotificationRecipient[]
+  conversationLinks     ConversationParticipant[]
+  messagesSent           Message[]
+}
+
+model DoctorProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department String?
+
+  patients PatientProfile[] @relation("TreatingDoctor")
+}
+
+model PatientProfile {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patientCode          String  @unique
+  address              String?
+  emergencyContactName String?
+  emergencyContactPhone String?
+  doctorId             String?
+  doctor               DoctorProfile? @relation("TreatingDoctor", fields: [doctorId], references: [id])
+
+  visits             Visit[]
+  sideEffectReports  SideEffectReport[]
+}
+
+model Visit {
+  id         String    @id @default(cuid())
+  patientId  String
+  patient    PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  type       VisitType
+  visitDate  DateTime  @default(now())
+
+  history     String? // tiền sử
+  illness     String? // bệnh sử
+  examination String? // khám
+  labResults  String? // xét nghiệm
+  diagnosis   String?
+  progress    String? // diễn biến và kết quả điều trị
+  nextPlan    String? // hướng điều trị tiếp theo
+  note        String? // ghi chú thêm (tái khám)
+
+  treatmentPlans TreatmentPlan[]
+  prescriptions  Prescription[]
+
+  createdAt DateTime @default(now())
+}
+
+model TreatmentPlan {
+  id      String @id @default(cuid())
+  visitId String
+  visit   Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  surgeryOn  Boolean @default(false)
+  surgeryData Json?
+
+  radioOn    Boolean @default(false)
+  radioData  Json?
+
+  chemoOn    Boolean @default(false)
+  chemoData  Json?
+
+  immunoOn   Boolean @default(false)
+  immunoData Json?
+
+  targetedOn   Boolean @default(false)
+  targetedData Json?
+
+  hormoneOn   Boolean @default(false)
+  hormoneData Json?
+}
+
+model Prescription {
+  id          String   @id @default(cuid())
+  visitId     String
+  visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  prescribedBy String
+  prescribedAt DateTime @default(now())
+
+  items PrescriptionItem[]
+}
+
+model PrescriptionItem {
+  id             String  @id @default(cuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  drugName       String
+  dose           String?
+  unit           String?
+  frequency      String?
+  duration       String?
+  quantity       String?
+  reminderTimes  String?
+}
+
+model CatalogDrug {
+  id          String @id @default(cuid())
+  name        String @unique
+  group       String?
+  description String?
+
+  interactionsA DrugInteraction[] @relation("DrugA")
+  interactionsB DrugInteraction[] @relation("DrugB")
+}
+
+model DrugInteraction {
+  id          String   @id @default(cuid())
+  drugAId     String
+  drugA       CatalogDrug @relation("DrugA", fields: [drugAId], references: [id], onDelete: Cascade)
+  drugBId     String
+  drugB       CatalogDrug @relation("DrugB", fields: [drugBId], references: [id], onDelete: Cascade)
+  severity    Severity
+  description String
+
+  @@unique([drugAId, drugBId])
+}
+
+model CatalogCancerType {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  stage       String?
+  description String?
+}
+
+model CatalogSymptom {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  group       String?
+  description String?
+}
+
+model CatalogRegimen {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+}
+
+model SideEffectReport {
+  id         String       @id @default(cuid())
+  patientId  String
+  patient    PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  symptom    String
+  ctcaeGrade Int?
+  severity   String?      // Nhẹ / Trung bình / Nặng (báo cáo từ bệnh nhân)
+  site       String?
+  photoUrl   String?
+  cycle      Int?
+  status     ReportStatus @default(PENDING)
+  note       String?
+  createdAt  DateTime     @default(now())
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  patientId String
+  patient   User              @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId  String
+  doctor    User              @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
+  type      String
+  datetime  DateTime?
+  location  String?
+  reason    String?
+  status    AppointmentStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  createdAt    DateTime                  @default(now())
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  createdAt      DateTime     @default(now())
+}
+
+model Notification {
+  id         String                   @id @default(cuid())
+  senderId   String
+  sender     User                     @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
+  content    String
+  createdAt  DateTime                 @default(now())
+  recipients NotificationRecipient[]
+}
+
+model NotificationRecipient {
+  id             String       @id @default(cuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime?
+}
+
+model PermissionMatrix {
+  id      String  @id @default(cuid())
+  module  String
+  role    Role
+  allowed Boolean @default(false)
+
+  @@unique([module, role])
+}
