@@ -23,3 +23,4 @@ Mở http://localhost:3000/login.
 Đã hoàn thành: Đăng nhập (JWT + cookie, RBAC theo vai trò), toàn bộ **Quản trị viên** (Quản lý tài khoản, Danh mục, Ma trận phân quyền).
 
 Các module lâm sàng (Hồ sơ bệnh án, Thuốc, Tác dụng phụ, Lịch hẹn, Liên lạc, Báo cáo, Thông tin giáo dục) đang hiển thị trang tạm "đang xây dựng" — xem lộ trình chi tiết trong `PLAN.md`.
+ 
