@@ -25,3 +25,4 @@ Mở http://localhost:3000/login.
 Các module lâm sàng (Hồ sơ bệnh án, Thuốc, Tác dụng phụ, Lịch hẹn, Liên lạc, Báo cáo, Thông tin giáo dục) đang hiển thị trang tạm "đang xây dựng" — xem lộ trình chi tiết trong `PLAN.md`.
  
  
+ 
