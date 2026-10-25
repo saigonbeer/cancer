@@ -32,7 +32,7 @@ export default function LoginPage() {
         return;
       }
       const home = ROLE_HOME[data.user.role] || "/login";
-      router.push(home);
+      window.location.href = home;
     } catch {
       setError("Không thể kết nối đến máy chủ.");
     } finally {
