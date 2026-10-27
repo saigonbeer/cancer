@@ -2,61 +2,90 @@
 
 import { useEffect, useState } from 'react';
 
-const SECTION_LABELS: Array<[string, string]> = [
-  ['history', 'Tiền sử'],
-  ['illness', 'Bệnh sử'],
-  ['examination', 'Khám'],
-  ['labResults', 'Xét nghiệm'],
-  ['diagnosis', 'Chẩn đoán'],
-  ['progress', 'Diễn biến và kết quả điều trị'],
-  ['nextPlan', 'Hướng điều trị tiếp theo'],
+const TREATMENTS: Array<[string, string]> = [
+  ['radioOn', 'Xạ trị'],
+  ['chemoOn', 'Hóa chất'],
+  ['immunoOn', 'Miễn dịch'],
+  ['targetedOn', 'Đích'],
+  ['hormoneOn', 'Nội tiết'],
+  ['surgeryOn', 'Phẫu thuật'],
 ];
 
-function Field({ label, value }: { label: string; value?: string | null }) {
+function ReadBlock({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
       <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 14.5, whiteSpace: 'pre-line' }}>{value || 'Chưa cập nhật'}</div>
+      <div className='readtext'>{value || 'Chưa cập nhật'}</div>
     </div>
   );
 }
 
-function treatmentTags(plan: any) {
-  if (!plan) return [];
-  const tags: Array<[string, string, string]> = [];
-  if (plan.chemoOn) tags.push(['Hóa trị', 'var(--purple-tint)', 'var(--purple)']);
-  if (plan.surgeryOn) tags.push(['Phẫu thuật', 'var(--amber-tint)', 'var(--amber)']);
-  if (plan.radioOn) tags.push(['Xạ trị', 'var(--teal-tint)', 'var(--teal)']);
-  if (plan.immunoOn) tags.push(['Miễn dịch', 'var(--purple-tint)', 'var(--purple)']);
-  if (plan.targetedOn) tags.push(['Điều trị đích', 'var(--teal-tint)', 'var(--teal)']);
-  if (plan.hormoneOn) tags.push(['Nội tiết', 'var(--amber-tint)', 'var(--amber)']);
-  return tags;
+function Section({ n, title, amber, children }: { n: number; title: string; amber?: boolean; children: React.ReactNode }) {
+  return (
+    <section className='sec-card'>
+      <div className='sec-head'>
+        <span className={amber ? 'badge amber' : 'badge'}>{n}</span>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{title}</h2>
+      </div>
+      <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>{children}</div>
+    </section>
+  );
 }
 
-function VisitDetail({ visit }: { visit: any }) {
-  const plan = visit.treatmentPlans?.[0];
-  const tags = treatmentTags(plan);
+function FirstVisitSections({ v }: { v: any }) {
+  const plan = v.treatmentPlans?.[0];
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
-        {SECTION_LABELS.map(([key, label]) => (
-          <Field key={key} label={label} value={visit[key]} />
-        ))}
+    <>
+      <Section n={1} title='Tiền sử'>
+        <ReadBlock label='Tiền sử bản thân & gia đình' value={v.history} />
+      </Section>
+      <Section n={2} title='Bệnh sử'>
+        <ReadBlock label='Triệu chứng lâm sàng & diễn biến bệnh' value={v.illness} />
+        <ReadBlock label='Khám lâm sàng' value={v.examination} />
+      </Section>
+      <Section n={3} title='Xét nghiệm'>
+        <ReadBlock label='Kết quả xét nghiệm & chẩn đoán hình ảnh' value={v.labResults} />
+      </Section>
+      <Section n={4} title='Chẩn đoán'>
+        <ReadBlock label='Chẩn đoán xác định' value={v.diagnosis} />
+      </Section>
+      <Section n={5} title='Phương pháp điều trị'>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {TREATMENTS.map(([key, label]) => (
+            <span key={key} className={plan?.[key] ? 'chk-pill on' : 'chk-pill'}>
+              {plan?.[key] ? '✓ ' : ''}{label}
+            </span>
+          ))}
+        </div>
+      </Section>
+      <Section n={6} title='Diễn biến và kết quả điều trị'>
+        <ReadBlock label='Diễn biến & kết quả' value={v.progress} />
+      </Section>
+      <Section n={7} title='Hướng điều trị tiếp theo' amber>
+        <ReadBlock label='Kế hoạch điều trị' value={v.nextPlan} />
+      </Section>
+    </>
+  );
+}
+
+function FollowupCard({ v, n }: { v: any; n: number }) {
+  return (
+    <section className='sec-card'>
+      <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span className='badge'>{n}</span>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Tái khám</h2>
+        </div>
+        <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>{new Date(v.visitDate).toLocaleDateString('vi-VN')}</span>
       </div>
-      <div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 6 }}>Phương pháp điều trị</div>
-        {tags.length === 0 ? (
-          <div style={{ fontSize: 14.5 }}>Chưa cập nhật</div>
-        ) : (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {tags.map(([t, bg, fg]) => (
-              <span key={t} className='pill' style={{ background: bg, color: fg }}>{t}</span>
-            ))}
-          </div>
-        )}
+      <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <ReadBlock label='Lâm sàng' value={v.examination || v.illness} />
+        <ReadBlock label='Xét nghiệm' value={v.labResults} />
+        <ReadBlock label='Kết luận' value={v.diagnosis} />
+        <ReadBlock label='Kế hoạch điều trị tiếp' value={v.nextPlan} />
+        {v.note && <ReadBlock label='Ghi chú' value={v.note} />}
       </div>
-      {visit.note && <Field label='Ghi chú' value={visit.note} />}
-    </div>
+    </section>
   );
 }
 
@@ -80,18 +109,6 @@ export default function PatientRecordPage() {
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
-  const tabStyle = (active: boolean): React.CSSProperties => ({
-    border: 'none',
-    background: 'none',
-    fontFamily: 'inherit',
-    fontSize: 14,
-    fontWeight: 600,
-    padding: '12px 4px',
-    cursor: 'pointer',
-    borderBottom: active ? '3px solid var(--teal)' : '3px solid transparent',
-    color: active ? 'var(--teal-deep)' : 'var(--ink-soft)',
-  });
-
   if (loading && !profile) {
     return <div className='sec-card' style={{ padding: 20, color: 'var(--ink-soft)' }}>Đang tải hồ sơ...</div>;
   }
@@ -102,77 +119,63 @@ export default function PatientRecordPage() {
   const visits: any[] = profile.visits || [];
   const firstVisit = [...visits].reverse().find((v) => v.type === 'FIRST');
   const followups = visits.filter((v) => v.type === 'FOLLOWUP');
-  const age = profile.user?.dob && /^\d{4}$/.test(profile.user.dob) ? new Date().getFullYear() - Number(profile.user.dob) : null;
+  const year = profile.user?.dob && /^\d{4}$/.test(profile.user.dob) ? Number(profile.user.dob) : null;
+  const age = year !== null ? new Date().getFullYear() - year : null;
+  const emergency = profile.emergencyContactName
+    ? `${profile.emergencyContactName}${profile.emergencyContactPhone ? ' — ' + profile.emergencyContactPhone : ''}`
+    : 'Chưa cập nhật';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Hồ sơ bệnh án</h1>
-          <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>Dữ liệu do bác sĩ ghi nhận — chỉ xem</div>
+    <>
+      <div>
+        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>
+          Khoa Xạ trị &amp; Ung bướu
         </div>
-        <button type='button' className='ghostbtn' onClick={load}>Cập nhật</button>
+        <h1 style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700 }}>Hồ sơ bệnh án</h1>
+        <div style={{ marginTop: 2, fontSize: 13.5, color: 'var(--ink-soft)' }}>Dữ liệu do bác sĩ ghi nhận — chỉ xem</div>
       </div>
 
       <div style={{ display: 'flex', gap: 26, borderBottom: '1px solid var(--line)' }}>
-        <button type='button' style={tabStyle(tab === 'personal')} onClick={() => setTab('personal')}>Thông tin cá nhân</button>
-        <button type='button' style={tabStyle(tab === 'medical')} onClick={() => setTab('medical')}>Thông tin bệnh</button>
+        <button type='button' className={tab === 'personal' ? 'tabbtn active' : 'tabbtn'} onClick={() => setTab('personal')}>
+          Thông tin cá nhân
+        </button>
+        <button type='button' className={tab === 'medical' ? 'tabbtn active' : 'tabbtn'} onClick={() => setTab('medical')}>
+          Thông tin bệnh
+        </button>
+        <button type='button' className='ghostbtn' style={{ marginLeft: 'auto', alignSelf: 'center' }} onClick={load}>
+          Cập nhật
+        </button>
       </div>
 
       {tab === 'personal' && (
         <section className='sec-card'>
-          <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)' }}>
+          <div className='sec-head'>
             <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Thông tin cá nhân</h2>
           </div>
-          <div style={{ padding: 22, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
-            <Field label='Họ và tên' value={profile.user?.name} />
-            <Field label='Năm sinh' value={profile.user?.dob ? `${profile.user.dob}${age !== null ? ` (${age} tuổi)` : ''}` : null} />
-            <Field label='Email' value={profile.user?.email} />
-            <Field label='Số điện thoại' value={profile.user?.phone} />
-            <Field label='Địa chỉ' value={profile.address} />
-            <Field
-              label='Người liên hệ khẩn cấp'
-              value={profile.emergencyContactName ? `${profile.emergencyContactName}${profile.emergencyContactPhone ? ' — ' + profile.emergencyContactPhone : ''}` : null}
-            />
-            <Field label='Mã bệnh án' value={profile.patientCode} />
-            <Field label='Bác sĩ điều trị' value={profile.doctor?.user?.name} />
-          </div>
+          <dl className='info-grid'>
+            <div className='info-item'><dt>Họ và tên</dt><dd>{profile.user?.name || 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Năm sinh</dt><dd>{year ? `${year}${age !== null ? ` (${age} tuổi)` : ''}` : 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Email</dt><dd>{profile.user?.email || 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Số điện thoại</dt><dd>{profile.user?.phone || 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Địa chỉ</dt><dd>{profile.address || 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Người liên hệ khẩn cấp</dt><dd>{emergency}</dd></div>
+            <div className='info-item'><dt>Mã bệnh án</dt><dd>{profile.patientCode}</dd></div>
+            <div className='info-item'><dt>Bác sĩ điều trị</dt><dd>{profile.doctor?.user?.name || 'Chưa chỉ định'}</dd></div>
+          </dl>
         </section>
       )}
 
       {tab === 'medical' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {!firstVisit && followups.length === 0 && (
-            <div className='sec-card' style={{ padding: 22, color: 'var(--ink-soft)' }}>
-              Bác sĩ chưa ghi nhận lượt khám nào.
-            </div>
+            <div className='sec-card' style={{ padding: 22, color: 'var(--ink-soft)' }}>Bác sĩ chưa ghi nhận lượt khám nào.</div>
           )}
-
-          {firstVisit && (
-            <section className='sec-card'>
-              <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)', display: 'flex', justifyContent: 'space-between' }}>
-                <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Khám lần đầu</h2>
-                <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>{new Date(firstVisit.visitDate).toLocaleDateString('vi-VN')}</span>
-              </div>
-              <div style={{ padding: 22 }}>
-                <VisitDetail visit={firstVisit} />
-              </div>
-            </section>
-          )}
-
+          {firstVisit && <FirstVisitSections v={firstVisit} />}
           {followups.map((v, idx) => (
-            <section key={v.id} className='sec-card'>
-              <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)', display: 'flex', justifyContent: 'space-between' }}>
-                <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Tái khám #{followups.length - idx}</h2>
-                <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>{new Date(v.visitDate).toLocaleDateString('vi-VN')}</span>
-              </div>
-              <div style={{ padding: 22 }}>
-                <VisitDetail visit={v} />
-              </div>
-            </section>
+            <FollowupCard key={v.id} v={v} n={followups.length - idx} />
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
