@@ -33,12 +33,94 @@ export default function DoctorPatientsPage() {
   const [items, setItems] = useState<any[]>([]);
   const [interactionWarnings, setInteractionWarnings] = useState<any[]>([]);
 
+  // Trạng thái tìm kiếm và form bệnh nhân
+  const [query, setQuery] = useState('');
+  const [patientModal, setPatientModal] = useState<'create' | 'edit' | null>(null);
+  const emptyPatientForm = { name: '', dob: '', email: '', phone: '', username: '', password: '', address: '', emergencyContactName: '', emergencyContactPhone: '' };
+  const [patientForm, setPatientForm] = useState<any>(emptyPatientForm);
+  const [patientError, setPatientError] = useState<string | null>(null);
+
+  const filteredPatients = patients.filter((p) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return [p.patientCode, p.user?.name, p.user?.phone, p.user?.email].some((v) => (v || '').toLowerCase().includes(q));
+  });
+
+  function openCreatePatient() {
+    setPatientForm(emptyPatientForm);
+    setPatientError(null);
+    setPatientModal('create');
+  }
+
+  function openEditPatient() {
+    setPatientForm({
+      name: selectedPatient.user?.name || '',
+      dob: selectedPatient.user?.dob || '',
+      email: selectedPatient.user?.email || '',
+      phone: selectedPatient.user?.phone || '',
+      username: selectedPatient.user?.username || '',
+      password: '',
+      address: selectedPatient.address || '',
+      emergencyContactName: selectedPatient.emergencyContactName || '',
+      emergencyContactPhone: selectedPatient.emergencyContactPhone || '',
+    });
+    setPatientError(null);
+    setPatientModal('edit');
+  }
+
+  async function savePatient() {
+    setPatientError(null);
+    const f = patientForm;
+    const payload: any = {
+      name: f.name, dob: f.dob, email: f.email, phone: f.phone,
+      address: f.address, emergencyContactName: f.emergencyContactName, emergencyContactPhone: f.emergencyContactPhone,
+    };
+    let res: Response;
+    if (patientModal === 'create') {
+      res = await fetch('/api/doctor/patients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...payload, username: f.username, password: f.password }),
+      });
+    } else {
+      res = await fetch('/api/doctor/patients/' + selectedPatient.id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setPatientError(data.error || 'Không lưu được. Vui lòng thử lại.');
+      return;
+    }
+    const mode = patientModal;
+    setPatientModal(null);
+    const list = await loadPatients();
+    if (mode === 'edit') {
+      const updated = list.find((p: any) => p.id === selectedPatient.id);
+      if (updated) viewPatientDetails(updated);
+    }
+  }
+
+  async function deletePatient() {
+    if (!selectedPatient) return;
+    if (!window.confirm('Xóa bệnh nhân ' + selectedPatient.user?.name + '? Toàn bộ hồ sơ sẽ bị xóa.')) return;
+    const res = await fetch('/api/doctor/patients/' + selectedPatient.id, { method: 'DELETE' });
+    if (res.ok) {
+      setSelectedPatient(null);
+      setVisits([]);
+      loadPatients();
+    }
+  }
+
   async function loadPatients() {
     setLoading(true);
     const res = await fetch('/api/doctor/patients');
     const data = await res.json();
     setPatients(data.patients || []);
     setLoading(false);
+    return (data.patients || []) as any[];
   }
 
   async function viewPatientDetails(p: any) {
@@ -118,18 +200,26 @@ export default function DoctorPatientsPage() {
             Quản lý hồ sơ bệnh án, lịch sử khám và phác đồ điều trị
           </div>
         </div>
+        <button type='button' className='addbtn' onClick={openCreatePatient}>+ Tạo bệnh nhân</button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selectedPatient ? '1fr 1.6fr' : '1fr', gap: 20 }}>
         <div className='sec-card' style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Bệnh nhân điều trị ({patients.length})</div>
+          <input
+            type='text'
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder='Tìm theo mã BN, họ tên, SĐT hoặc email...'
+            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
+          />
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Bệnh nhân điều trị ({filteredPatients.length})</div>
           {loading ? (
             <div style={{ padding: 20, color: 'var(--ink-soft)' }}>Đang tải...</div>
           ) : patients.length === 0 ? (
             <div style={{ padding: 20, color: 'var(--ink-soft)' }}>Chưa có bệnh nhân nào được giao.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {patients.map((p) => (
+              {filteredPatients.map((p) => (
                 <div
                   key={p.id}
                   onClick={() => viewPatientDetails(p)}
@@ -166,14 +256,18 @@ export default function DoctorPatientsPage() {
                   Mã BN: {selectedPatient.patientCode} • SĐT: {selectedPatient.user?.phone}
                 </div>
               </div>
-              <button
-                type='button'
-                className='addbtn'
-                style={{ fontSize: 13 }}
-                onClick={() => setShowVisitModal(true)}
-              >
-                + Tạo Lượt Khám Mới
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type='button' className='ghostbtn' style={{ fontSize: 13 }} onClick={openEditPatient}>Sửa hồ sơ</button>
+                <button type='button' className='ghostbtn' style={{ fontSize: 13, color: 'var(--red)' }} onClick={deletePatient}>Xóa</button>
+                <button
+                  type='button'
+                  className='addbtn'
+                  style={{ fontSize: 13 }}
+                  onClick={() => setShowVisitModal(true)}
+                >
+                  + Tạo Lượt Khám Mới
+                </button>
+              </div>
             </div>
 
             <div style={{ borderTop: '1px solid var(--line)', paddingTop: 14 }}>
@@ -245,6 +339,58 @@ export default function DoctorPatientsPage() {
           </div>
         )}
       </div>
+
+      {patientModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div className='sec-card' style={{ width: 620, maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0 }}>
+              {patientModal === 'create' ? 'Tạo Bệnh Nhân Mới' : 'Sửa Hồ Sơ Bệnh Nhân'}
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {[
+                ['name', 'Họ và tên *', 'Nguyễn Văn A'],
+                ['dob', 'Năm sinh', '1978'],
+                ['phone', 'Số điện thoại', '090...'],
+                ['email', 'Email', 'email@domain.com'],
+              ].map(([key, label, ph]) => (
+                <div key={key}>
+                  <label className='field-label'>{label}</label>
+                  <input type='text' value={patientForm[key]} placeholder={ph} onChange={(e) => setPatientForm({ ...patientForm, [key]: e.target.value })} />
+                </div>
+              ))}
+              {patientModal === 'create' && (
+                <>
+                  <div>
+                    <label className='field-label'>Username *</label>
+                    <input type='text' value={patientForm.username} placeholder='username' onChange={(e) => setPatientForm({ ...patientForm, username: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className='field-label'>Mật khẩu *</label>
+                    <input type='password' value={patientForm.password} placeholder='Tối thiểu 6 ký tự' onChange={(e) => setPatientForm({ ...patientForm, password: e.target.value })} />
+                  </div>
+                </>
+              )}
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label className='field-label'>Địa chỉ</label>
+                <input type='text' value={patientForm.address} onChange={(e) => setPatientForm({ ...patientForm, address: e.target.value })} />
+              </div>
+              <div>
+                <label className='field-label'>Người liên hệ khẩn cấp</label>
+                <input type='text' value={patientForm.emergencyContactName} onChange={(e) => setPatientForm({ ...patientForm, emergencyContactName: e.target.value })} />
+              </div>
+              <div>
+                <label className='field-label'>SĐT người liên hệ khẩn cấp</label>
+                <input type='text' value={patientForm.emergencyContactPhone} onChange={(e) => setPatientForm({ ...patientForm, emergencyContactPhone: e.target.value })} />
+              </div>
+            </div>
+            {patientError && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 12 }}>{patientError}</div>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button type='button' className='ghostbtn' onClick={() => setPatientModal(null)}>Hủy</button>
+              <button type='button' className='addbtn' onClick={savePatient}>Lưu</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showVisitModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
