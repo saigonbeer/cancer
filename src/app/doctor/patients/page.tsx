@@ -10,7 +10,7 @@ export default function DoctorPatientsPage() {
   const [showVisitModal, setShowVisitModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
 
-  // Visit form state
+  // Trạng thái form lượt khám
   const [visitType, setVisitType] = useState<'FIRST' | 'FOLLOWUP'>('FIRST');
   const [diagnosis, setDiagnosis] = useState('');
   const [history, setHistory] = useState('');
@@ -23,13 +23,13 @@ export default function DoctorPatientsPage() {
   const [surgeryOn, setSurgeryOn] = useState(false);
   const [radioOn, setRadioOn] = useState(false);
 
-  // Prescription form state
+  // Trạng thái form đơn thuốc
   const [currentVisitId, setCurrentVisitId] = useState('');
   const [drugName, setDrugName] = useState('');
   const [dose, setDose] = useState('');
   const [unit, setUnit] = useState('mg');
-  const [frequency, setFrequency] = useState('2 lÃƒÂ¡Ã‚ÂºÃ‚Â§n/ngÃƒÆ’Ã‚Â y');
-  const [duration, setDuration] = useState('7 ngÃƒÆ’Ã‚Â y');
+  const [frequency, setFrequency] = useState('2 lần/ngày');
+  const [duration, setDuration] = useState('7 ngày');
   const [items, setItems] = useState<any[]>([]);
   const [interactionWarnings, setInteractionWarnings] = useState<any[]>([]);
 
@@ -113,20 +113,20 @@ export default function DoctorPatientsPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Danh sÃƒÆ’Ã‚Â¡ch BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh nhÃƒÆ’Ã‚Â¢n PhÃƒÂ¡Ã‚Â»Ã‚Â¥ trÃƒÆ’Ã‚Â¡ch</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Danh sách Bệnh nhân Phụ trách</h1>
           <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
-            QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ hÃƒÂ¡Ã‚Â»Ã¢â‚¬Å“ sÃƒâ€ Ã‚Â¡ bÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh ÃƒÆ’Ã‚Â¡n, lÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ch sÃƒÂ¡Ã‚Â»Ã‚Â­ khÃƒÆ’Ã‚Â¡m vÃƒÆ’Ã‚Â  phÃƒÆ’Ã‚Â¡c Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â‚¬Å“ Ãƒâ€žÃ¢â‚¬ËœiÃƒÂ¡Ã‚Â»Ã‚Âu trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹
+            Quản lý hồ sơ bệnh án, lịch sử khám và phác đồ điều trị
           </div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selectedPatient ? '1fr 1.6fr' : '1fr', gap: 20 }}>
         <div className='sec-card' style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh nhÃƒÆ’Ã‚Â¢n Ãƒâ€žÃ¢â‚¬ËœiÃƒÂ¡Ã‚Â»Ã‚Âu trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ ({patients.length})</div>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Bệnh nhân điều trị ({patients.length})</div>
           {loading ? (
-            <div style={{ padding: 20, color: 'var(--ink-soft)' }}>Ãƒâ€žÃ‚Âang tÃƒÂ¡Ã‚ÂºÃ‚Â£i...</div>
+            <div style={{ padding: 20, color: 'var(--ink-soft)' }}>Đang tải...</div>
           ) : patients.length === 0 ? (
-            <div style={{ padding: 20, color: 'var(--ink-soft)' }}>ChÃƒâ€ Ã‚Â°a cÃƒÆ’Ã‚Â³ bÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh nhÃƒÆ’Ã‚Â¢n nÃƒÆ’Ã‚Â o Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£c gÃƒÆ’Ã‚Â¡n.</div>
+            <div style={{ padding: 20, color: 'var(--ink-soft)' }}>Chưa có bệnh nhân nào được giao.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {patients.map((p) => (
@@ -149,7 +149,7 @@ export default function DoctorPatientsPage() {
                     </span>
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4 }}>
-                    SÃƒâ€žÃ‚ÂT: {p.user?.phone || 'ChÃƒâ€ Ã‚Â°a cÃƒÂ¡Ã‚ÂºÃ‚Â­p nhÃƒÂ¡Ã‚ÂºÃ‚Â­t'} | NgÃƒÆ’Ã‚Â y sinh: {p.user?.dob || 'N/A'}
+                    SĐT: {p.user?.phone || 'Chưa cập nhật'} | Ngày sinh: {p.user?.dob || 'N/A'}
                   </div>
                 </div>
               ))}
@@ -163,7 +163,7 @@ export default function DoctorPatientsPage() {
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{selectedPatient.user?.name}</h2>
                 <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                  MÃƒÆ’Ã‚Â£ BN: {selectedPatient.patientCode} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ SÃƒâ€žÃ‚ÂT: {selectedPatient.user?.phone}
+                  Mã BN: {selectedPatient.patientCode} • SĐT: {selectedPatient.user?.phone}
                 </div>
               </div>
               <button
@@ -172,21 +172,21 @@ export default function DoctorPatientsPage() {
                 style={{ fontSize: 13 }}
                 onClick={() => setShowVisitModal(true)}
               >
-                + TÃƒÂ¡Ã‚ÂºÃ‚Â¡o LÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t KhÃƒÆ’Ã‚Â¡m MÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi
+                + Tạo Lượt Khám Mới
               </button>
             </div>
 
             <div style={{ borderTop: '1px solid var(--line)', paddingTop: 14 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>LÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ch sÃƒÂ¡Ã‚Â»Ã‚Â­ LÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t khÃƒÆ’Ã‚Â¡m & Ãƒâ€žÃ‚ÂiÃƒÂ¡Ã‚Â»Ã‚Âu trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ ({visits.length})</div>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Lịch sử lượt khám & Điều trị ({visits.length})</div>
               {visits.length === 0 ? (
-                <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>ChÃƒâ€ Ã‚Â°a cÃƒÆ’Ã‚Â³ lÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t khÃƒÆ’Ã‚Â¡m nÃƒÆ’Ã‚Â o.</div>
+                <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>Chưa có lượt khám nào.</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {visits.map((v) => (
                     <div key={v.id} style={{ border: '1px solid var(--line)', borderRadius: 10, padding: 14 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                         <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>
-                          {v.type === 'FIRST' ? 'KhÃƒÆ’Ã‚Â¡m LÃƒÂ¡Ã‚ÂºÃ‚Â§n Ãƒâ€žÃ‚ÂÃƒÂ¡Ã‚ÂºÃ‚Â§u' : 'TÃƒÆ’Ã‚Â¡i KhÃƒÆ’Ã‚Â¡m'}
+                          {v.type === 'FIRST' ? 'Khám Lần Đầu' : 'Tái Khám'}
                         </span>
                         <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
                           {new Date(v.visitDate).toLocaleDateString('vi-VN')}
@@ -194,21 +194,21 @@ export default function DoctorPatientsPage() {
                       </div>
 
                       <div style={{ fontSize: 13.5, lineHeight: 1.5 }}>
-                        <strong>ChÃƒÂ¡Ã‚ÂºÃ‚Â©n Ãƒâ€žÃ¢â‚¬ËœoÃƒÆ’Ã‚Â¡n:</strong> {v.diagnosis || 'ChÃƒâ€ Ã‚Â°a ghi'}<br />
-                        <strong>BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh sÃƒÂ¡Ã‚Â»Ã‚Â­ / DiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¦n biÃƒÂ¡Ã‚ÂºÃ‚Â¿n:</strong> {v.illness || v.progress || 'KhÃƒÆ’Ã‚Â´ng cÃƒÆ’Ã‚Â³'}<br />
-                        <strong>KÃƒÂ¡Ã‚ÂºÃ‚Â¿ hoÃƒÂ¡Ã‚ÂºÃ‚Â¡ch tiÃƒÂ¡Ã‚ÂºÃ‚Â¿p theo:</strong> {v.nextPlan || 'TiÃƒÂ¡Ã‚ÂºÃ‚Â¿p tÃƒÂ¡Ã‚Â»Ã‚Â¥c theo dÃƒÆ’Ã‚Âµi'}
+                        <strong>Chẩn đoán:</strong> {v.diagnosis || 'Chưa ghi'}<br />
+                        <strong>Bệnh sử / Diễn biến:</strong> {v.illness || v.progress || 'Không có'}<br />
+                        <strong>Kế hoạch tiếp theo:</strong> {v.nextPlan || 'Tiếp tục theo dõi'}
                       </div>
 
                       {v.treatmentPlans && v.treatmentPlans.length > 0 && (
                         <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                           {v.treatmentPlans[0].chemoOn && (
-                            <span className='pill' style={{ background: 'var(--purple-tint)', color: 'var(--purple)' }}>HÃƒÆ’Ã‚Â³a trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹</span>
+                            <span className='pill' style={{ background: 'var(--purple-tint)', color: 'var(--purple)' }}>Hóa trị</span>
                           )}
                           {v.treatmentPlans[0].surgeryOn && (
-                            <span className='pill' style={{ background: 'var(--amber-tint)', color: 'var(--amber)' }}>PhÃƒÂ¡Ã‚ÂºÃ‚Â«u thuÃƒÂ¡Ã‚ÂºÃ‚Â­t</span>
+                            <span className='pill' style={{ background: 'var(--amber-tint)', color: 'var(--amber)' }}>Phẫu thuật</span>
                           )}
                           {v.treatmentPlans[0].radioOn && (
-                            <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>XÃƒÂ¡Ã‚ÂºÃ‚Â¡ trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹</span>
+                            <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>Xạ trị</span>
                           )}
                         </div>
                       )}
@@ -223,13 +223,13 @@ export default function DoctorPatientsPage() {
                             setShowPrescriptionModal(true);
                           }}
                         >
-                          + KÃƒÆ’Ã‚Âª Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â¡n thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc cho lÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t khÃƒÆ’Ã‚Â¡m nÃƒÆ’Ã‚Â y
+                          + Kê thuốc cho lượt khám này
                         </button>
                       </div>
 
                       {v.prescriptions && v.prescriptions.length > 0 && (
                         <div style={{ marginTop: 10, background: 'var(--bg)', padding: 10, borderRadius: 8 }}>
-                          <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 4 }}>Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â£ kÃƒÆ’Ã‚Âª:</div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 4 }}>Đơn thuốc đã kê:</div>
                           {v.prescriptions.map((pr: any) => (
                             <div key={pr.id} style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
                               • {pr.items.map((it: any) => it.drugName + ' (' + (it.dose || '') + (it.unit || '') + ' - ' + (it.frequency || '') + ')').join(', ')}
@@ -249,57 +249,57 @@ export default function DoctorPatientsPage() {
       {showVisitModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div className='sec-card' style={{ width: 600, maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0 }}>TÃƒÂ¡Ã‚ÂºÃ‚Â¡o LÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t KhÃƒÆ’Ã‚Â¡m MÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0 }}>Tạo Lượt Khám Mới</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label className='field-label'>LoÃƒÂ¡Ã‚ÂºÃ‚Â¡i khÃƒÆ’Ã‚Â¡m</label>
+                <label className='field-label'>Loại khám</label>
                 <select
                   value={visitType}
                   onChange={(e: any) => setVisitType(e.target.value)}
                   style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
                 >
-                  <option value='FIRST'>KhÃƒÆ’Ã‚Â¡m lÃƒÂ¡Ã‚ÂºÃ‚Â§n Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚ÂºÃ‚Â§u</option>
-                  <option value='FOLLOWUP'>TÃƒÆ’Ã‚Â¡i khÃƒÆ’Ã‚Â¡m</option>
+                  <option value='FIRST'>Khám lần đầu</option>
+                  <option value='FOLLOWUP'>Tái khám</option>
                 </select>
               </div>
 
               <div>
-                <label className='field-label'>ChÃƒÂ¡Ã‚ÂºÃ‚Â©n Ãƒâ€žÃ¢â‚¬ËœoÃƒÆ’Ã‚Â¡n xÃƒÆ’Ã‚Â¡c Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹nh</label>
-                <input type='text' value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} placeholder='VD: Ung thÃƒâ€ Ã‚Â° vÃƒÆ’Ã‚Âº giai Ãƒâ€žÃ¢â‚¬ËœoÃƒÂ¡Ã‚ÂºÃ‚Â¡n IIA' />
+                <label className='field-label'>Chẩn đoán xác định</label>
+                <input type='text' value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} placeholder='VD: Ung thư vú giai đoạn IIA' />
               </div>
 
               <div>
-                <label className='field-label'>TiÃƒÂ¡Ã‚Â»Ã‚Ân sÃƒÂ¡Ã‚Â»Ã‚Â­ bÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh & DÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ ÃƒÂ¡Ã‚Â»Ã‚Â©ng</label>
-                <textarea rows={2} value={history} onChange={(e) => setHistory(e.target.value)} placeholder='TiÃƒÂ¡Ã‚Â»Ã‚Ân sÃƒÂ¡Ã‚Â»Ã‚Â­ bÃƒÂ¡Ã‚ÂºÃ‚Â£n thÃƒÆ’Ã‚Â¢n, gia Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â¬nh, dÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ ÃƒÂ¡Ã‚Â»Ã‚Â©ng...' />
+                <label className='field-label'>Tiền sử bản thân & Dị ứng</label>
+                <textarea rows={2} value={history} onChange={(e) => setHistory(e.target.value)} placeholder='Tiền sử bản thân, gia đình, dị ứng...' />
               </div>
 
               <div>
-                <label className='field-label'>BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh sÃƒÂ¡Ã‚Â»Ã‚Â­ & DiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¦n biÃƒÂ¡Ã‚ÂºÃ‚Â¿n</label>
-                <textarea rows={2} value={illness} onChange={(e) => setIllness(e.target.value)} placeholder='QuÃƒÆ’Ã‚Â¡ trÃƒÆ’Ã‚Â¬nh khÃƒÂ¡Ã‚Â»Ã…Â¸i phÃƒÆ’Ã‚Â¡t, triÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡u chÃƒÂ¡Ã‚Â»Ã‚Â©ng...' />
+                <label className='field-label'>Bệnh sử & Diễn biến</label>
+                <textarea rows={2} value={illness} onChange={(e) => setIllness(e.target.value)} placeholder='Quá trình khởi phát, triệu chứng...' />
               </div>
 
               <div>
-                <label className='field-label'>KÃƒÂ¡Ã‚ÂºÃ‚Â¿t quÃƒÂ¡Ã‚ÂºÃ‚Â£ lÃƒÆ’Ã‚Â¢m sÃƒÆ’Ã‚Â ng & XÃƒÆ’Ã‚Â©t nghiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡m</label>
-                <textarea rows={2} value={labResults} onChange={(e) => setLabResults(e.target.value)} placeholder='KÃƒÂ¡Ã‚ÂºÃ‚Â¿t quÃƒÂ¡Ã‚ÂºÃ‚Â£ mÃƒÆ’Ã‚Â¡u, CT/MRI, giÃƒÂ¡Ã‚ÂºÃ‚Â£i phÃƒÂ¡Ã‚ÂºÃ‚Â«u bÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡nh...' />
+                <label className='field-label'>Kết quả lâm sàng & Xét nghiệm</label>
+                <textarea rows={2} value={labResults} onChange={(e) => setLabResults(e.target.value)} placeholder='Kết quả máu, CT/MRI, giải phẫu bệnh...' />
               </div>
 
               <div>
-                <label className='field-label'>HÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºng Ãƒâ€žÃ¢â‚¬ËœiÃƒÂ¡Ã‚Â»Ã‚Âu trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ tiÃƒÂ¡Ã‚ÂºÃ‚Â¿p theo</label>
-                <textarea rows={2} value={nextPlan} onChange={(e) => setNextPlan(e.target.value)} placeholder='KÃƒÂ¡Ã‚ÂºÃ‚Â¿ hoÃƒÂ¡Ã‚ÂºÃ‚Â¡ch chu kÃƒÂ¡Ã‚Â»Ã‚Â³ hÃƒÆ’Ã‚Â³a trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹, hÃƒÂ¡Ã‚ÂºÃ‚Â¹n khÃƒÆ’Ã‚Â¡m...' />
+                <label className='field-label'>Hướng điều trị tiếp theo</label>
+                <textarea rows={2} value={nextPlan} onChange={(e) => setNextPlan(e.target.value)} placeholder='Kế hoạch chu kỳ hóa trị, hẹn khám...' />
               </div>
 
               <div>
-                <label className='field-label'>PhÃƒâ€ Ã‚Â°Ãƒâ€ Ã‚Â¡ng phÃƒÆ’Ã‚Â¡p phÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœi hÃƒÂ¡Ã‚Â»Ã‚Â£p</label>
+                <label className='field-label'>Phương pháp áp dụng</label>
                 <div style={{ display: 'flex', gap: 16 }}>
-                  <label><input type='checkbox' checked={chemoOn} onChange={(e) => setChemoOn(e.target.checked)} /> HÃƒÆ’Ã‚Â³a trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹</label>
-                  <label><input type='checkbox' checked={surgeryOn} onChange={(e) => setSurgeryOn(e.target.checked)} /> PhÃƒÂ¡Ã‚ÂºÃ‚Â«u thuÃƒÂ¡Ã‚ÂºÃ‚Â­t</label>
-                  <label><input type='checkbox' checked={radioOn} onChange={(e) => setRadioOn(e.target.checked)} /> XÃƒÂ¡Ã‚ÂºÃ‚Â¡ trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹</label>
+                  <label><input type='checkbox' checked={chemoOn} onChange={(e) => setChemoOn(e.target.checked)} /> Hóa trị</label>
+                  <label><input type='checkbox' checked={surgeryOn} onChange={(e) => setSurgeryOn(e.target.checked)} /> Phẫu thuật</label>
+                  <label><input type='checkbox' checked={radioOn} onChange={(e) => setRadioOn(e.target.checked)} /> Xạ trị</label>
                 </div>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
-                <button type='button' className='ghostbtn' onClick={() => setShowVisitModal(false)}>HÃƒÂ¡Ã‚Â»Ã‚Â§y</button>
-                <button type='button' className='addbtn' onClick={handleCreateVisit}>LÃƒâ€ Ã‚Â°u LÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£t KhÃƒÆ’Ã‚Â¡m</button>
+                <button type='button' className='ghostbtn' onClick={() => setShowVisitModal(false)}>Hủy</button>
+                <button type='button' className='addbtn' onClick={handleCreateVisit}>Lưu Lượt Khám</button>
               </div>
             </div>
           </div>
@@ -309,41 +309,41 @@ export default function DoctorPatientsPage() {
       {showPrescriptionModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div className='sec-card' style={{ width: 650, maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0 }}>KÃƒÆ’Ã‚Âª Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n ThuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc & KiÃƒÂ¡Ã‚Â»Ã†â€™m Tra TÃƒâ€ Ã‚Â°Ãƒâ€ Ã‚Â¡ng TÃƒÆ’Ã‚Â¡c</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0 }}>Kê Đơn Thuốc & Kiểm Tra Tương Tác</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 8 }}>
                 <div>
-                  <label className='field-label'>TÃƒÆ’Ã‚Âªn thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc (BiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡t dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£c / HoÃƒÂ¡Ã‚ÂºÃ‚Â¡t chÃƒÂ¡Ã‚ÂºÃ‚Â¥t)</label>
+                  <label className='field-label'>Tên thuốc (Biệt dược / Hoạt chất)</label>
                   <input type='text' value={drugName} onChange={(e) => setDrugName(e.target.value)} placeholder='VD: Cisplatin, Paclitaxel' />
                 </div>
                 <div>
-                  <label className='field-label'>LiÃƒÂ¡Ã‚Â»Ã‚Âu lÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Â£ng</label>
+                  <label className='field-label'>Liều lượng</label>
                   <input type='text' value={dose} onChange={(e) => setDose(e.target.value)} placeholder='VD: 50' />
                 </div>
                 <div>
-                  <label className='field-label'>Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n vÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹</label>
+                  <label className='field-label'>Đơn vị</label>
                   <input type='text' value={unit} onChange={(e) => setUnit(e.target.value)} />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <label className='field-label'>TÃƒÂ¡Ã‚ÂºÃ‚Â§n suÃƒÂ¡Ã‚ÂºÃ‚Â¥t</label>
+                  <label className='field-label'>Tần suất</label>
                   <input type='text' value={frequency} onChange={(e) => setFrequency(e.target.value)} />
                 </div>
                 <div>
-                  <label className='field-label'>ThÃƒÂ¡Ã‚Â»Ã‚Âi gian dÃƒÆ’Ã‚Â¹ng</label>
+                  <label className='field-label'>Thời gian dùng</label>
                   <input type='text' value={duration} onChange={(e) => setDuration(e.target.value)} />
                 </div>
               </div>
 
               <button type='button' className='ghostbtn' style={{ alignSelf: 'flex-start' }} onClick={addItemToPrescription}>
-                + ThÃƒÆ’Ã‚Âªm ThuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc VÃƒÆ’Ã‚Â o Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n
+                + Thêm thuốc vào đơn
               </button>
 
               {items.length > 0 && (
                 <div style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 12 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Danh mÃƒÂ¡Ã‚Â»Ã‚Â¥c thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc trong Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â¡n ({items.length}):</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Danh mục thuốc trong đơn ({items.length}):</div>
                   {items.map((it, idx) => (
                     <div key={idx} style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
                       <span>{it.drugName} - {it.dose}{it.unit} ({it.frequency}, {it.duration})</span>
@@ -352,7 +352,7 @@ export default function DoctorPatientsPage() {
                         style={{ border: 'none', background: 'none', color: 'var(--red)', cursor: 'pointer' }}
                         onClick={() => setItems(items.filter((_, i) => i !== idx))}
                       >
-                        XÃƒÆ’Ã‚Â³a
+                        Xóa
                       </button>
                     </div>
                   ))}
@@ -361,21 +361,21 @@ export default function DoctorPatientsPage() {
 
               {interactionWarnings.length > 0 && (
                 <div style={{ background: 'var(--red-tint)', border: '1px solid var(--red)', borderRadius: 8, padding: 12 }}>
-                  <div style={{ color: 'var(--red)', fontWeight: 700, fontSize: 13 }}>CÃƒÂ¡Ã‚ÂºÃ‚Â£nh bÃƒÆ’Ã‚Â¡o tÃƒâ€ Ã‚Â°Ãƒâ€ Ã‚Â¡ng tÃƒÆ’Ã‚Â¡c thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc phÃƒÆ’Ã‚Â¡t hiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡n!</div>
+                  <div style={{ color: 'var(--red)', fontWeight: 700, fontSize: 13 }}>⚠ Cảnh báo tương tác thuốc phát hiện!</div>
                   {interactionWarnings.map((w, idx) => (
                     <div key={idx} style={{ fontSize: 12.5, marginTop: 4 }}>
-                      ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ <strong>{w.drugA?.name}</strong> tÃƒâ€ Ã‚Â°Ãƒâ€ Ã‚Â¡ng tÃƒÆ’Ã‚Â¡c vÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi <strong>{w.drugB?.name}</strong>: {w.description} (MÃƒÂ¡Ã‚Â»Ã‚Â©c Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â€žÂ¢: {w.severity})
+                      • <strong>{w.drugA?.name}</strong> tương tác với <strong>{w.drugB?.name}</strong>: {w.description} (Mức độ: {w.severity})
                     </div>
                   ))}
                   <div style={{ fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
-                    Vui lÃƒÆ’Ã‚Â²ng Ãƒâ€žÃ¢â‚¬ËœiÃƒÂ¡Ã‚Â»Ã‚Âu chÃƒÂ¡Ã‚Â»Ã¢â‚¬Â°nh Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â¡n thuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc hoÃƒÂ¡Ã‚ÂºÃ‚Â·c xÃƒÆ’Ã‚Â¡c nhÃƒÂ¡Ã‚ÂºÃ‚Â­n bÃƒÂ¡Ã‚Â»Ã‚Â qua cÃƒÂ¡Ã‚ÂºÃ‚Â£nh bÃƒÆ’Ã‚Â¡o nÃƒÂ¡Ã‚ÂºÃ‚Â¿u cÃƒÆ’Ã‚Â³ chÃƒÂ¡Ã‚Â»Ã¢â‚¬Â° Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹nh Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚ÂºÃ‚Â·c biÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡t.
+                    Vui lòng điều chỉnh đơn thuốc hoặc xác nhận bỏ qua cảnh báo nếu có chỉ định đặc biệt.
                   </div>
                 </div>
               )}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
-                <button type='button' className='ghostbtn' onClick={() => { setShowPrescriptionModal(false); setInteractionWarnings([]); }}>HÃƒÂ¡Ã‚Â»Ã‚Â§y</button>
-                <button type='button' className='addbtn' onClick={handleSavePrescription}>LÃƒâ€ Ã‚Â°u Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n ThuÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœc</button>
+                <button type='button' className='ghostbtn' onClick={() => { setShowPrescriptionModal(false); setInteractionWarnings([]); }}>Hủy</button>
+                <button type='button' className='addbtn' onClick={handleSavePrescription}>Lưu Đơn Thuốc</button>
               </div>
             </div>
           </div>

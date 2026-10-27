@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export default function PatientMessagesPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [doctorName, setDoctorName] = useState<string>('BÃ¡c sÄ© Ä‘iá»u trá»‹');
+  const [doctorName, setDoctorName] = useState<string>('Bác sĩ điều trị');
   const [inputContent, setInputContent] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -50,19 +50,19 @@ export default function PatientMessagesPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Nháº¯n tin & TÆ° váº¥n vá»›i BÃ¡c sÄ©</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Nhắn tin & Tư vấn với Bác sĩ</h1>
         <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
-          Trao Ä‘á»•i trá»±c tiáº¿p vá»›i BÃ¡c sÄ© {doctorName}
+          Trao đổi trực tiếp với Bác sĩ {doctorName}
         </div>
       </div>
 
       <div className='sec-card' style={{ padding: 20, display: 'flex', flexDirection: 'column', height: '70vh' }}>
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 6 }}>
           {loading ? (
-            <div style={{ color: 'var(--ink-soft)', textAlign: 'center', marginTop: 40 }}>Äang káº¿t ná»‘i há»™i thoáº¡i...</div>
+            <div style={{ color: 'var(--ink-soft)', textAlign: 'center', marginTop: 40 }}>Đang kết nối hội thoại...</div>
           ) : messages.length === 0 ? (
             <div style={{ color: 'var(--ink-soft)', textAlign: 'center', marginTop: 40 }}>
-              Báº¡n chÆ°a cÃ³ tin nháº¯n nÃ o vá»›i BÃ¡c sÄ©. HÃ£y gá»­i cÃ¢u há»i náº¿u cÃ³ tháº¯c máº¯c vá» Ä‘Æ¡n thuá»‘c hoáº·c Ä‘iá»u trá»‹!
+              Bạn chưa có tin nhắn nào với Bác sĩ. Hãy gửi câu hỏi nếu có thắc mắc về đơn thuốc hoặc điều trị!
             </div>
           ) : (
             messages.map((m) => {
@@ -98,7 +98,7 @@ export default function PatientMessagesPage() {
             onKeyDown={(e) => {
               if (e.key === 'Enter') send();
             }}
-            placeholder='Nháº­p cÃ¢u há»i hoáº·c tÃ¬nh tráº¡ng cáº§n há»i bÃ¡c sÄ©...'
+            placeholder='Nhập câu hỏi hoặc tình trạng cần hỏi bác sĩ...'
           />
           <button type='button' className='addbtn' onClick={send}>
             Gá»­i

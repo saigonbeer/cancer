@@ -35,17 +35,17 @@ export default function DoctorMedicationsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Quáº£n lÃ½ ÄÆ¡n thuá»‘c & PhÃ¡c Ä‘á»“ DÆ°á»£c</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Quản lý Đơn thuốc & Phác đồ Dược</h1>
         <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
-          Theo dÃµi lá»‹ch sá»­ kÃª Ä‘Æ¡n, danh má»¥c thuá»‘c Ä‘Ã£ cáº¥p vÃ  kiá»ƒm tra tÆ°Æ¡ng tÃ¡c thuá»‘c
+          Theo dõi lịch sử kê đơn, danh mục thuốc đã cấp và kiểm tra tương tác thuốc
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20 }}>
         <div className='sec-card' style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Chá»n Bá»‡nh nhÃ¢n</div>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Chọn Bệnh nhân</div>
           {loading ? (
-            <div style={{ color: 'var(--ink-soft)' }}>Äang táº£i...</div>
+            <div style={{ color: 'var(--ink-soft)' }}>Đang tải...</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {patients.map((p) => (
@@ -73,26 +73,26 @@ export default function DoctorMedicationsPage() {
         </div>
 
         <div className='sec-card' style={{ padding: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Lá»‹ch sá»­ ÄÆ¡n thuá»‘c</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Lịch sử Đơn thuốc</h2>
           {prescriptions.length === 0 ? (
-            <div style={{ color: 'var(--ink-soft)' }}>Bá»‡nh nhÃ¢n nÃ y chÆ°a cÃ³ Ä‘Æ¡n thuá»‘c nÃ o.</div>
+            <div style={{ color: 'var(--ink-soft)' }}>Bệnh nhân này chưa có đơn thuốc nào.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {prescriptions.map((pr) => (
                 <div key={pr.id} style={{ border: '1px solid var(--line)', borderRadius: 10, padding: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                     <span style={{ fontWeight: 600, fontSize: 14 }}>
-                      BÃ¡c sÄ© kÃª: {pr.prescribedBy || 'BÃ¡c sÄ© Ä‘iá»u trá»‹'}
+                      Bác sĩ kê: {pr.prescribedBy || 'Bác sĩ điều trị'}
                     </span>
                     <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                      NgÃ y kÃª: {new Date(pr.prescribedAt).toLocaleDateString('vi-VN')}
+                      Ngày kê: {new Date(pr.prescribedAt).toLocaleDateString('vi-VN')}
                     </span>
                   </div>
 
                   <div style={{ borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
                     {pr.items?.map((it: any) => (
                       <div key={it.id} style={{ fontSize: 13, padding: '4px 0' }}>
-                        â€¢ <strong>{it.drugName}</strong>: {it.dose || ''} {it.unit || ''} | {it.frequency || 'HÃ ng ngÃ y'} | {it.duration || 'Theo chá»‰ Ä‘á»‹nh'}
+                        • <strong>{it.drugName}</strong>: {it.dose || ''} {it.unit || ''} | {it.frequency || 'Hàng ngày'} | {it.duration || 'Theo chỉ định'}
                       </div>
                     ))}
                   </div>
