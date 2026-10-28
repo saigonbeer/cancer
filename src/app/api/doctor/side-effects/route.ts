@@ -23,7 +23,13 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const updated = await updateSideEffectStatus(body.reportId, body.status, body.ctcaeGrade, auth.session.role);
+    const updated = await updateSideEffectStatus(
+      body.reportId,
+      body.status,
+      body.ctcaeGrade,
+      auth.session.role,
+      body.doseReduced
+    );
     return NextResponse.json({ report: updated });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 403 });

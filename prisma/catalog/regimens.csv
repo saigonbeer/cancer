@@ -1,0 +1,469 @@
+Name,EVS ID,Histology,Radiation,Remarks,Primary Site,Alternate Names,Drugs
+7+3,,,,6/12/23 Moved to hidden status,,,Mitoxantrone;Daunorubicin Hydrochloride;Idarubicin;Cytarabine
+ABCD,,,,,,ADBC,Dacarbazine;Lomustine;Doxorubicin;Bleomycin
+ABCM,,,,,,,Mitomycin;Doxorubicin;Cyclophosphamide;Bleomycin
+ABD,,,,,,,Dacarbazine;Doxorubicin;Bleomycin
+ABDIC,,,,,,,Dacarbazine;Lomustine;Doxorubicin;Prednisone;Bleomycin
+ABVD,,,,,,ABDV,Dacarbazine;Doxorubicin;Bleomycin;Vinblastine
+AC,,,,"AC regimen often includes other agents such as paclitaxel, docetaxel, or 5-FU.",Breast,,Doxorubicin;Cyclophosphamide
+AC-T,,,,,,,Doxorubicin;Cyclophosphamide;Paclitaxel
+ACOAP,,,,,,,Doxorubicin;Cytarabine;Prednisone;Cyclophosphamide;Vincristine
+ACOPP,,,,,,,Doxorubicin;Procarbazine;Prednisone;Cyclophosphamide;Vincristine
+ACT-FU-Cy,,,,,,,Fluorouracil;Dactinomycin;Cyclophosphamide
+ACVBP,,,,,,,Doxorubicin;Prednisone;Cyclophosphamide;Bleomycin;Vindesine
+AD,,,,,,ADIC,Dacarbazine;Doxorubicin
+ADE,,,,,,,Etoposide;Daunorubicin Hydrochloride;Cytarabine
+ADM,,,,,,,Doxorubicin;Cisplatin;Methotrexate
+ADOC,,,,Used to treat invasive thymoma,,,Doxorubicin;Cisplatin;Cyclophosphamide;Vincristine
+AIM,,,,,,,Asparaginase;Ifosfamide;Methotrexate
+ALOMAD,,,,,,,Dactinomycin;Dacarbazine;Doxorubicin;Chlorambucil;Methotrexate;Vincristine
+APO regimen,,,,,,,Ethyl-6-Mercaptopurine;Doxorubicin;Methotrexate;Prednisone;Vincristine
+ASHAP,,,,,,,Methylprednisolone;Doxorubicin;Cisplatin;Cytarabine
+ASHAP/M-BACOS,,,,,,,Methylprednisolone Sodium Succinate;Doxorubicin;Cisplatin;Methotrexate;Cyclophosphamide;Bleomycin;Vincristine
+ATRA (263),,,,,,,Tretinoin;Gemtuzumab Ozogamicin
+Adria-L-PAM,,,,,,,Melphalan;Doxorubicin
+B-DOPA,,Hodgkin's lymphoma,,,,,Dacarbazine;Doxorubicin;Prednisone;Bleomycin;Vincristine
+BAC,,,,,,,Cytarabine;Cyclophosphamide;Carmustine
+BACO,,,,,,,Lomustine;Doxorubicin;Bleomycin;Vincristine
+BACOD,,Non-Hodgkin's lymphomas,,,,,Dexamethasone;Doxorubicin;Cyclophosphamide;Bleomycin;Vincristine
+BACON,,,,,,,Lomustine;Mechlorethamine;Doxorubicin;Bleomycin;Vincristine
+BAMON,,Multiple myeloma,,,,,Mechlorethamine;Doxorubicin;Methotrexate;Bleomycin;Vincristine
+BAVIP,,,,,,,Dacarbazine;Doxorubicin;Prednisone;Bleomycin;Vinblastine
+BBD,,Multiple myeloma,,First-line triplet for multiple myeloma,,,Bendamustine;Bortezomib;Dexamethasone
+BBVP-M,,,,,,,Methotrexate;Prednisone;Bleomycin;Carmustine
+BCAP,,,,,,,Doxorubicin;Prednisone;Cyclophosphamide;Carmustine
+BCAVe,,,,,,,Lomustine;Doxorubicin;Bleomycin;Vinblastine
+BCD,,Multiple myeloma,,,,,Dactinomycin;Cyclophosphamide;Bleomycin
+BCMF,,,,,,CMF-BLEO,Fluorouracil;Methotrexate;Cyclophosphamide;Bleomycin
+BCP,,Non-small cell lung carcinoma,,,,,Prednisone;Cyclophosphamide;Carmustine
+BCVP,,,,,,BCOP,Prednisone;Cyclophosphamide;Vincristine;Carmustine
+BCVPP-bleo,,,,,,,Procarbazine;Cyclophosphamide;Bleomycin;Vinblastine;Carmustine
+BEACOPP,,,,,,,Etoposide;Doxorubicin;Procarbazine;Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+BEMP,,,,,,,Mitomycin;Cisplatin;Bleomycin;Vindesine
+BEP,,Germ cell tumors,,,Testicle,PEB;HDPEB,Etoposide;Cisplatin;Bleomycin
+BIRD,,,,,,,Dexamethasone;Lenalidomide;Clarithromycin
+BLEO-COMF,,,,,,,Fluorouracil;Methotrexate;Cyclophosphamide;Bleomycin;Vincristine
+BOLD,,Melanoma,,,"Colorectal, skin",,Dacarbazine;Lomustine;Bleomycin;Vincristine
+BOMP,,,,,,,Procarbazine;Prednisone;Bleomycin;Vincristine
+BONP,,,,,,,Procarbazine;Prednisolone;Bleomycin;Vincristine
+BOPAM,,,,,,,Mechlorethamine;Doxorubicin;Methotrexate;Prednisone;Bleomycin;Vincristine
+BOPP,,,,,,BVPP,Procarbazine;Prednisone;Vincristine;Carmustine
+BV,,,,,,,Bleomycin;Vincristine
+BVAM,,,,,,,Methotrexate;Cytarabine;Vincristine;Carmustine
+BVCPP,,Hodgkin's lymphoma,,,,BCVPP,Procarbazine;Prednisone;Cyclophosphamide;Vinblastine;Carmustine
+BVDS,,,,,,,Streptozocin;Doxorubicin;Bleomycin;Vinblastine
+Bevacizumab + IFL,,,,,,FOLFIRIB,Fluorouracil;Bevacizumab;Leucovorin;Irinotecan
+Biochemotherapy,,,,,,,Dacarbazine;Cisplatin;Interferon alpha-NS;Interleukin-2;Vinblastine
+BuCyE,,"Hodgkin's lymphoma, non-Hodgkin's lymphoma",,BuCyE is a conditioning regimen for autologous stem cell transplantation in the treatment of refractory and relapsed lymphomas,,,Etoposide;Cyclophosphamide;Busulfan
+C-TPF,,Squamous cell carcinoma,,Used in treatment of SCC Head & Neck tumors and gastric cancers.,"Head and Neck, stomach",,Fluorouracil;Docetaxel;Cisplatin;Cetuximab
+CAC,,,,,Breast;Ovary,,Cisplatin;Fluosol-DA
+CAF,,,,,Breast,CAFFI;FAC,Fluorouracil;Doxorubicin;Cyclophosphamide
+CAFP,,,,Used to treat recurrence and metastatic breast cancer,Breast,,Fluorouracil;Doxorubicin;Prednisone;Cyclophosphamide
+CAPIRI,,,,,Colorectal;Esophagus;Stomach,XELIRI,Irinotecan;Capecitabine
+CAPOX,,,,,,XELOX;CAPE-OX,Oxaliplatin;Capecitabine
+CB,,,,,,,Bevacizumab;Cetuximab
+CCAVV,,Small cell carcinoma,,,Lung,,Etoposide;Lomustine;Doxorubicin;Cyclophosphamide;Vincristine
+CCNU-OP,,,,,Brain,,Lomustine;Prednisone;Vincristine
+CCVV,,Small cell lung carcinoma,,,Lung,,Etoposide;Lomustine;Cyclophosphamide;Vincristine
+CCVVP,,,,,Lung,,Etoposide;Lomustine;Cisplatin;Cyclophosphamide;Vincristine
+CEF,,,,,Breast,FCE;FEC,Epirubicin;Fluorouracil;Cyclophosphamide
+CEM,,Neuroblastoma,,Regimen for childhood neuroblastoma,,,Etoposide;Methotrexate;Cytarabine
+CEPP,,,,,,,Etoposide;Procarbazine;Prednisone;Cyclophosphamide
+CEV,,Retinoblastoma,,Used to treat pediatric retinoblastoma,,,Etoposide;Cyclophosphamide;Vincristine
+CFAR,,"Leukemia, lymphoma",,,,,Fludarabine;Alemtuzumab;Rituximab;Cyclophosphamide
+CFL,,,,,Head and Neck,PFL,Fluorouracil;Cisplatin;Leucovorin
+CFM,,,,,Breast,CNF,Fluorouracil;Cyclophosphamide;Methotrexate
+CFPT,,,,Review noted a similar regimen used in breast cancer treatment.,,,Fluorouracil;Tamoxifen;Prednisone;Cyclophosphamide
+CGI,,,,,,,Cisplatin;Ifosfamide;Gemcitabine
+CHAMOCA,,,,,,,Dactinomycin;Doxorubicin;Leucovorin;Methotrexate;Hydroxyurea;Vincristine
+CHD,,,,,,,Altretamine;Cisplatin;Cyclophosphamide
+CHD-R,,,,,,,Altretamine;Cisplatin;Cephalosporin;Cyclophosphamide
+CHF,,,,May be used in ovarian primaries,,,Fluorouracil;Altretamine;Cyclophosphamide
+CHOB,,,,,,,Doxorubicin;Cyclophosphamide;Bleomycin;Vincristine
+CHOP,,Non-Hodgkin's lymphomas,,,,,Cyclophosphamide;Doxorubicin;Vincristine;Prednisone
+CIA,,,,,,,Lomustine;Doxorubicin;Ifosfamide
+CIM,,,,,,,Mesna;Cisplatin;Ifosfamide
+CLAG,,,,,,,Cladribine;Cytarabine
+CLAG-M,,,,,,G-CLAM,Mitoxantrone;Cladribine;Cytarabine
+CMC-VAP,,,,NSCLC,,,Lomustine;Doxorubicin;Procarbazine;Methotrexate;Cyclophosphamide;Vincristine
+CMF-FLU,,,,,,,Fluorouracil;Fluoxymesterone;Methotrexate;Cyclophosphamide
+CMFH,,,,,,,Fluorouracil;Methotrexate;Cyclophosphamide;Hydroxyurea
+CMFP-VA,,,,,,CMFAVP,Fluorouracil;Doxorubicin;Methotrexate;Prednisone;Cyclophosphamide;Vincristine
+CMFPT,,,,,,,Fluorouracil;Tamoxifen;Methotrexate;Prednisone;Cyclophosphamide
+CMFPTH,,,,,,,Fluorouracil;Fluoxymesterone;Tamoxifen;Methotrexate;Prednisone;Cyclophosphamide
+CMFT,,,,,,,Fluorouracil;Tamoxifen;Methotrexate;Cyclophosphamide
+CMFVAT,,,,,,,Fluorouracil;Testosterone;Doxorubicin;Methotrexate;Cyclophosphamide;Vincristine
+CMOPP,,,,,,C-MOPP,Procarbazine;Prednisone;Cyclophosphamide;Vincristine
+CNOP,,,,,,,Mitoxantrone;Prednisone;Cyclophosphamide;Vincristine
+CODOX,,,,,,,Doxorubicin;Leucovorin;Methotrexate;Cytarabine;Cyclophosphamide;Leukine;Vincristine
+COMB,,,,,Lung;Head and Neck;Melanoma,,Semustine;Cyclophosphamide;Bleomycin;Vincristine
+COMET-A,,,,,,,Etoposide;Leucovorin;Methotrexate;Cytarabine;Cyclophosphamide;Vincristine
+COMLA,,,,,,,Leucovorin;Methotrexate;Cytarabine;Cyclophosphamide;Vincristine
+COPADM,,,,,,,Doxorubicin;Leucovorin;Methotrexate;Prednisone;Cyclophosphamide;Vincristine
+COPP,,,,,,,Procarbazine;Prednisone;Vincristine;Cyclophosphamide
+CPR,,Multiple myeloma,,First-line triplet for multiple myeloma,,,Cyclophosphamide;Prednisone;Lenalidomide
+CRd,,Multiple myeloma,,"First-line triplet for multiple myeloma
+CRd: Cyclophosphamide, Revlimid (Lenalidomide), low-dose dexamethasone
+Rdc: Revlimid (Lenalidomide), low-dose dexamethasone, low-dose cyclophosphamide",,Rdc,Cyclophosphamide;Lenalidomide;Dexamethasone
+CTCb,,,,,,,Thiotepa;Cyclophosphamide;Carboplatin
+CTD,,Multiple myeloma,,"First-line triplet for multiple myeloma
+Variants: 
+CTD: Cyclophosphamide, Thalidomide, Dexamethasone
+CTDa: Cyclophosphamide, Thalidomide, Dexamethasone, attenuated
+Tdc: Thalidomide, low-dose dexamethasone, low-dose cyclophosphamide",,,Cyclophosphamide;Thalidomide;Dexamethasone
+CTX-Plat,,,,,,,Cisplatin;Cyclophosphamide
+CVA-BMP,,,,,,,Doxorubicin;Procarbazine;Methotrexate;Cyclophosphamide;Vincristine;Carmustine
+CVAD,,,,,,CHOD,Dexamethasone;Doxorubicin;Cyclophosphamide;Vincristine
+CVB,,,,,,,Lomustine;Bleomycin;Vinblastine
+CVBD,,,,,,CBVD,Dexamethasone;Lomustine;Bleomycin;Vinblastine
+CVDD,,,,,,,Dexamethasone;Doxorubicin;Cyclophosphamide;Bortezomib
+CVEB,,,,,,,Etoposide;Cisplatin;Bleomycin;Vinblastine
+CVI,,,,,,,Mesna;Ifosfamide;Carboplatin
+CVP-BLEO,,,,,,COP-BLEO;CPOB;COPB,Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+CYCLONE,,,,,,,Carfilzomib;Thalidomide;Dexamethasone;Cyclophosphamide
+CYVE,,,,,,,Etoposide;Cytarabine
+CarbF,,,,,,,Fluorouracil;Carboplatin
+ChlVPP,,,,,,CIVPP,Chlorambucil;Procarbazine;Prednisone;Vinblastine
+CyBor-D,,,,,,,Dexamethasone;Cyclophosphamide;Bortezomib
+CyVADIC,,,,,,CyVMAD,Dacarbazine;Doxorubicin;Methotrexate;Cyclophosphamide;Vincristine
+Cyta BOM,,,,,,,Leucovorin;Methotrexate;Vincristine
+CytaBOM,,,,,,,Mechlorethamine;Cytarabine;Bleomycin;Vincristine
+D-PACE,,,,,,,Etoposide;Dexamethasone;Doxorubicin;Cisplatin;Cyclophosphamide
+DAP,,,,,,,Dianhydrodulcitol;Doxorubicin;Cisplatin
+DAP/TMP,,,,,,,Trimethoprim;Dapsone
+DATE,,,,,,,Etoposide;Topotecan;Daunorubicin Hydrochloride;Cytarabine
+DATVP,,,,,,,Thioguanine;Daunorubicin Hydrochloride;Cytarabine;Prednisone;Vincristine
+DAV,,,,,,,Dibromodulcitol;Doxorubicin;Vincristine
+DAVH,,,,,,,Fluoxymesterone;Dibromodulcitol;Doxorubicin;Vincristine
+DBV,,,,,,BVD,Dacarbazine;Vincristine;Carmustine
+DCCMP,,,,,,,Daunorubicin Hydrochloride;Mercaptopurine;Prednisone;Cyclocytidine (HCl)
+DCEP,,,,,,CDEP,Etoposide;Dexamethasone;Cisplatin;Cyclophosphamide
+DCEP-T,,,,,,,Etoposide;Thalidomide;Dexamethasone;Cisplatin;Cyclophosphamide
+DCMP,,,,,,,Daunorubicin Hydrochloride;Mercaptopurine;Cytarabine;Prednisone
+DCV,,,,,,,Dacarbazine;Lomustine;Vincristine
+DDP-CHAD,,,,,,CHAD;H-CAP;CHAP,Altretamine;Doxorubicin;Cisplatin;Cyclophosphamide
+DDP-MECY,,,,,,,Cisplatin;Leucovorin;Methotrexate;Cyclophosphamide
+DECA,,,,,,EDAP,Etoposide;Dexamethasone;Cisplatin;Cytarabine
+DECAL,,,,,,,Etoposide;Dexamethasone;Asparaginase;Cisplatin;Cytarabine
+DFV,,,,,,CF;Wayne State protocol;PF;FUP,Fluorouracil;Cisplatin
+DHAP,,,,,,,Dexamethasone;Cisplatin;Cytarabine
+DOAP,,,,,,,Daunorubicin Hydrochloride;Cytarabine;Prednisone;Vincristine
+DT-PACE,,,,,,,Etoposide;Thalidomide;Dexamethasone;Doxorubicin;Cisplatin;Cyclophosphamide
+DTIC+BCNU+Cisplatin,,,,,,,Dacarbazine;Cisplatin;Carmustine
+DTIC-ACTD,,,,,,,Dactinomycin;Dacarbazine
+DVB,,,,,,,Cisplatin;Bleomycin;Vindesine
+DVBE,,,,,,ABVE,Etoposide;Doxorubicin;Bleomycin;Vincristine
+DVBE-PC,,,,,,ABVE-PC,Etoposide;Doxorubicin;Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+DVD,,,,,,,Dexamethasone;Vincristine
+DVM,,,,,,,Mitoguazone;Cisplatin;Vindesine
+DVP,,,,,,VDP,Daunorubicin Hydrochloride;Prednisone;Vincristine
+DVd-R,,,,,,,Dexamethasone;Lenalidomide;Vincristine
+DZAPO,,,,,,,Azacitidine;Daunorubicin Hydrochloride;Cytarabine;Prednisone;Vincristine
+Dartmouth regimen,,,,,,,Tamoxifen;Dacarbazine;Cisplatin;Carmustine
+Dexa-BEAM,,,,,,,Etoposide;Dexamethasone;Melphalan;Cytarabine;Carmustine
+E-CMF,,,,,,,Epirubicin;Fluorouracil;Methotrexate;Cyclophosphamide
+E-MVAC,,,,,,,Doxorubicin;Methotrexate;Cyclophosphamide;Vinblastine
+EBAP,,,,,,,Doxorubicin;Prednisone;Vindesine;Carmustine
+ECF,,,,,,,Epirubicin;Fluorouracil;Cisplatin
+ECHO,,,,,,VOCA;CAVV,Etoposide;Doxorubicin;Cyclophosphamide;Vincristine
+ECMV,,,,,,,Etoposide;Doxorubicin;Methotrexate;Vincristine
+ECOG,,,,,,,Vidaza;Gemcitabine
+ECX,,,,,,,Epirubicin;Cisplatin;Capecitabine
+EFP,,,,,,FED,Etoposide;Fluorouracil;Cisplatin
+ELF,,,,,,,Etoposide;Fluorouracil;Leucovorin
+EMACO,,,,,,,Etoposide;Dactinomycin;Methotrexate;Cyclophosphamide;Vincristine
+EOF,,,,,,,Epirubicin;Fluorouracil;Oxaliplatin
+EOX,,,,,,,Epirubicin;Oxaliplatin;Capecitabine
+EPOCH,,,,,,CHOPE,Etoposide;Prednisone;Cyclophosphamide;Vincristine;Doxorubicin
+EPOCH-R,,,,,,,Etoposide;Doxorubicin;Rituximab;Prednisone;Cyclophosphamide;Vincristine
+ESHAP,,,,,,,Etoposide;Methylprednisolone;Cisplatin;Cytarabine
+ET,,,,,,,Epirubicin;Docetaxel
+EVA,,,,,,,Etoposide;Doxorubicin;Vinblastine
+EVAP,,,,,,,Etoposide;Doxorubicin;Prednisolone;Vinblastine
+FA,,,,,,AF,Fluorouracil;Doxorubicin
+FAC-BCG,,,,,,,Tegafur;BCG;Doxorubicin;Cyclophosphamide
+FAC-LEV,,,,,,,Fluorouracil;Levamisole;Doxorubicin;Cyclophosphamide
+FACS,,,,,,,Fluorouracil;Streptozocin;Doxorubicin;Cyclophosphamide
+FACVP,,,,,,,Etoposide;Fluorouracil;Doxorubicin;Cyclophosphamide
+FAM-CF,,,,,,,Mitomycin;Fluorouracil;Doxorubicin;Leucovorin
+FAM-S,,,,,,,Mitomycin;Fluorouracil;Streptozocin;Doxorubicin
+FAMMe,,,,,,,Mitomycin;Fluorouracil;Doxorubicin;Semustine
+FAMTX,,,,,,AFM,Fluorouracil;Doxorubicin;Methotrexate
+FAP,,,,,,PAF,Fluorouracil;Doxorubicin;Cisplatin
+FC,,,,,,,Fludarabine;Cyclophosphamide
+FCAP,,,,,,,Fluorouracil;Doxorubicin;Cisplatin;Cyclophosphamide
+FCT,,,,,,,Fludarabine;Topotecan;Cyclophosphamide
+FIMe,,,,,,,Fluorouracil;Semustine;Razoxane
+FL,,,,,,,Flutamide;Leuprolide Acetate
+FLAG,,,,,,,Fludarabine;Meg-CSF;Cytarabine
+FLAG-Ida,,,,,,,Fludarabine;Meg-CSF;Idarubicin;Cytarabine
+FLAP,,,,,,,Fluorouracil;Doxorubicin;Cisplatin;Leucovorin
+FLOT,,,,,Gastric-esophageal;Gastric,,Fluorouracil;Oxaliplatin;Docetaxel;Leucovorin
+FND,,,,,,,Mitoxantrone;Fludarabine;Dexamethasone
+FNM,,,,,,,Mitoxantrone;Fluorouracil;Methotrexate
+FOAM,,,,,,,Mitomycin;Fluorouracil;Doxorubicin;Vincristine
+FOLFIRI,,,,,,,Zaltrap;Fluorouracil;Leucovorin;Irinotecan
+FOLFIRINOX,,,,,,FOIL,Fluorouracil;Leucovorin;Oxaliplatin;Irinotecan
+FOLFOX,,,,,,FLO;FLOX;FOLFOX4;OFF;FOLFOX6;FOLFOX7,Fluorouracil;Leucovorin;Oxaliplatin
+FOLFOXIRI,,,,,,,Fluorouracil;Oxaliplatin;Irinotecan
+FP,,,,,,,Fludarabine;Prednisone
+FR,,,,,,,Fludarabine;Rituximab
+FURAM,,,,,,,Mitomycin;Tegafur;Doxorubicin
+FUVAC,,,,,,,Fluorouracil;Doxorubicin;Cyclophosphamide;Vinblastine
+FZ,,,,,,,Flutamide;Zoladex
+Fluosol/BCNU,,,,,,,Gentamicin;Carmustine
+GCP,,,,,,,Gemcitabine;Paclitaxel;Carboplatin
+GEM-CAP,,,,,,,Gemcitabine;Capecitabine
+GEMOX-B,,,,,,,Bevacizumab;Gemcitabine;Oxaliplatin
+GTP,,,,,,,Cisplatin;Gemcitabine;Paclitaxel
+GTX,,,,,,,Docetaxel;Gemcitabine;Capecitabine
+GVD,,,,,,,"Doxorubicin, liposome-encapsulated;Gemcitabine;Vinorelbine"
+GemCis,,,,,,,Cisplatin;Gemcitabine
+GemIri,,,,,,,Gemcitabine;Irinotecan
+GemOx,,,,,,,Gemcitabine;Oxaliplatin
+HAD,,,,,,,Altretamine;Doxorubicin;Cisplatin
+HAMP,,,,,,,Altretamine;Doxorubicin;Cisplatin;Methotrexate
+HEXA-CAF,,,,,,,Floxuridine;Altretamine;Methotrexate;Cyclophosphamide
+HI-CDAZE,,,,,,,Etoposide;Azacitidine;Daunorubicin Hydrochloride;Cytarabine
+HOAP-BLEO,,,,,,,Doxorubicin;Cytarabine;Prednisone;Bleomycin;Vincristine
+HOP,,,,,,OPA;APO;AdOP;AdOAP,Doxorubicin;Prednisone;Vincristine
+Hexa-CAF,,,,,,,Fluorouracil;Altretamine;Methotrexate;Cyclophosphamide
+HiC-COM,,,,,,,Elliott's B Solution;Allopurinol;Leucovorin;Methotrexate;Cytarabine;Cyclophosphamide;Vincristine
+HiDAC,,,,,,HDAC;HDARA-C,Cytarabine
+Hyper-CVAD,,,,,,,Dexamethasone;Doxorubicin;Mesna;Cyclophosphamide;Vincristine
+ICE,,,,,,MICE,Etoposide;Mesna;Ifosfamide;Carboplatin
+ICE-V,,,,,,,Etoposide;Mesna;Ifosfamide;Vincristine;Carboplatin
+ID,,,,,,DI,Doxorubicin;Ifosfamide
+IDMTX,,,,,,HMTX;HDMTX,Methotrexate
+IE,,,,,,,Etoposide;Ifosfamide
+IFL,,,,,,Saltz regimen;mIFL;Douillard regimen;deGramont regimen;FLOFIRI;LV5FU-P;AIO,Fluorouracil;Leucovorin;Irinotecan
+IFN+DTIC,,,,,,,Dacarbazine;Interferon
+IFoVP,,,,,,,Etoposide;Mesna;Ifosfamide
+IMF,,,,,,,Fluorouracil;Mesna;Ifosfamide;Methotrexate
+IMVP-16,,,,,,,Etoposide;Ifosfamide;Methotrexate
+IP,,,,,,,Cisplatin;Irinotecan
+IPB,,,,,,,Bevacizumab;Cisplatin;Irinotecan
+IROX,,,,,,,Oxaliplatin;Irinotecan
+IVAC,,,,,,,Etoposide;Mesna;Ifosfamide;Methotrexate;Cytarabine;Leukine
+JEB,,,,,,CEB,Etoposide;Bleomycin;Carboplatin
+KAVE,,,,,,,Estramustine Phosphate Sodium;Doxorubicin;Ketoconazole;Vinblastine
+KGC,,,,,,,Carbenicillin;Total body irradiation;Ultraviolet A
+KRd,,Multiple myeloma,,"July 2020 KRd - carfilzomib (Kyprolis) -- chemotherapy, lenalidomide (Revlimid) -- BRM, and dexamethasone -- hormone is a new treatment for newly treated patients with standard- and intermediate-risk multiple myeloma who are not slated for immediate autologous stem cell transplantation (ASCT). 
+   
+8/12/2025 update: code all three agents",,KRD,Carfilzomib;Lenalidomide;Dexamethasone
+L-CF,,,,,,,Leucovorin
+L-VAM,,,,,,,Mitomycin;Leuprolide Acetate;Doxorubicin;Vinblastine
+LAM,,,,,,,Asparaginase;Methotrexate
+LAMPP,,,,,,,"Asparaginase;Doxorubicin, liposome-encapsulated;Methotrexate;Prednisone"
+LAPOCA,,,,,,,Asparaginase;Doxorubicin;Cytarabine;Prednisone;Vincristine
+LEV,,,,,,FLe,Fluorouracil;Levamisole
+LMF,,,,,,,Fluorouracil;Chlorambucil;Methotrexate
+LOMAC,,,,,,,Doxorubicin;Leucovorin;Methotrexate;Cyclophosphamide;Vincristine
+LSA2-L2,,,,,,,Thioguanine;Daunorubicin Hydrochloride;Asparaginase;Methotrexate;Cytarabine;Prednisone;Cyclophosphamide;Hydroxyurea;Vincristine;Carmustine
+LV5FU2,,,,,,LV;Roswell Park Cancer Institute Regimen;F-CL,Fluorouracil;Leucovorin
+LVVP,,,,,,,Chlorambucil;Prednisone;Vincristine;Vinblastine
+Larson Regimen (245),,,,,,,Daunorubicin Hydrochloride;Asparaginase;Prednisone;Cyclophosphamide;Vincristine
+Linker Regimen induction,,,,,,DVPL-ASP;PVDA,Daunorubicin Hydrochloride;Asparaginase;Prednisone;Vincristine
+Linker Regimen maintenance,,,,,,MM;MTX/6-MP;MTX + MP,Mercaptopurine;Methotrexate
+M-BACOD,,,,,,,Dexamethasone;Doxorubicin;Methotrexate;Cyclophosphamide;Bleomycin;Vincristine
+M-BACOS,,,,,,,Methylprednisolone Sodium Succinate;Doxorubicin;Methotrexate;Cyclophosphamide;Bleomycin;Vincristine
+M-BAM,,,,,,,Alemtuzumab;Therasphere;Cyclophosphamide
+M2,,,,,,VBMCP,Melphalan;Prednisone;Cyclophosphamide;Vincristine;Carmustine
+MABOP,,,,,,,Mechlorethamine;Doxorubicin;Prednisone;Bleomycin;Vincristine
+MACC,,,,,,CCMA,Lomustine;Doxorubicin;Methotrexate;Cyclophosphamide
+MACE,,,,,,,Etoposide;Doxorubicin;Methotrexate;Cyclophosphamide
+MACHO,,,,,,,Asparaginase;Doxorubicin;Methotrexate;Cyclophosphamide;Vincristine
+MACOP-B,,,,,,COMBAP,Doxorubicin;Methotrexate;Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+MAD,,,,,,,Doxorubicin;Semustine
+MADDOC,,,,,,,Dacarbazine;Mechlorethamine;Doxorubicin;Cisplatin;Cyclophosphamide;Vincristine
+MAZE,,,,,,,Etoposide;Azacitidine
+MBC,,,,,,MBD;MBP;PMB,Cisplatin;Methotrexate;Bleomycin
+MC,,,,,,,Mitoxantrone;Cytarabine
+MCBP,,,,,,,Melphalan;Prednisone;Cyclophosphamide;Carmustine
+MCF,,,,,,,Mitomycin;Fluorouracil;Cisplatin
+MCP,,,,,,,Melphalan;Prednisone;Cyclophosphamide
+MCV,,,,,,CMV,Cisplatin;Methotrexate;Vinblastine
+MDLO,,,,,,,Metoclopramide;Dexamethasone;Lorazepam;Ondansetron
+MEC,,,,,,EMA-86,Mitoxantrone;Etoposide;Cytarabine
+MECY,,,,,,,Methotrexate;Cyclophosphamide
+MFL,,,,,,,Fluorouracil;Leucovorin;Methotrexate
+MFP,,,,,,,Fluorouracil;Melphalan;Medroxyprogesterone Acetate
+MIFA,,,,,,FAM,Mitomycin;Fluorouracil;Doxorubicin
+MINE,,,,,,,Mitoxantrone;Etoposide;Mesna;Ifosfamide
+MINE-ESHAP,,,,,,,Mitoxantrone;Etoposide;Methylprednisolone;Mesna;Cisplatin;Ifosfamide;Cytarabine
+MMOPP,,,,,,,Mechlorethamine;Procarbazine;Methotrexate;Prednisone;Vincristine
+MMV,,,,,,,Mitomycin;Methotrexate;Vincristine
+MOAD,,,,,,,Dexamethasone;Asparaginase;Methotrexate;Vincristine
+MOAP,,,,,,,Methotrexate;Prednisone;Pegaspargase;Vincristine
+MOB,,,,,,,Mechlorethamine;Bleomycin;Vincristine
+MOBP,,,,,,MOB-III,Mitomycin;Cisplatin;Bleomycin;Vincristine
+MOCA,,,,,,CODOX-M,Doxorubicin;Methotrexate;Cyclophosphamide;Vincristine
+MOF-S,,,,,,,Fluorouracil;Streptozocin;Semustine;Vincristine
+MOMP,,,,,,,Mechlorethamine;Methotrexate;Prednisone;Vincristine
+MOP-BAP,,,,,,,Mechlorethamine;Doxorubicin;Procarbazine;Prednisone;Bleomycin;Vincristine
+MOPP-ABV,,,,,,,Mechlorethamine;Doxorubicin;Procarbazine;Prednisone;Bleomycin;Vincristine;Vinblastine
+MOPP-ABVD,,,,,,,Dacarbazine;Mechlorethamine;Doxorubicin;Procarbazine;Prednisone;Bleomycin;Vincristine;Vinblastine
+MOPPLDB,,,,,,MOPPHDB;MOPP-LO BLEO;BLEO-MOPP;B-MOPP,Mechlorethamine;Procarbazine;Prednisone;Bleomycin;Vincristine
+MP,,,,,,MPL + PRED,Melphalan;Prednisone
+MPFL,,,,,,,Fluorouracil;Cisplatin;Leucovorin;Methotrexate
+MPT,,,,,,,Thalidomide;Melphalan;Prednisone
+MPV,,,,,,,Procarbazine;Leucovorin;Methotrexate
+MTX-CDDPAdr,,,,,,,Doxorubicin;Cisplatin;Leucovorin;Methotrexate
+MTX-CF,,,,,,HDMTX/LV;HDMTX-CF,Leucovorin;Methotrexate
+MV,,,,,,,Mitoxantrone;Etoposide
+MVAC,,,,,,EVMAC;HD-VAC,Doxorubicin;Cisplatin;Methotrexate;Vinblastine
+MVF,,,,,,,Mitoxantrone;Fluorouracil;Vincristine
+MVP,,,,,,,Mitomycin;Cisplatin;Vinblastine
+MVPP,,,,,,,Mechlorethamine;Procarbazine;Prednisone;Vinblastine
+MVT,,,,,,,Mitoxantrone;Etoposide;Thiotepa
+MVVPP,,,,,,,Mechlorethamine;Procarbazine;Prednisone;Vincristine;Vinblastine
+Machover regimen,,,,,,Mayo regimen,Fluorouracil;L-Leucovorin
+Magrath Protocol,,,,,,,Doxorubicin;Leucovorin;Methotrexate;Cytarabine;Prednisone;Cyclophosphamide;Vincristine
+MeFA,,,,,,FAM-C;FAME,Fluorouracil;Doxorubicin;Semustine
+Mito-FLAG,,,,,,,Mitoxantrone;Fludarabine;Meg-CSF;Cytarabine
+NA,,,,,,,Doxorubicin;Vinorelbine
+NAC,,,,,,,Lomustine;Mechlorethamine;Doxorubicin
+NALIRIFOX,,,,,,,Fluorouracil;Leucovorin;Irinotecan;Oxaliplatin
+NFL,,,,,,,Mitoxantrone;Fluorouracil;Leucovorin
+NOVP,,,,,,,Mitoxantrone;Prednisone;Vincristine;Vinblastine
+O-DAP,,,,,,,Dianhydrodulcitol;Doxorubicin;Cisplatin;Vincristine
+OAP,,,,,,,Cytarabine;Prednisone;Vincristine
+OAP-BLEO,,,,,,,Cytarabine;Prednisone;Bleomycin;Vincristine
+OEPA,,,,,,AOPE,Etoposide;Doxorubicin;Prednisone;Vincristine
+OPEN,,,,,,,Mitoxantrone;Etoposide;Prednisone;Vincristine
+OPP,,,,,,,Procarbazine;Prednisone;Vincristine
+OPPA,,,,,,,Doxorubicin;Procarbazine;Prednisone;Vincristine
+Opdivo + cisplatin + gemcitabine,,,,"March 8, 2024 The FDA approved Opdivo (nivolumab) in combination with cisplatin and gemcitabine for first-line treatment of adult patients with unresectable or metastatic urothelial carcinoma.",Bladder,,Nivolumab;Cisplatin;Gemcitabine
+P-MVAC,,,,,,,Doxorubicin;Cisplatin;Methotrexate;Vinblastine;Carboplatin
+PAB-Esc-C,,,,,,,Doxorubicin;Cisplatin;Cyclophosphamide;Bleomycin
+PATCO,,,,,,,Thioguanine;Cytarabine;Prednisone;Cyclophosphamide;Vincristine
+PAVe,,,,,,,Melphalan;Procarbazine;Vinblastine
+PBM,,,,,,,Cisplatin;Leucovorin;Methotrexate;Bleomycin
+PCE,,,,,,,Cisplatin;Cyclophosphamide;Vindesine
+PCR,,,,,,,Rituximab;Cyclophosphamide;Pentostatin
+PEBA,,,,,,,Etoposide;Doxorubicin;Cisplatin;Bleomycin
+PELF,,,,,,,Epirubicin;Fluorouracil;Cisplatin;Leucovorin;Filgrastim
+PEP,,,,,,,Etoposide;Cyclophosphamide;Prednisolone
+PET,,,,,,,Etoposide;Cisplatin;Paclitaxel
+PF + E,,,,,,,Etoposide;Fluorouracil;Cisplatin;Leucovorin;Methotrexate
+PFM,,,,,,,Fluorouracil;Cisplatin;Methotrexate
+PFT,,,,,,,Fluorouracil;Tamoxifen;Melphalan
+PHRT,,,,,,,Procarbazine;Cephalosporin;Hydroxyurea
+PIA,,,,,,,Doxorubicin;Cisplatin;Ifosfamide
+PIE,,,,,,,Etoposide;Cisplatin;Ifosfamide
+PM,,,,,,,Cisplatin;Methotrexate
+PMF,,,,,,,Fluorouracil;Melphalan;Methotrexate
+PMFAC,,,,,,,Fluorouracil;Doxorubicin;Methotrexate;Prednisone;Cyclophosphamide
+POC,,,,,,PCV,Lomustine;Procarbazine;Vincristine
+POCA,,,,,,,Doxorubicin;Cytarabine;Prednisone;Vincristine
+POCC,,,,,,,Lomustine;Procarbazine;Cyclophosphamide;Vincristine
+POMB,,,,,,,Cisplatin;Methotrexate;Bleomycin;Vincristine
+PRH-E,,,,,,,Etanidazole;Cisplatin
+PRIME,,,,,,,Ifosfamide;Procarbazine;Methotrexate
+PUVA,,,,,,,Psoralen;Abraxane
+Pan-TPF,,,,,,,Fluorouracil;Docetaxel;Panitumumab;Cisplatin
+Phesgo,,,,"6/29/2020 The FDA approved Phesgo—a combination of pertuzumab, trastuzumab and hyaluronidase–zzxf—for injection under the skin to treat adult patients with HER2-positive breast cancer that has spread to other parts of the body, and for treatment of adult patients with early HER2-positive breast cancer. Patients should be selected based on an FDA-approved companion diagnostic test.
+
+Note: Pertuzumab and trastuzumab are immunotherapy while hyaluronidase-zzxf is an ancillary drug.  Code this regimen as BRM/Immunotherapy.",Breast,,Pertuzumab;Ado-trastuzumab emtansine
+ProMACE,,,,,,CAVPM,Etoposide;Doxorubicin;Methotrexate;Prednisone;Cyclophosphamide
+ProMACE-CytaBOM,,,,,,,Etoposide;Doxorubicin;Methotrexate;Cytarabine;Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+ProMACE-MOPP,,,,,,,Etoposide;Mechlorethamine;Doxorubicin;Procarbazine;Leucovorin;Methotrexate;Prednisone;Cyclophosphamide;Vincristine
+R-CHOP,,,,,,CHOP + R,Doxorubicin;Rituximab;Prednisone;Cyclophosphamide;Vincristine
+R-CVP,,,,,,,Rituximab;Cyclophosphamide;Prednisolone;Vincristine
+R-DHAP,,,,,,,Dexamethasone;Rituximab;Cisplatin;Cytarabine
+R-DHAX,,Lymphoma,,,,,Rituximab;Dexamethasone;Cytarabine;Oxaliplatin
+R-FCM,,,,,,FCR,Fludarabine;Rituximab;Cyclophosphamide
+R-GemOx,,,,,,GROC,Rituximab;Gemcitabine;Oxaliplatin
+R-HiDAC,,Mantle cell lymphoma,,,,,Cytarabine;Rituximab
+R-HyperCVAD,,,,,,Hyper-CVAD + R,Dexamethasone;Doxorubicin;Rituximab;Mesna;Cyclophosphamide;Vincristine
+R-MPV,,,,,,,Rituximab;Procarbazine;Leucovorin;Methotrexate;Vincristine
+RICE,,,,,,,Etoposide;Rituximab;Ifosfamide;Carboplatin
+RIDD,,,,,,,Dacarbazine;Liposome encapsulated recombinant interleukin-2;Cisplatin
+ROAP,,,,,,,Zorubicin;Cytarabine;Prednisone;Vincristine
+RTOG Chemoradiation,,,,,,,Fluorouracil;Vidaza;Gemcitabine
+RVD,,,,,,,Dexamethasone;Lenalidomide;Bortezomib
+SAM,,,,,,,Streptozocin;Doxorubicin;Semustine
+SCAB,,,,,,CABS,Lomustine;Streptozocin;Doxorubicin;Bleomycin
+SIMAL-bone marrow transplant,,,,,,,Methotrexate;Cytarabine;Prednisone
+SIMAL-pilot,,,,,,,Etoposide;Mesna;Leucovorin;Cytarabine;Prednisone;Hydrocortisone
+SIMAL-second induction/maintenance,,,,,,,Etoposide;Teniposide;Daunorubicin Hydrochloride;Asparaginase;Leucovorin;Methotrexate;Cytarabine;Prednisone
+SK,,,,,,Memorial Sloan-Kettering protocol,Dactinomycin;Doxorubicin;Cisplatin;Methotrexate;Cyclophosphamide;Bleomycin
+SMF,,,,,,FMS,Mitomycin;Fluorouracil;Streptozocin
+SMILE,,,,,"Extranodal natural killer/T-cell lymphoma, nasal type (ENKL)",,Etoposide;Dexamethasone;Asparaginase;Ifosfamide;Methotrexate
+STEAM,,,,,,,Mitomycin;Thioguanine;Dactinomycin;Streptonigrin;Cyclophosphamide
+SWOG CMFVP,,,,,,VPCMF;Cooper CMFVP;CMFVP,Fluorouracil;Methotrexate;Prednisone;Cyclophosphamide;Vincristine
+Stanford V,,,,,,,Etoposide;Mechlorethamine;Doxorubicin;Prednisone;Bleomycin;Vincristine;Vinblastine
+T-10 protocol,,,,,,,Dactinomycin;Doxorubicin;Cisplatin;Leucovorin;Methotrexate;Cyclophosphamide;Bleomycin
+T-2 protocol,,,,,,,Dactinomycin;Doxorubicin;Vidaza;Cyclophosphamide;Vincristine
+T-CAP,,,,,,,Baker's antifol;Doxorubicin;Cisplatin;Cyclophosphamide
+T-CID,,,,,,,Thalidomide;Dexamethasone;Idarubicin;Cyclophosphamide
+T-MOP,,,,,,,Thioguanine;Methotrexate;Prednisone;Vincristine
+TAC,,,,,,,Docetaxel;Doxorubicin;Cyclophosphamide
+TAD,,,,,,DCT;DAT,Thioguanine;Daunorubicin Hydrochloride;Cytarabine
+TAXOL/CBDCA,,,,,,CBDCA,Vincristine;Paclitaxel;Carboplatin
+TBP,,,,,,,Thiotepa;Prednisone;Bleomycin
+TCHP,,,,,Breast,,Docetaxel;Carboplatin;Trastuzumab;Pertuzumab
+TEE,,,,,,,Estramustine Phosphate Sodium;Etoposide;Paclitaxel
+TEMP,,,,,,,Mitoxantrone;Etoposide;Tamoxifen;Cisplatin
+THP,,,,THP is a chemotherapy regimen used to treat HER2-positive breast cancer.,Breast,,Docetaxel;Trastuzumab;Pertuzumab
+TIC,,,,,,,Mesna;Ifosfamide;Paclitaxel;Carboplatin
+TIP,,,,,,ITP,Mesna;Cisplatin;Ifosfamide;Paclitaxel
+TIT,,,,,,,Methotrexate;Cytarabine;Hydrocortisone
+TOAP,,,,,,,Thioguanine;Cytarabine;Prednisone;Vincristine
+TPCH,,,,,,,Thioguanine;Lomustine;Procarbazine;Hydroxyurea
+TPDC-FUHU,,,,,,,Fluorouracil;Thioguanine;Lomustine;Dibromodulcitol;Procarbazine;Hydroxyurea
+TPDCV,,,,,,,Thioguanine;Lomustine;Dibromodulcitol;Procarbazine;Vincristine
+TPF,,,,,,DCF,Fluorouracil;Docetaxel;Cisplatin
+TRAP,,,,,,,Thioguanine;Daunorubicin Hydrochloride;Cytarabine;Prednisone
+TT-R,,,,,,,Topotecan;Rituximab;Paclitaxel
+Tam Exemestane,,,,,,,Tamoxifen;Exemestane
+Tam Letrozole,,,,,,,Tamoxifen;Letrozole
+Temozolomide + CRA,,,,,,,Temozolomide;Accutane
+UFT,,,,,,,Tegafur
+VAAP,,,,,,,Asparaginase;Doxorubicin;Prednisone;Vincristine
+VAB 1,,,,,,,Dactinomycin;Bleomycin;Vinblastine
+VAB 2,,,,,,,Dactinomycin;Cisplatin;Bleomycin;Vinblastine
+VAB 3,,,,,,,Dactinomycin;Cisplatin;Chlorambucil;Cyclophosphamide;Bleomycin;Vinblastine
+VAB-V,,,,,,VAB-VI;VAB 4;VAB 5;VAB 6,Dactinomycin;Cisplatin;Cyclophosphamide;Bleomycin;Vinblastine
+VABCD,,,,,,,Dacarbazine;Lomustine;Doxorubicin;Bleomycin;Vinblastine
+VACA,,,,,,CyVADACT,Dactinomycin;Doxorubicin;Cyclophosphamide;Vincristine
+VACAD,,,,,,,Dactinomycin;Dacarbazine;Doxorubicin;Cyclophosphamide;Vincristine
+VAD,,,,,,,Dexamethasone;Doxorubicin;Vincristine
+VAD/V,,,,,,,Dexamethasone;Doxorubicin;Verapamil;Vincristine
+VAFAC,,,,,,CMF-AV,Fluorouracil;Doxorubicin;Methotrexate;Cyclophosphamide;Vincristine
+VAI,,,,,,,Dactinomycin;Ifosfamide;Vincristine
+VAM,,,,,,,Etoposide;Doxorubicin;Methotrexate
+VAP-II,,,,,,,Dactinomycin;Cisplatin;Vinblastine
+VATD,,,,,,,Thioguanine;Daunorubicin Hydrochloride;Cytarabine;Vincristine
+VATH,,,,,,,Fluoxymesterone;Thiotepa;Doxorubicin;Vinblastine
+VAV,,,,,,,Etoposide;Doxorubicin;Vincristine
+VB,,,,,,,Bleomycin;Vinblastine
+VBA,,,,,,,Doxorubicin;Vincristine;Carmustine
+VBAP,,,,,,BVAP,Doxorubicin;Prednisone;Vincristine;Carmustine
+VBMF,,,,,,,Fluorouracil;Methotrexate;Bleomycin;Vincristine
+VC,,,,,,PE,Etoposide;Carboplatin
+VCF,,,,,,,Fluorouracil;Cyclophosphamide;Vincristine
+VCMP,,,,,,VMCP,Melphalan;Prednisone;Cyclophosphamide;Vincristine
+VDD,,,,,,PAD,Dexamethasone;Doxorubicin;Bortezomib
+VDT,,,,,,VTD,Thalidomide;Dexamethasone;Bortezomib
+VDT-PACE,,,,,,VTD-PACE,Etoposide;Thalidomide;Dexamethasone;Doxorubicin;Cisplatin;Cyclophosphamide;Bortezomib
+VEMP,,,,,,,Ethyl-6-Mercaptopurine;Prednisone;Cyclophosphamide;Vincristine
+VIE,,,,,,,Etoposide;Ifosfamide;Vincristine
+VIP-B,,,,,,,Etoposide;Cisplatin;Ifosfamide;Bleomycin
+VM,,,,,,,Melphalan;Vincristine
+VM-26PP,,,,,,,Teniposide;Procarbazine;Prednisone
+VMAD,,,,,,OMAD,Dactinomycin;Doxorubicin;Methotrexate;Vincristine
+VMC,,,,,,,Etoposide;Leucovorin;Methotrexate
+VMPT,,,,,,,Thalidomide;Melphalan;Prednisone;Bortezomib
+VNCOP-B,,,,,,,Mitoxantrone;Etoposide;Prednisone;Cyclophosphamide;Bleomycin;Vincristine
+VOCAP,,,,,,CAV/EP,Etoposide;Doxorubicin;Cisplatin;Cyclophosphamide;Vincristine
+VP/CY,,,,,,CE,Etoposide;Cyclophosphamide
+VPBCPr,,,,,,VPVCP,Chlorambucil;Procarbazine;Prednisone;Vincristine;Vinblastine
+VPP,,,,,,,Cisplatin
+VPV,,,,,,,Etoposide;Cisplatin;Vinblastine
+VTEPA,,,,,,,Etoposide;Cisplatin;Paclitaxel;Vinorelbine
+ara-C + DNR + PRED + MP,,,,,,,Daunorubicin Hydrochloride;Mercaptopurine;Cytarabine;Prednisolone
+ara-C-HU,,,,,,,Hydroxyurea
+ara-C/MTX,,,,,,,Methotrexate;Cytarabine;Filgrastim
+mini-BEAM,,,,,,BEAM,Etoposide;Melphalan;Cytarabine;Carmustine
+super-CM regimen,,,,,,CM-5-FU;CMF,Fluorouracil;Methotrexate;Cyclophosphamide

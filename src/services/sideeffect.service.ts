@@ -66,7 +66,8 @@ export async function updateSideEffectStatus(
   reportId: string,
   status: 'PENDING' | 'RESOLVED',
   ctcaeGrade?: number,
-  role?: Role
+  role?: Role,
+  doseReduced?: boolean
 ) {
   if (role) await assertPermission('sideeffects', role);
 
@@ -74,7 +75,8 @@ export async function updateSideEffectStatus(
     where: { id: reportId },
     data: {
       status,
-      ...(ctcaeGrade ? { ctcaeGrade } : {})
+      ...(ctcaeGrade ? { ctcaeGrade } : {}),
+      ...(typeof doseReduced === 'boolean' ? { doseReduced } : {})
     }
   });
 }

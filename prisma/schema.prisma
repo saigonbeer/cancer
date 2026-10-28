@@ -83,6 +83,7 @@ model PatientProfile {
 
   visits             Visit[]
   sideEffectReports  SideEffectReport[]
+  doseLogs           DoseLog[]
 }
 
 model Visit {
@@ -152,16 +153,44 @@ model PrescriptionItem {
   duration       String?
   quantity       String?
   reminderTimes  String?
+  doseLogs       DoseLog[]
+}
+
+enum DoseStatus {
+  TAKEN
+  MISSED
+}
+
+model DoseLog {
+  id                 String           @id @default(cuid())
+  patientId          String
+  patient            PatientProfile   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescriptionItemId String
+  prescriptionItem   PrescriptionItem @relation(fields: [prescriptionItemId], references: [id], onDelete: Cascade)
+  scheduledAt        DateTime
+  status             DoseStatus
+  recordedAt         DateTime         @default(now())
+
+  @@unique([prescriptionItemId, scheduledAt])
 }
 
 model CatalogDrug {
-  id          String @id @default(cuid())
-  name        String @unique
-  group       String?
-  description String?
+  id             String  @id @default(cuid())
+  name           String  @unique
+  group          String?
+  subGroup       String?
+  description    String?
+  abbreviation   String?
+  alternateNames String?
+  primarySite    String?
+  histology      String?
+  note           String? // ghi chú từ NCI (Remarks)
+  evsId          String?
+  source         String? // nguồn import, ví dụ "NCI drugs.csv"
 
   interactionsA DrugInteraction[] @relation("DrugA")
   interactionsB DrugInteraction[] @relation("DrugB")
+  regimenDrugs  RegimenDrug[]
 }
 
 model DrugInteraction {
@@ -191,9 +220,45 @@ model CatalogSymptom {
 }
 
 model CatalogRegimen {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  description String?
+  id             String  @id @default(cuid())
+  name           String  @unique
+  description    String?
+  histology      String?
+  primarySite    String?
+  radiation      String?
+  alternateNames String?
+  remarks        String?
+  source         String? // nguồn import, ví dụ "NCI regimens.csv"
+
+  drugs RegimenDrug[]
+}
+
+model RegimenDrug {
+  id         String          @id @default(cuid())
+  regimenId  String
+  regimen    CatalogRegimen  @relation(fields: [regimenId], references: [id], onDelete: Cascade)
+  drugId     String
+  drug       CatalogDrug     @relation(fields: [drugId], references: [id], onDelete: Cascade)
+
+  @@unique([regimenId, drugId])
+}
+
+model CtcaeTerm {
+  id                String  @id @default(cuid())
+  lltCode           String  @unique // MedDRA LLT code
+  soc               String  // nhóm cơ quan (System Organ Class)
+  term              String
+  grade1            String?
+  grade2            String?
+  grade3            String?
+  grade4            String?
+  grade5            String?
+  definition        String?
+  navigationalNote  String?
+  changeNote        String?
+  version           String  @default("v6.0")
+
+  @@index([term])
 }
 
 model SideEffectReport {
@@ -207,6 +272,7 @@ model SideEffectReport {
   photoUrl   String?
   cycle      Int?
   status     ReportStatus @default(PENDING)
+  doseReduced Boolean     @default(false)
   note       String?
   createdAt  DateTime     @default(now())
 }

@@ -34,11 +34,11 @@ export default function DoctorSideEffectsPage() {
     loadReports();
   }, []);
 
-  async function updateStatus(reportId: string, status: string, ctcaeGrade?: number) {
+  async function updateStatus(reportId: string, status: string, ctcaeGrade?: number, doseReduced?: boolean) {
     await fetch('/api/doctor/side-effects', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reportId, status, ctcaeGrade }),
+      body: JSON.stringify({ reportId, status, ctcaeGrade, doseReduced }),
     });
     loadReports();
   }
@@ -116,11 +116,26 @@ export default function DoctorSideEffectsPage() {
                         </span>
                       </td>
                       <td style={tdStyle}>
-                        {!resolved && (
-                          <button type='button' className='addbtn' style={{ fontSize: 12, padding: '7px 14px' }} onClick={() => updateStatus(r.id, 'RESOLVED')}>
-                            Ghi xử trí
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          {!resolved && (
+                            <button type='button' className='addbtn' style={{ fontSize: 12, padding: '7px 14px' }} onClick={() => updateStatus(r.id, 'RESOLVED')}>
+                              Ghi xử trí
+                            </button>
+                          )}
+                          <button
+                            type='button'
+                            className='ghostbtn'
+                            style={{
+                              fontSize: 12, padding: '7px 14px',
+                              color: r.doseReduced ? 'var(--red)' : 'var(--ink-soft)',
+                              borderColor: r.doseReduced ? 'var(--red)' : 'var(--line)',
+                              background: r.doseReduced ? 'var(--red-tint)' : '#fff',
+                            }}
+                            onClick={() => updateStatus(r.id, r.status, undefined, !r.doseReduced)}
+                          >
+                            {r.doseReduced ? 'Đã giảm liều' : 'Giảm liều'}
                           </button>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   );

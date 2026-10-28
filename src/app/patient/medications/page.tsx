@@ -1,46 +1,89 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type Tab = 'today' | 'rx';
-type Status = 'pending' | 'taken' | 'missed';
+type DoseStatus = 'TAKEN' | 'MISSED' | null;
 
-const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString('vi-VN');
+type ActiveItem = {
+  id: string;
+  drugName: string;
+  dose: string | null;
+  unit: string | null;
+  frequency: string | null;
+  times: string[];
+  takenQuantity: number;
+  totalQuantity: number | null;
+};
 
-function activeDays(duration?: string | null): number | null {
-  const m = (duration || '').match(/(\d+)/);
-  return m ? Number(m[1]) : null;
+type TodayDose = {
+  itemId: string;
+  drugName: string;
+  dose: string;
+  time: string;
+  scheduledAt: string;
+  status: DoseStatus;
+  due: boolean;
+};
+
+type HistoryRow = { id: string; scheduledAt: string; drugName: string; status: 'TAKEN' | 'MISSED' };
+
+type MedicationView = {
+  activeItems: ActiveItem[];
+  today: TodayDose[];
+  adherence: { taken: number; expected: number; percent: number | null };
+  history: HistoryRow[];
+};
+
+const EMPTY: MedicationView = { activeItems: [], today: [], adherence: { taken: 0, expected: 0, percent: null }, history: [] };
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const fmtDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+const fmtTime = (iso: string) => {
+  const d = new Date(iso);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const card: React.CSSProperties = { background: '#fff' };
+
+function StatusPill({ status }: { status: 'TAKEN' | 'MISSED' }) {
+  const taken = status === 'TAKEN';
+  return (
+    <span
+      className='pill'
+      style={{
+        background: taken ? 'var(--teal-tint)' : 'var(--red-tint)',
+        color: taken ? 'var(--teal-deep)' : 'var(--red)',
+      }}
+    >
+      ● {taken ? 'Đã uống' : 'Bỏ lỡ'}
+    </span>
+  );
 }
 
-function isActiveToday(prescribedAt: string, duration?: string | null) {
-  const start = new Date(prescribedAt);
-  start.setHours(0, 0, 0, 0);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (today < start) return false;
-  const days = activeDays(duration);
-  if (days === null) return true;
-  const end = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
-  return today < end;
-}
-
-function timesOf(reminderTimes?: string | null) {
-  const list = (reminderTimes || '').split(',').map((t) => t.trim()).filter(Boolean);
-  return list.length > 0 ? list : ['08:00'];
-}
+const thStyle: React.CSSProperties = {
+  textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--ink-soft)',
+  padding: '10px 14px', borderBottom: '1px solid var(--line)', whiteSpace: 'nowrap',
+};
+const tdStyle: React.CSSProperties = { padding: '12px 14px', borderBottom: '1px solid var(--line-soft)', fontSize: 13.5, verticalAlign: 'middle' };
 
 export default function PatientMedicationsPage() {
-  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [view, setView] = useState<MedicationView>(EMPTY);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>('today');
-  // Trạng thái uống thuốc chỉ giữ trên trang này, chưa lưu lên máy chủ.
-  const [status, setStatus] = useState<Record<string, Status>>({});
+  const [saving, setSaving] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
-    setLoading(true);
     const res = await fetch('/api/patient/medications', { cache: 'no-store' });
     const data = await res.json();
-    setPrescriptions(data.prescriptions || []);
+    if (res.ok) {
+      setView({ ...EMPTY, ...data });
+    } else {
+      setView(EMPTY);
+      setError('Không tải được dữ liệu thuốc. Vui lòng thử lại sau.');
+    }
     setLoading(false);
   }
 
@@ -48,137 +91,185 @@ export default function PatientMedicationsPage() {
     load();
   }, []);
 
-  const doses = useMemo(() => {
-    const list: Array<{ key: string; time: string; name: string; dose: string }> = [];
-    for (const pr of prescriptions) {
-      for (const it of pr.items || []) {
-        if (!isActiveToday(pr.prescribedAt, it.duration)) continue;
-        for (const time of timesOf(it.reminderTimes)) {
-          list.push({
-            key: `${it.id}-${time}`,
-            time,
-            name: it.drugName,
-            dose: [it.dose, it.unit].filter(Boolean).join(' ') + (it.frequency ? ' • ' + it.frequency : ''),
-          });
-        }
-      }
+  async function record(dose: TodayDose, status: 'TAKEN' | 'MISSED') {
+    const key = `${dose.itemId}|${dose.scheduledAt}`;
+    setSaving(key);
+    setError(null);
+    const res = await fetch('/api/patient/medications/doses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId: dose.itemId, scheduledAt: dose.scheduledAt, status }),
+    });
+    setSaving(null);
+    if (!res.ok) {
+      setError('Không ghi nhận được. Vui lòng thử lại.');
+      return;
     }
-    return list.sort((a, b) => a.time.localeCompare(b.time));
-  }, [prescriptions]);
+    await load();
+  }
 
-  const takenCount = doses.filter((d) => status[d.key] === 'taken').length;
-  const missedCount = doses.filter((d) => status[d.key] === 'missed').length;
-  const pendingCount = doses.length - takenCount - missedCount;
-  const adherence = doses.length > 0 ? Math.round((takenCount / doses.length) * 100) : 0;
-
-  const tabStyle = (on: boolean): React.CSSProperties => ({
-    border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, padding: '12px 4px', cursor: 'pointer',
-    borderBottom: on ? '3px solid var(--teal)' : '3px solid transparent', color: on ? 'var(--teal-deep)' : 'var(--ink-soft)',
-  });
-
-  const stat = (label: string, value: React.ReactNode, color?: string) => (
-    <div className='sec-card' style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 700, color: color || 'var(--ink)' }}>{value}</div>
-    </div>
-  );
+  const takenToday = view.today.filter((d) => d.status === 'TAKEN').length;
 
   return (
     <>
       <div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>Khoa Xạ trị &amp; Ung bướu</div>
-        <h1 style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700 }}>Thuốc</h1>
+        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Quản lý thuốc &amp; nhắc uống thuốc</h1>
+        <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
+          Xác nhận liều, theo dõi tuần thủ. Hôm nay đã uống {takenToday}/{view.today.length} liều.
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 26, borderBottom: '1px solid var(--line)' }}>
-        <button type='button' style={tabStyle(tab === 'today')} onClick={() => setTab('today')}>Thuốc uống hôm nay</button>
-        <button type='button' style={tabStyle(tab === 'rx')} onClick={() => setTab('rx')}>Đơn thuốc</button>
-      </div>
+      {error && <div className='sec-card' style={{ ...card, padding: 14, color: 'var(--red)' }}>{error}</div>}
 
-      {loading && <div className='sec-card' style={{ padding: 20, color: 'var(--ink-soft)' }}>Đang tải...</div>}
-
-      {!loading && tab === 'today' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 14 }}>
-            {stat('Tuân thủ uống thuốc', adherence + '%', 'var(--teal-deep)')}
-            {stat('Đã uống', takenCount)}
-            {stat('Bỏ lỡ', missedCount, 'var(--red)')}
-            {stat('Chờ uống', pendingCount, 'var(--amber)')}
-            {stat('Lịch uống thuốc', doses.length + ' liều')}
+      {/* Đơn thuốc hiện hành */}
+      <section className='sec-card'>
+        <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Đơn thuốc hiện hành</h2>
+        </div>
+        {loading ? (
+          <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Đang tải...</div>
+        ) : view.activeItems.length === 0 ? (
+          <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Hiện bạn không có thuốc đang dùng.</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Thuốc</th>
+                  <th style={thStyle}>Liều/lần</th>
+                  <th style={thStyle}>Số lần/ngày</th>
+                  <th style={thStyle}>Giờ dùng</th>
+                  <th style={thStyle}>Cách dùng</th>
+                  <th style={thStyle}>Đã uống / tổng số lượng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {view.activeItems.map((it) => (
+                  <tr key={it.id}>
+                    <td style={{ ...tdStyle, fontWeight: 600 }}>{it.drugName}</td>
+                    <td style={tdStyle}>{[it.dose, it.unit].filter(Boolean).join(' ') || '—'}</td>
+                    <td style={tdStyle}>{it.times.length} lần/ngày</td>
+                    <td style={{ ...tdStyle, fontFamily: 'ui-monospace, monospace' }}>{it.times.join(', ')}</td>
+                    <td style={tdStyle}>{it.frequency || '—'}</td>
+                    <td style={{ ...tdStyle, fontWeight: 600 }}>
+                      {it.takenQuantity}/{it.totalQuantity ?? '—'}
+                      {it.unit ? ` ${it.unit}` : ''}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        )}
+      </section>
 
-          <section className='sec-card'>
-            <div className='sec-head'><h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Lịch uống thuốc hôm nay</h2></div>
-            {doses.length === 0 && <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Hôm nay bạn không có thuốc cần uống.</div>}
-            {doses.map((d) => {
-              const st = status[d.key] || 'pending';
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20, alignItems: 'start' }}>
+        {/* Xác nhận liều hôm nay */}
+        <section className='sec-card'>
+          <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Xác nhận liều hôm nay</h2>
+          </div>
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {!loading && view.today.length === 0 && (
+              <div style={{ color: 'var(--ink-soft)', padding: 6 }}>Hôm nay bạn không có liều nào cần xác nhận.</div>
+            )}
+            {view.today.map((d) => {
+              const key = `${d.itemId}|${d.scheduledAt}`;
               return (
-                <div key={d.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, padding: '14px 22px', borderBottom: '1px solid var(--line-soft)' }}>
+                <div
+                  key={key}
+                  style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}
+                >
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{d.time} · {d.name}</div>
-                    <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 2 }}>{d.dose}</div>
+                    <div style={{ fontWeight: 600 }}>{d.drugName}</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 2, fontFamily: 'ui-monospace, monospace' }}>
+                      {fmtDate(d.scheduledAt)} {d.time}
+                      {d.dose ? ` · ${d.dose}` : ''}
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      type='button'
-                      onClick={() => setStatus({ ...status, [d.key]: 'taken' })}
-                      style={{ border: '1px solid ' + (st === 'taken' ? 'var(--teal)' : 'var(--line)'), background: st === 'taken' ? 'var(--teal-tint)' : '#fff', color: st === 'taken' ? 'var(--teal-deep)' : 'var(--ink-soft)', borderRadius: 8, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      Đã uống
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => setStatus({ ...status, [d.key]: 'missed' })}
-                      style={{ border: '1px solid ' + (st === 'missed' ? 'var(--red)' : 'var(--line)'), background: st === 'missed' ? 'var(--red-tint)' : '#fff', color: st === 'missed' ? 'var(--red)' : 'var(--ink-soft)', borderRadius: 8, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      Bỏ lỡ
-                    </button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {d.status ? (
+                      <StatusPill status={d.status} />
+                    ) : d.due ? (
+                      <>
+                        <button
+                          type='button'
+                          className='addbtn'
+                          style={{ fontSize: 12, padding: '6px 12px' }}
+                          disabled={saving === key}
+                          onClick={() => record(d, 'TAKEN')}
+                        >
+                          Đã uống
+                        </button>
+                        <button
+                          type='button'
+                          className='ghostbtn'
+                          style={{ fontSize: 12, padding: '6px 12px', color: 'var(--red)', borderColor: 'var(--red)' }}
+                          disabled={saving === key}
+                          onClick={() => record(d, 'MISSED')}
+                        >
+                          Bỏ lỡ
+                        </button>
+                      </>
+                    ) : (
+                      <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Chưa đến giờ</span>
+                    )}
                   </div>
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Tỷ lệ tuân thủ + lịch sử */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <section className='sec-card'>
+            <div className='sec-head'>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Tỷ lệ tuân thủ</h2>
+            </div>
+            <div style={{ padding: 18 }}>
+              <div style={{ fontSize: 40, fontWeight: 700, color: 'var(--teal-deep)' }}>
+                {view.adherence.percent === null ? '—' : `${view.adherence.percent}%`}
+              </div>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4 }}>
+                Tuần này · liều đã uống {view.adherence.taken} / tổng liều chỉ định {view.adherence.expected}
+              </div>
+            </div>
+          </section>
+
+          <section className='sec-card'>
+            <div className='sec-head'>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Lịch sử dùng thuốc</h2>
+            </div>
+            {view.history.length === 0 ? (
+              <div style={{ padding: 18, color: 'var(--ink-soft)' }}>Chưa có lịch sử.</div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={thStyle}>Ngày</th>
+                      <th style={thStyle}>Giờ</th>
+                      <th style={thStyle}>Thuốc</th>
+                      <th style={thStyle}>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {view.history.map((h) => (
+                      <tr key={h.id}>
+                        <td style={{ ...tdStyle, fontFamily: 'ui-monospace, monospace' }}>{fmtDate(h.scheduledAt)}</td>
+                        <td style={{ ...tdStyle, fontFamily: 'ui-monospace, monospace' }}>{fmtTime(h.scheduledAt)}</td>
+                        <td style={tdStyle}>{h.drugName}</td>
+                        <td style={tdStyle}><StatusPill status={h.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </section>
         </div>
-      )}
-
-      {!loading && tab === 'rx' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {prescriptions.length === 0 && <div className='sec-card' style={{ padding: 22, color: 'var(--ink-soft)' }}>Bạn chưa có đơn thuốc nào.</div>}
-          {prescriptions.map((pr) => (
-            <section key={pr.id} className='sec-card'>
-              <div className='sec-head' style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Đơn thuốc ngày {fmtDate(pr.prescribedAt)}</h2>
-                <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Kê bởi {pr.prescribedBy || 'Bác sĩ điều trị'}</span>
-              </div>
-              <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {(pr.items || []).map((it: any, idx: number) => (
-                  <div key={it.id} style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: 14, background: 'var(--bg)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-                      <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--teal-deep)' }}>{idx + 1}. {it.drugName}</div>
-                      <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal-deep)' }}>
-                        {it.duration || 'Theo hướng dẫn'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginTop: 10, fontSize: 13 }}>
-                      <div><div style={{ color: 'var(--ink-soft)', fontWeight: 600, fontSize: 12 }}>Liều</div>{[it.dose, it.unit].filter(Boolean).join(' ') || '—'}</div>
-                      <div><div style={{ color: 'var(--ink-soft)', fontWeight: 600, fontSize: 12 }}>Tần suất</div>{it.frequency || '—'}</div>
-                      <div><div style={{ color: 'var(--ink-soft)', fontWeight: 600, fontSize: 12 }}>Số lượng</div>{it.quantity || '—'}</div>
-                    </div>
-                    <div style={{ marginTop: 10 }}>
-                      <div style={{ color: 'var(--ink-soft)', fontWeight: 600, fontSize: 12, marginBottom: 6 }}>Uống theo giờ mỗi ngày</div>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {timesOf(it.reminderTimes).map((t) => (
-                          <span key={t} className='chk-pill on'>{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      )}
+      </div>
     </>
   );
 }

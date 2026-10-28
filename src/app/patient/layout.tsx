@@ -3,7 +3,7 @@ import Sidebar from "@/components/Sidebar";
 const items = [
   { href: "/patient", label: "Dashboard" },
   { href: "/patient/record", label: "Hồ sơ bệnh án" },
-  { href: "/patient/medications", label: "Thuốc" },
+  { href: "/patient/medications", label: "Thuốc và lịch uống" },
   { href: "/patient/side-effects", label: "Tác dụng phụ" },
   { href: "/patient/schedule", label: "Lịch" },
   { href: "/patient/messages", label: "Liên lạc" },
