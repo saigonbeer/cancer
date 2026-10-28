@@ -31,6 +31,13 @@ export default function PatientSideEffectsPage() {
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  function pickPhoto(file: File | null) {
+    setPhoto(file);
+    setPhotoPreview(file ? URL.createObjectURL(file) : null);
+  }
 
   async function load() {
     setLoading(true);
@@ -80,7 +87,15 @@ export default function PatientSideEffectsPage() {
     const res = await fetch('/api/patient/side-effects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symptom: symptom.trim(), severity, site: site.trim(), note: note.trim() }),
+      body: (() => {
+        const form = new FormData();
+        form.append('symptom', symptom.trim());
+        form.append('severity', severity);
+        form.append('site', site.trim());
+        form.append('note', note.trim());
+        if (photo) form.append('photo', photo);
+        return form;
+      })(),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -93,6 +108,7 @@ export default function PatientSideEffectsPage() {
     setSite('');
     setNote('');
     setSeverity('Nhẹ');
+    pickPhoto(null);
     load();
   }
 
@@ -150,9 +166,11 @@ export default function PatientSideEffectsPage() {
             </div>
             <div>
               <label className='field-label'>Hình ảnh</label>
-              <div style={{ border: '1.5px dashed var(--line)', borderRadius: 10, padding: 20, textAlign: 'center', color: 'var(--ink-soft)', fontSize: 13 }}>
-                Tải ảnh lên sẽ được bổ sung sau (chưa hỗ trợ)
-              </div>
+              <label style={{ display: 'block', border: '1.5px dashed var(--line)', borderRadius: 10, padding: 16, textAlign: 'center', color: 'var(--ink-soft)', fontSize: 13, cursor: 'pointer' }}>
+                <input type='file' accept='image/jpeg,image/png,image/webp' style={{ display: 'none' }} onChange={(e) => pickPhoto(e.target.files?.[0] || null)} />
+                {photo ? 'Đã chọn: ' + photo.name + ' (nhấn để đổi)' : 'Nhấn để chọn ảnh (JPG, PNG hoặc WEBP, tối đa 5 MB)'}
+              </label>
+              {photoPreview && <img src={photoPreview} alt='Xem trước' style={{ marginTop: 10, maxWidth: 240, maxHeight: 200, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />}
             </div>
             <div>
               <label className='field-label'>Ghi chú</label>
@@ -183,6 +201,11 @@ export default function PatientSideEffectsPage() {
                   Vị trí: {r.site || 'Chưa ghi'} · {fmtDate(r.createdAt)} · {r.status === 'PENDING' ? 'Chờ bác sĩ xem' : 'Bác sĩ đã xử lý'}
                 </div>
                 {r.note && <div style={{ fontSize: 13.5, marginTop: 4 }}>{r.note}</div>}
+                {r.photoSignedUrl && (
+                  <a href={r.photoSignedUrl} target='_blank' rel='noreferrer' style={{ display: 'inline-block', marginTop: 8 }}>
+                    <img src={r.photoSignedUrl} alt='Ảnh đã gửi' style={{ maxWidth: 200, maxHeight: 160, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />
+                  </a>
+                )}
               </div>
             </div>
           );

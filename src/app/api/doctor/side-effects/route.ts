@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
 import { getSideEffectReports, updateSideEffectStatus } from '@/services/sideeffect.service';
 import { prisma } from '@/lib/db';
+import { withPhotoUrls } from '@/lib/storage';
 
 export async function GET() {
   const auth = await requireRole('DOCTOR', 'ADMIN');
@@ -9,7 +10,7 @@ export async function GET() {
 
   const doctor = await prisma.doctorProfile.findUnique({ where: { userId: auth.session.userId } });
   const reports = await getSideEffectReports({ doctorId: doctor?.id });
-  return NextResponse.json({ reports });
+  return NextResponse.json({ reports: await withPhotoUrls(reports) });
 }
 
 export async function PATCH(req: NextRequest) {

@@ -94,6 +94,12 @@ export default function DoctorSideEffectsPage() {
                     </span>
                   </div>
 
+                  {r.photoSignedUrl && (
+                    <a href={r.photoSignedUrl} target='_blank' rel='noreferrer' style={{ display: 'inline-block', marginTop: 10 }}>
+                      <img src={r.photoSignedUrl} alt='Ảnh tác dụng phụ' style={{ maxWidth: 220, maxHeight: 180, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />
+                    </a>
+                  )}
+
                   {r.status === 'PENDING' && (
                     <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                       <button
