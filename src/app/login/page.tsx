@@ -57,10 +57,7 @@ export default function LoginPage() {
             BỆNH VIỆN TRUNG ƯƠNG QUÂN ĐỘI 108
           </div>
           <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 240, height: 240, objectFit: "contain", borderRadius: 14, background: "#fff" }} />
-          <div style={{ fontSize: 19, fontWeight: 700 }}>Onco EMR</div>
-          <div style={{ fontSize: 13.5, color: "var(--ink-soft)", textAlign: "center" }}>
-            Khoa Xạ trị &amp; Ung bướu — Hệ thống quản lý điều trị
-          </div>
+          <div style={{ fontSize: 19, fontWeight: 700, textAlign: "center" }}>PHẦN MỀM QUẢN LÝ ĐIỀU TRỊ</div>
         </div>
 
         <form
