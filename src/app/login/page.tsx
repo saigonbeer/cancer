@@ -53,7 +53,7 @@ export default function LoginPage() {
     >
       <div style={{ width: "100%", maxWidth: 420, display: "flex", flexDirection: "column", gap: 40 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-          <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 240, height: 240, objectFit: "contain" }} />
+          <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 240, height: 240, objectFit: "contain", borderRadius: 14, background: "#fff" }} />
           <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.04em", color: "var(--teal)", textAlign: "center" }}>
             BỆNH VIỆN TRUNG ƯƠNG QUÂN ĐỘI 108
           </div>
