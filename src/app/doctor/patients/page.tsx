@@ -342,7 +342,7 @@ export default function DoctorPatientsPage() {
       address: p.address || '',
       emergencyContactName: p.emergencyContactName || '',
       emergencyContactPhone: p.emergencyContactPhone || '',
-      username: '',
+      username: p.user?.username || '',
       password: '',
     });
     setAccountError(null);
@@ -355,9 +355,11 @@ export default function DoctorPatientsPage() {
     const body: any = {
       name: f.name, dob: f.dob, gender: f.gender, phone: f.phone, email: f.email, address: f.address,
       emergencyContactName: f.emergencyContactName, emergencyContactPhone: f.emergencyContactPhone,
+      username: f.username,
     };
+    if (f.password) body.password = f.password;
     const res = accountModal === 'create'
-      ? await fetch('/api/doctor/patients', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, username: f.username, password: f.password }) })
+      ? await fetch('/api/doctor/patients', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, password: f.password }) })
       : await fetch('/api/doctor/patients/' + f.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -419,18 +421,19 @@ export default function DoctorPatientsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
               <thead>
                 <tr style={{ background: 'var(--bg)', textAlign: 'left', fontSize: 12, textTransform: 'uppercase', color: 'var(--ink-soft)' }}>
-                  {['Mã BN', 'Họ và tên', 'Năm sinh', 'Giới tính', 'Số điện thoại', 'Email', 'Địa chỉ', 'Người liên hệ khẩn cấp', 'SĐT liên hệ khẩn cấp', 'Hành động'].map((h) => (
+                  {['Mã BN', 'Họ và tên', 'Username', 'Năm sinh', 'Giới tính', 'Số điện thoại', 'Email', 'Địa chỉ', 'Người liên hệ khẩn cấp', 'SĐT liên hệ khẩn cấp', 'Hành động'].map((h) => (
                     <th key={h} style={{ padding: '12px 14px', borderBottom: '1px solid var(--line)', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {loading && <tr><td colSpan={10} style={{ padding: 20, textAlign: 'center', color: 'var(--ink-soft)' }}>Đang tải...</td></tr>}
+                {loading && <tr><td colSpan={11} style={{ padding: 20, textAlign: 'center', color: 'var(--ink-soft)' }}>Đang tải...</td></tr>}
                 {!loading && filtered.length === 0 && <tr><td colSpan={10} style={{ padding: 20, textAlign: 'center', color: 'var(--ink-soft)' }}>Chưa có bệnh nhân nào.</td></tr>}
                 {filtered.map((p) => (
                   <tr key={p.id} style={{ borderBottom: '1px solid var(--line-soft)' }}>
                     <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--teal-deep)' }}>{p.patientCode}</td>
                     <td style={{ padding: '10px 14px', fontWeight: 600 }}>{p.user?.name}</td>
+                    <td style={{ padding: '10px 14px', color: 'var(--ink-soft)' }}>{p.user?.username || '—'}</td>
                     <td style={{ padding: '10px 14px' }}>{p.user?.dob || '—'}</td>
                     <td style={{ padding: '10px 14px' }}>{p.gender || '—'}</td>
                     <td style={{ padding: '10px 14px' }}>{p.user?.phone || '—'}</td>
@@ -671,15 +674,11 @@ export default function DoctorPatientsPage() {
               </div>
               <Line label='Người liên hệ khẩn cấp' value={accountForm.emergencyContactName} onChange={(v) => setAccountForm({ ...accountForm, emergencyContactName: v })} />
               <Line label='SĐT người liên hệ khẩn cấp' value={accountForm.emergencyContactPhone} onChange={(v) => setAccountForm({ ...accountForm, emergencyContactPhone: v })} />
-              {accountModal === 'create' && (
-                <>
-                  <Line label='Username *' value={accountForm.username} onChange={(v) => setAccountForm({ ...accountForm, username: v })} />
-                  <div>
-                    <label className='field-label'>Mật khẩu * (tối thiểu 6 ký tự)</label>
-                    <input type='password' value={accountForm.password} onChange={(e) => setAccountForm({ ...accountForm, password: e.target.value })} />
-                  </div>
-                </>
-              )}
+              <Line label='Username *' value={accountForm.username} onChange={(v) => setAccountForm({ ...accountForm, username: v })} />
+              <div>
+                <label className='field-label'>{accountModal === 'create' ? 'Mật khẩu * (tối thiểu 6 ký tự)' : 'Mật khẩu mới (để trống nếu không đổi)'}</label>
+                <input type='password' value={accountForm.password} onChange={(e) => setAccountForm({ ...accountForm, password: e.target.value })} />
+              </div>
             </div>
             {accountError && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 12 }}>{accountError}</div>}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>

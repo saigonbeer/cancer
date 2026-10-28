@@ -56,7 +56,7 @@ export async function getDoctorPatients(userId: string, role: Role) {
     where: { doctorId: doctor.id },
     include: {
       user: {
-        select: { id: true, name: true, dob: true, phone: true, email: true }
+        select: { id: true, name: true, username: true, dob: true, phone: true, email: true }
       },
       visits: {
         orderBy: { visitDate: 'desc' },

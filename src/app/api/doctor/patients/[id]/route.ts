@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
+import { hashPassword } from '@/lib/auth';
 
 const updateSchema = z.object({
   name: z.string().trim().min(1, 'Vui lòng nhập họ và tên.').optional(),
@@ -9,6 +10,8 @@ const updateSchema = z.object({
   email: z.string().trim().email('Email không hợp lệ.').optional().or(z.literal('')),
   phone: z.string().trim().optional(),
   gender: z.string().trim().optional(),
+  username: z.string().trim().min(3, 'Username tối thiểu 3 ký tự.').optional(),
+  password: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự.').optional().or(z.literal('')),
   address: z.string().trim().optional(),
   emergencyContactName: z.string().trim().optional(),
   emergencyContactPhone: z.string().trim().optional(),
@@ -33,9 +36,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!patient) return NextResponse.json({ error: 'Không tìm thấy bệnh nhân.' }, { status: 404 });
 
   const d = parsed.data;
+  if (d.username !== undefined) {
+    const taken = await prisma.user.findFirst({ where: { username: d.username, NOT: { id: patient.userId } }, select: { id: true } });
+    if (taken) return NextResponse.json({ error: 'Username đã tồn tại.' }, { status: 409 });
+  }
   await prisma.user.update({
     where: { id: patient.userId },
     data: {
+      ...(d.username !== undefined && { username: d.username }),
+      ...(d.password && { passwordHash: await hashPassword(d.password) }),
       ...(d.name !== undefined && { name: d.name }),
       ...(d.dob !== undefined && { dob: d.dob || null }),
       ...(d.email !== undefined && { email: d.email || null }),
