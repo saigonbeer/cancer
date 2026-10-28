@@ -189,7 +189,6 @@ export default function DoctorPatientsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState('');
   const [pickerQuery, setPickerQuery] = useState('');
-  const [changingPatient, setChangingPatient] = useState(false);
   const pickerResults = patients
     .filter((p) => {
       const q = pickerQuery.trim().toLowerCase();
@@ -453,13 +452,9 @@ export default function DoctorPatientsPage() {
 
       {mainTab === 'record' && (
         <>
-          {(!selected || changingPatient) && (
             <div className='sec-card' style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>Tìm bệnh nhân</div>
-                {selected && (
-                  <button type='button' className='ghostbtn' onClick={() => { setChangingPatient(false); setPickerQuery(''); }}>Hủy</button>
-                )}
               </div>
               <input
                 type='text'
@@ -485,7 +480,7 @@ export default function DoctorPatientsPage() {
                         type='button'
                         className='addbtn'
                         style={{ padding: '7px 16px', fontSize: 13 }}
-                        onClick={() => { setSelectedId(p.id); setChangingPatient(false); setPickerQuery(''); }}
+                        onClick={() => { setSelectedId(p.id); setPickerQuery(''); }}
                       >
                         Chọn
                       </button>
@@ -494,9 +489,8 @@ export default function DoctorPatientsPage() {
                 </div>
               )}
             </div>
-          )}
 
-          {selected && !changingPatient && (
+          {selected && (
             <div className='sec-card' style={{ padding: '18px 22px', display: 'flex', flexWrap: 'wrap', gap: 18, alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14, flex: 1 }}>
                 <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Họ và tên</div><div style={{ fontWeight: 700, fontSize: 15 }}>{selected.user?.name}</div></div>
@@ -505,7 +499,6 @@ export default function DoctorPatientsPage() {
                 <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Giới tính</div><div>{selected.gender || 'Chưa cập nhật'}</div></div>
                 <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Số điện thoại</div><div>{selected.user?.phone || 'Chưa cập nhật'}</div></div>
               </div>
-              <button type='button' className='ghostbtn' onClick={() => { setChangingPatient(true); setPickerQuery(''); }}>Đổi bệnh nhân</button>
             </div>
           )}
 
