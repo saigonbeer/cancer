@@ -53,10 +53,10 @@ export default function LoginPage() {
     >
       <div style={{ width: "100%", maxWidth: 420, display: "flex", flexDirection: "column", gap: 40 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-          <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 240, height: 240, objectFit: "contain", borderRadius: 14, background: "#fff" }} />
           <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.04em", color: "var(--teal)", textAlign: "center" }}>
             BỆNH VIỆN TRUNG ƯƠNG QUÂN ĐỘI 108
           </div>
+          <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 240, height: 240, objectFit: "contain", borderRadius: 14, background: "#fff" }} />
           <div style={{ fontSize: 19, fontWeight: 700 }}>Onco EMR</div>
           <div style={{ fontSize: 13.5, color: "var(--ink-soft)", textAlign: "center" }}>
             Khoa Xạ trị &amp; Ung bướu — Hệ thống quản lý điều trị
@@ -99,7 +99,7 @@ export default function LoginPage() {
         </form>
 
         <div style={{ textAlign: "center", fontSize: 12.5, color: "var(--ink-soft)" }}>
-          © 2026 Onco EMR · Khoa Xạ trị &amp; Ung bướu
+          © 2026 Viện Ung thư &amp; Ban CNTT/Bệnh viện TWQĐ 108
         </div>
       </div>
     </div>
