@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function DoctorPatientsPage() {
   const [patients, setPatients] = useState<any[]>([]);
@@ -200,7 +201,7 @@ export default function DoctorPatientsPage() {
             Quản lý hồ sơ bệnh án, lịch sử khám và phác đồ điều trị
           </div>
         </div>
-        <button type='button' className='addbtn' onClick={openCreatePatient}>+ Tạo bệnh nhân</button>
+        <Link href='/doctor/patients/new' className='addbtn'>+ Tạo bệnh nhân</Link>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selectedPatient ? '1fr 1.6fr' : '1fr', gap: 20 }}>

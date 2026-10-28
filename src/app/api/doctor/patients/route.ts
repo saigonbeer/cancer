@@ -70,8 +70,11 @@ export async function POST(req: NextRequest) {
         },
       },
     },
-    select: { id: true, name: true, username: true },
+    select: { id: true, name: true, username: true, patientProfile: { select: { id: true } } },
   });
 
-  return NextResponse.json({ patient: { ...user, patientCode } }, { status: 201 });
+  return NextResponse.json(
+    { patient: { id: user.patientProfile!.id, userId: user.id, name: user.name, username: user.username, patientCode } },
+    { status: 201 }
+  );
 }
