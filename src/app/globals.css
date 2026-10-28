@@ -219,3 +219,9 @@ label.field-label {
     grid-template-columns: 1fr;
   }
 }
+
+h1 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
