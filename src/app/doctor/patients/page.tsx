@@ -189,7 +189,7 @@ export default function DoctorPatientsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState('');
   const [pickerQuery, setPickerQuery] = useState('');
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [changingPatient, setChangingPatient] = useState(false);
   const pickerResults = patients
     .filter((p) => {
       const q = pickerQuery.trim().toLowerCase();
@@ -453,50 +453,61 @@ export default function DoctorPatientsPage() {
 
       {mainTab === 'record' && (
         <>
-          <div className='sec-card' style={{ padding: '14px 20px', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
-            <div style={{ minWidth: 280, flex: 1 }}>
-              <label className='field-label'>Tìm bệnh nhân (tên hoặc mã BN)</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type='text'
-                  value={pickerQuery}
-                  onChange={(e) => { setPickerQuery(e.target.value); setPickerOpen(true); }}
-                  onFocus={() => setPickerOpen(true)}
-                  onBlur={() => setTimeout(() => setPickerOpen(false), 150)}
-                  placeholder={loading ? 'Đang tải...' : patients.length === 0 ? 'Chưa có bệnh nhân — thêm ở tab Quản lý tài khoản BN' : 'Nhập tên hoặc mã BN, ví dụ: Nguyễn hoặc BN-0012'}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
-                />
-                {pickerOpen && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: '1px solid var(--line)', borderRadius: 10, boxShadow: '0 8px 20px rgba(0,0,0,0.08)', maxHeight: 280, overflowY: 'auto', zIndex: 20 }}>
-                    {pickerResults.length === 0 && (
-                      <div style={{ padding: 12, fontSize: 13, color: 'var(--ink-soft)' }}>Không tìm thấy bệnh nhân phù hợp.</div>
-                    )}
-                    {pickerResults.map((p) => (
-                      <div
-                        key={p.id}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => { setSelectedId(p.id); setPickerQuery(''); setPickerOpen(false); }}
-                        style={{ padding: '10px 12px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 10, background: p.id === selectedId ? 'var(--teal-tint)' : '#fff' }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--teal-tint)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = p.id === selectedId ? 'var(--teal-tint)' : '#fff')}
-                      >
-                        <span style={{ fontWeight: 600 }}>{p.user?.name}</span>
-                        <span style={{ fontSize: 12.5, color: 'var(--teal-deep)', fontWeight: 600 }}>{p.patientCode}</span>
-                      </div>
-                    ))}
-                  </div>
+          {(!selected || changingPatient) && (
+            <div className='sec-card' style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>Tìm bệnh nhân</div>
+                {selected && (
+                  <button type='button' className='ghostbtn' onClick={() => { setChangingPatient(false); setPickerQuery(''); }}>Hủy</button>
                 )}
               </div>
+              <input
+                type='text'
+                value={pickerQuery}
+                onChange={(e) => setPickerQuery(e.target.value)}
+                placeholder={loading ? 'Đang tải...' : patients.length === 0 ? 'Chưa có bệnh nhân — thêm ở tab Quản lý tài khoản BN' : 'Nhập tên hoặc mã BN, ví dụ: Nguyễn hoặc BN-0012'}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
+              />
+              {pickerQuery.trim() !== '' && (
+                <div style={{ border: '1px solid var(--line)', borderRadius: 10, overflow: 'hidden' }}>
+                  {pickerResults.length === 0 && (
+                    <div style={{ padding: 14, fontSize: 13, color: 'var(--ink-soft)' }}>Không tìm thấy bệnh nhân phù hợp.</div>
+                  )}
+                  {pickerResults.map((p) => (
+                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 14px', borderTop: '1px solid var(--line-soft)' }}>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{p.user?.name}</div>
+                        <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                          {p.patientCode} • {p.user?.dob ? 'Năm sinh ' + p.user.dob : 'Chưa có năm sinh'} • {p.user?.phone || 'Chưa có SĐT'}
+                        </div>
+                      </div>
+                      <button
+                        type='button'
+                        className='addbtn'
+                        style={{ padding: '7px 16px', fontSize: 13 }}
+                        onClick={() => { setSelectedId(p.id); setChangingPatient(false); setPickerQuery(''); }}
+                      >
+                        Chọn
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {selected && (
-              <div style={{ fontSize: 13.5, color: 'var(--ink-soft)' }}>
-                <strong style={{ color: 'var(--ink)' }}>{selected.user?.name}</strong>
-                {' • '}{selected.user?.dob ? 'Năm sinh ' + selected.user.dob : 'Chưa có năm sinh'}
-                {' • '}{selected.gender || 'Chưa có giới tính'}
-                {' • '}Mã BN: {selected.patientCode}
+          )}
+
+          {selected && !changingPatient && (
+            <div className='sec-card' style={{ padding: '18px 22px', display: 'flex', flexWrap: 'wrap', gap: 18, alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14, flex: 1 }}>
+                <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Họ và tên</div><div style={{ fontWeight: 700, fontSize: 15 }}>{selected.user?.name}</div></div>
+                <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Mã BN</div><div style={{ fontWeight: 600, color: 'var(--teal-deep)' }}>{selected.patientCode}</div></div>
+                <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Năm sinh</div><div>{selected.user?.dob || 'Chưa cập nhật'}</div></div>
+                <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Giới tính</div><div>{selected.gender || 'Chưa cập nhật'}</div></div>
+                <div><div style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 600 }}>Số điện thoại</div><div>{selected.user?.phone || 'Chưa cập nhật'}</div></div>
               </div>
-            )}
-          </div>
+              <button type='button' className='ghostbtn' onClick={() => { setChangingPatient(true); setPickerQuery(''); }}>Đổi bệnh nhân</button>
+            </div>
+          )}
 
           {selected && (
             <>
