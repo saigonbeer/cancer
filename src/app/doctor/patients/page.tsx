@@ -188,6 +188,15 @@ export default function DoctorPatientsPage() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState('');
+  const [pickerQuery, setPickerQuery] = useState('');
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerResults = patients
+    .filter((p) => {
+      const q = pickerQuery.trim().toLowerCase();
+      if (!q) return true;
+      return (p.user?.name || '').toLowerCase().includes(q) || (p.patientCode || '').toLowerCase().includes(q);
+    })
+    .slice(0, 50);
   const [visits, setVisits] = useState<any[]>([]);
   const [sideEffects, setSideEffects] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -446,15 +455,38 @@ export default function DoctorPatientsPage() {
         <>
           <div className='sec-card' style={{ padding: '14px 20px', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
             <div style={{ minWidth: 280, flex: 1 }}>
-              <label className='field-label'>Chọn bệnh nhân</label>
-              <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)' }}>
-                {patients.length === 0 && (
-                  <option value=''>{loading ? 'Đang tải...' : 'Chưa có bệnh nhân — thêm ở tab Quản lý tài khoản BN'}</option>
+              <label className='field-label'>Tìm bệnh nhân (tên hoặc mã BN)</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type='text'
+                  value={pickerQuery}
+                  onChange={(e) => { setPickerQuery(e.target.value); setPickerOpen(true); }}
+                  onFocus={() => setPickerOpen(true)}
+                  onBlur={() => setTimeout(() => setPickerOpen(false), 150)}
+                  placeholder={loading ? 'Đang tải...' : patients.length === 0 ? 'Chưa có bệnh nhân — thêm ở tab Quản lý tài khoản BN' : 'Nhập tên hoặc mã BN, ví dụ: Nguyễn hoặc BN-0012'}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
+                />
+                {pickerOpen && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, background: '#fff', border: '1px solid var(--line)', borderRadius: 10, boxShadow: '0 8px 20px rgba(0,0,0,0.08)', maxHeight: 280, overflowY: 'auto', zIndex: 20 }}>
+                    {pickerResults.length === 0 && (
+                      <div style={{ padding: 12, fontSize: 13, color: 'var(--ink-soft)' }}>Không tìm thấy bệnh nhân phù hợp.</div>
+                    )}
+                    {pickerResults.map((p) => (
+                      <div
+                        key={p.id}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => { setSelectedId(p.id); setPickerQuery(''); setPickerOpen(false); }}
+                        style={{ padding: '10px 12px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 10, background: p.id === selectedId ? 'var(--teal-tint)' : '#fff' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--teal-tint)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = p.id === selectedId ? 'var(--teal-tint)' : '#fff')}
+                      >
+                        <span style={{ fontWeight: 600 }}>{p.user?.name}</span>
+                        <span style={{ fontSize: 12.5, color: 'var(--teal-deep)', fontWeight: 600 }}>{p.patientCode}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>{p.patientCode} — {p.user?.name}</option>
-                ))}
-              </select>
+              </div>
             </div>
             {selected && (
               <div style={{ fontSize: 13.5, color: 'var(--ink-soft)' }}>
