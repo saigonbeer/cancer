@@ -8,6 +8,7 @@ const updateSchema = z.object({
   dob: z.string().trim().optional(),
   email: z.string().trim().email('Email không hợp lệ.').optional().or(z.literal('')),
   phone: z.string().trim().optional(),
+  gender: z.string().trim().optional(),
   address: z.string().trim().optional(),
   emergencyContactName: z.string().trim().optional(),
   emergencyContactPhone: z.string().trim().optional(),
@@ -44,6 +45,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   await prisma.patientProfile.update({
     where: { id: patient.id },
     data: {
+      ...(d.gender !== undefined && { gender: d.gender || null }),
       ...(d.address !== undefined && { address: d.address || null }),
       ...(d.emergencyContactName !== undefined && { emergencyContactName: d.emergencyContactName || null }),
       ...(d.emergencyContactPhone !== undefined && { emergencyContactPhone: d.emergencyContactPhone || null }),

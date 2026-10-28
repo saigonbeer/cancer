@@ -24,6 +24,7 @@ const createSchema = z.object({
   phone: z.string().trim().optional(),
   username: z.string().trim().min(3, 'Username tối thiểu 3 ký tự.'),
   password: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự.'),
+  gender: z.string().trim().optional(),
   address: z.string().trim().optional(),
   emergencyContactName: z.string().trim().optional(),
   emergencyContactPhone: z.string().trim().optional(),
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest) {
       patientProfile: {
         create: {
           patientCode,
+          gender: d.gender || null,
           address: d.address || null,
           emergencyContactName: d.emergencyContactName || null,
           emergencyContactPhone: d.emergencyContactPhone || null,
