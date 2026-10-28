@@ -211,7 +211,7 @@ export default function DoctorPatientsPage() {
   const [accountError, setAccountError] = useState<string | null>(null);
 
   const selected = patients.find((p) => p.id === selectedId) || null;
-  const firstVisit = visits.find((v) => v.type === 'FIRST') || null;
+  const firstVisit = [...visits].reverse().find((v) => v.type === 'FIRST') || null;
   const followups = visits
     .filter((v) => v.type === 'FOLLOWUP')
     .sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
