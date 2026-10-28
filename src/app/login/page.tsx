@@ -67,7 +67,7 @@ export default function LoginPage() {
               justifyContent: "center",
             }}
           >
-            OE
+            <img src="/logo-108.png" alt="Logo Bệnh viện Trung ương Quân đội 108" style={{ width: 48, height: 48, objectFit: "contain" }} />
           </div>
           <div style={{ fontSize: 19, fontWeight: 700 }}>Onco EMR</div>
           <div style={{ fontSize: 13.5, color: "var(--ink-soft)", textAlign: "center" }}>
