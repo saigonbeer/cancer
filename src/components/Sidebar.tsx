@@ -28,7 +28,7 @@ export default function Sidebar({
       style={{
         width: 232,
         flex: "none",
-        background: "var(--teal-deep)",
+        background: "var(--sidebar)",
         padding: "26px 16px",
         display: "flex",
         flexDirection: "column",
