@@ -178,25 +178,32 @@ function VisitSummary({ v }: { v: any }) {
     ['Chẩn đoán', v.diagnosis], ['Diễn biến & kết quả', v.progress], ['Hướng điều trị tiếp theo', v.nextPlan], ['Ghi chú', v.note],
   ];
   const items = (v.prescriptions || []).flatMap((p: any) => p.items || []);
+  const cardStyle: React.CSSProperties = { border: '1px solid var(--line-soft)', borderRadius: 12, padding: 18, background: '#fff' };
+  const labelStyle: React.CSSProperties = { fontSize: 25, fontWeight: 600, color: 'var(--ink-soft)' };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: 16 }}>
       {rows.filter(([, val]) => val).map(([label, val]) => (
-        <div key={label}>
-          <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>{label}</div>
-          <div className='readtext'>{val}</div>
+        <div key={label} style={cardStyle}>
+          <div style={labelStyle}>{label}</div>
+          <div className='readtext' style={{ fontSize: 28, marginTop: 8 }}>{val}</div>
         </div>
       ))}
-      <div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 4 }}>Phương pháp điều trị</div>
-        {tags.length === 0 ? <div style={{ fontSize: 14 }}>Chưa chọn</div> : (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{tags.map((t) => <span key={t} className='chk-pill on'>{t}</span>)}</div>
+      <div style={cardStyle}>
+        <div style={labelStyle}>Phương pháp điều trị</div>
+        {tags.length === 0 ? <div style={{ fontSize: 28, marginTop: 8 }}>Chưa chọn</div> : (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+            {tags.map((t) => <span key={t} className='chk-pill on' style={{ fontSize: 26 }}>{t}</span>)}
+          </div>
         )}
       </div>
       {items.length > 0 && (
-        <div style={{ background: 'var(--bg)', borderRadius: 8, padding: 10, fontSize: 13 }}>
-          <div style={{ fontWeight: 700, marginBottom: 4 }}>Đơn thuốc</div>
+        <div style={{ ...cardStyle, gridColumn: '1 / -1', background: 'var(--bg)' }}>
+          <div style={{ fontWeight: 700, fontSize: 28, marginBottom: 8 }}>Đơn thuốc</div>
           {items.map((it: any) => (
-            <div key={it.id}>• {it.drugName} — {it.dose || ''} {it.frequency || ''} {it.quantity ? '· SL ' + it.quantity : ''}</div>
+            <div key={it.id} style={{ fontSize: 26, marginTop: 4 }}>
+              • {it.drugName} — {it.dose || ''} {it.frequency || ''} {it.quantity ? '· SL ' + it.quantity : ''}
+            </div>
           ))}
         </div>
       )}
