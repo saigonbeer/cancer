@@ -273,6 +273,12 @@ model SideEffectReport {
   cycle      Int?
   status     ReportStatus @default(PENDING)
   doseReduced Boolean     @default(false)
+  managementNote  String? // biện pháp xử trí, can thiệp
+  outcome         String? // kết quả sau can thiệp
+  regimenDecision String? // NO_CHANGE | HOLD | REDUCE
+  decisionReason  String? // lý do khi hoãn chu kỳ / giảm liều
+  monitorMore     Boolean @default(false) // đánh dấu theo dõi thêm: đã biết có tương tác
+  managedAt       DateTime?
   note       String?
   createdAt  DateTime     @default(now())
 }

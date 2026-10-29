@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
 import { createVisit, getPatientVisits } from '@/services/visit.service';
+import { createAppointment } from '@/services/appointment.service';
+import { prisma } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   const auth = await requireRole('DOCTOR', 'ADMIN');
@@ -26,8 +28,32 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const visit = await createVisit(body, auth.session.role);
-    return NextResponse.json({ visit }, { status: 201 });
+    const { appointment, ...visitData } = body;
+    const visit = await createVisit(visitData, auth.session.role);
+
+    // Đặt lịch tái khám: lịch được tạo cho cả bác sĩ và bệnh nhân (bệnh nhân xem ở mục Lịch hẹn).
+    let scheduled = null;
+    if (appointment?.datetime) {
+      const when = new Date(appointment.datetime);
+      if (Number.isNaN(when.getTime())) {
+        return NextResponse.json({ error: 'Thời gian tái khám không hợp lệ.' }, { status: 400 });
+      }
+      const patient = await prisma.patientProfile.findUnique({ where: { id: body.patientId }, select: { userId: true } });
+      if (patient) {
+        scheduled = await createAppointment(
+          {
+            patientId: patient.userId,
+            doctorId: auth.session.userId,
+            type: 'Tái khám',
+            datetime: when,
+            location: typeof appointment.location === 'string' ? appointment.location.trim() : undefined,
+            reason: 'Tái khám theo kế hoạch điều trị',
+          },
+          auth.session.role
+        );
+      }
+    }
+    return NextResponse.json({ visit, appointment: scheduled }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 403 });
   }

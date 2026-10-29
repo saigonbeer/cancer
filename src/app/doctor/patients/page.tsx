@@ -35,6 +35,8 @@ const emptyFollow = () => ({
   examination: '', labResults: '', diagnosis: '', nextPlan: '', note: '', methods: emptyMethods(),
 });
 
+const emptyAppt = () => ({ datetime: '', location: 'Khoa Ung Bướu - Tầng 3' });
+
 const emptyAccount = {
   id: '', name: '', dob: '', gender: '', phone: '', email: '', address: '',
   emergencyContactName: '', emergencyContactPhone: '', username: '', password: '',
@@ -66,6 +68,27 @@ function Check({ label, checked, onChange }: { label: string; checked: boolean; 
       <input type='checkbox' checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ accentColor: 'var(--teal)' }} />
       {label}
     </label>
+  );
+}
+
+function AppointmentCard({ value, onChange }: { value: { datetime: string; location: string }; onChange: (v: { datetime: string; location: string }) => void }) {
+  return (
+    <div style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontWeight: 600, fontSize: 14 }}>Lịch hẹn tái khám</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+        <div>
+          <label className='field-label'>Thời gian</label>
+          <input type='datetime-local' value={value.datetime} onChange={(e) => onChange({ ...value, datetime: e.target.value })} />
+        </div>
+        <div>
+          <label className='field-label'>Địa điểm</label>
+          <input type='text' value={value.location} onChange={(e) => onChange({ ...value, location: e.target.value })} />
+        </div>
+      </div>
+      <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+        Để trống thời gian nếu chưa đặt lịch. Khi đặt, bệnh nhân sẽ thấy lịch hẹn này trong mục Lịch hẹn.
+      </div>
+    </div>
   );
 }
 
@@ -204,6 +227,8 @@ export default function DoctorPatientsPage() {
 
   const [first, setFirst] = useState<any>(emptyFirst());
   const [follow, setFollow] = useState<any>(emptyFollow());
+  const [apptFirst, setApptFirst] = useState(emptyAppt());
+  const [apptFollow, setApptFollow] = useState(emptyAppt());
 
   const [query, setQuery] = useState('');
   const [accountModal, setAccountModal] = useState<'create' | 'edit' | null>(null);
@@ -298,10 +323,17 @@ export default function DoctorPatientsPage() {
       : { examination: follow.examination, labResults: follow.labResults, diagnosis: follow.diagnosis, nextPlan: follow.nextPlan, note: follow.note };
     const methods: MethodsState = type === 'FIRST' ? first.methods : follow.methods;
 
+    const appt = type === 'FIRST' ? apptFirst : apptFollow;
     const res = await fetch('/api/doctor/visits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ patientId: selected.id, type, ...fields, treatmentPlan: buildTreatmentPlan(methods) }),
+      body: JSON.stringify({
+        patientId: selected.id,
+        type,
+        ...fields,
+        treatmentPlan: buildTreatmentPlan(methods),
+        appointment: appt.datetime ? { datetime: new Date(appt.datetime).toISOString(), location: appt.location } : undefined,
+      }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -319,9 +351,15 @@ export default function DoctorPatientsPage() {
       const rxData = await rx.json().catch(() => ({}));
       if (rx.ok && rxData.interactions?.length) setWarnings(rxData.interactions);
     }
-    setMessage(type === 'FIRST' ? 'Đã lưu khám lần đầu.' : 'Đã lưu lượt tái khám.');
-    if (type === 'FIRST') setFirst(emptyFirst());
-    else setFollow(emptyFollow());
+    const scheduled = data.appointment ? ' Đã đặt lịch tái khám cho bệnh nhân.' : '';
+    setMessage((type === 'FIRST' ? 'Đã lưu khám lần đầu.' : 'Đã lưu lượt tái khám.') + scheduled);
+    if (type === 'FIRST') {
+      setFirst(emptyFirst());
+      setApptFirst(emptyAppt());
+    } else {
+      setFollow(emptyFollow());
+      setApptFollow(emptyAppt());
+    }
     loadRecord(selected.id);
   }
 
@@ -575,6 +613,9 @@ export default function DoctorPatientsPage() {
                   </Section>
                   <Section n={8} title='Hướng điều trị tiếp theo' amber>
                     <Area label='Kế hoạch điều trị' value={first.nextPlan} onChange={(v) => setFirst({ ...first, nextPlan: v })} rows={3} />
+                    <div style={{ marginTop: 14 }}>
+                      <AppointmentCard value={apptFirst} onChange={setApptFirst} />
+                    </div>
                   </Section>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <button type='button' className='addbtn' onClick={() => saveVisit('FIRST')}>Lưu hồ sơ khám lần đầu</button>
@@ -611,6 +652,7 @@ export default function DoctorPatientsPage() {
                           <MethodsEditor value={follow.methods} onChange={(v) => setFollow({ ...follow, methods: v })} />
                         </div>
                         <Area label='Kế hoạch điều trị tiếp' value={follow.nextPlan} onChange={(v) => setFollow({ ...follow, nextPlan: v })} rows={3} />
+                        <AppointmentCard value={apptFollow} onChange={setApptFollow} />
                         <Area label='Ghi chú thêm về kế hoạch điều trị' value={follow.note} onChange={(v) => setFollow({ ...follow, note: v })} />
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           <button type='button' className='addbtn' onClick={() => saveVisit('FOLLOWUP')}>Lưu lượt tái khám</button>
