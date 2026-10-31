@@ -31,6 +31,8 @@ export default function PatientMessagesPage() {
 
   useEffect(() => {
     load();
+    const interval = setInterval(load, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   async function send() {

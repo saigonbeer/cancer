@@ -9,16 +9,20 @@ export default function DoctorMessagesPage() {
   const [inputContent, setInputContent] = useState('');
   const [loading, setLoading] = useState(true);
 
-  async function load() {
-    setLoading(true);
+  async function load(isRefresh = false) {
+    if (!isRefresh) setLoading(true);
     const res = await fetch('/api/messages');
     const data = await res.json();
     const convs = data.conversations || [];
     setConversations(convs);
-    if (convs.length > 0) {
-      selectConv(convs[0]);
-    }
-    setLoading(false);
+
+    setActiveConv((prev: any) => {
+      const match = prev ? convs.find((c: any) => c.id === prev.id) : null;
+      const selected = match || (convs.length > 0 ? convs[0] : null);
+      setMessages(selected?.messages || []);
+      return selected;
+    });
+    if (!isRefresh) setLoading(false);
   }
 
   function selectConv(conv: any) {
@@ -28,6 +32,8 @@ export default function DoctorMessagesPage() {
 
   useEffect(() => {
     load();
+    const interval = setInterval(() => load(true), 10000);
+    return () => clearInterval(interval);
   }, []);
 
   async function send() {
