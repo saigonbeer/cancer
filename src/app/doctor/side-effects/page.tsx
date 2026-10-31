@@ -36,12 +36,64 @@ function sheetFrom(r: any): Sheet {
   };
 }
 
+function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | null }) {
+  const [guidelines, setGuidelines] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!symptom) return;
+    setLoading(true);
+    const params = new URLSearchParams({ symptom });
+    if (grade) params.set('grade', String(grade));
+    fetch('/api/doctor/guidelines?' + params.toString())
+      .then((r) => r.json())
+      .then((data) => {
+        const all = (data.terms || []).flatMap((t: any) => t.guidelines.map((g: any) => ({ ...g, termName: t.term, soc: t.soc })));
+        setGuidelines(all);
+      })
+      .finally(() => setLoading(false));
+  }, [symptom, grade]);
+
+  if (loading) return <div style={{ fontSize: 13, color: 'var(--ink-soft)', padding: 8 }}>Đang tra cứu hướng dẫn...</div>;
+  if (guidelines.length === 0) return <div style={{ fontSize: 13, color: 'var(--ink-soft)', padding: 8 }}>Chưa có hướng dẫn xử trí cho triệu chứng này.</div>;
+
+  const modalityLabel: Record<string, string> = { CHEMO: 'Hóa trị', RADIATION: 'Xạ trị', TARGETED: 'Đích', IMMUNOTHERAPY: 'Miễn dịch', HORMONAL: 'Nội tiết', ALL: 'Chung' };
+  const actionColor: Record<string, React.CSSProperties> = {
+    CONTINUE: { background: 'var(--teal-tint)', color: 'var(--teal-deep)' },
+    MONITOR: { background: 'var(--amber-tint)', color: 'var(--amber)' },
+    HOLD: { background: 'var(--red-tint)', color: 'var(--red)' },
+    REDUCE: { background: 'var(--purple-tint)', color: 'var(--purple)' },
+    STOP: { background: '#fde8e8', color: '#991b1b' },
+  };
+  const actionLabel: Record<string, string> = { CONTINUE: 'Tiếp tục', MONITOR: 'Theo dõi', HOLD: 'Hoãn', REDUCE: 'Giảm liều', STOP: 'Ngưng' };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {guidelines.map((g, i) => (
+        <div key={i} style={{ background: 'var(--bg)', borderRadius: 10, padding: '12px 14px', fontSize: 13 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>Độ {g.grade}</span>
+            <span className='pill' style={{ background: '#e8f4f8', color: '#1a5276' }}>{modalityLabel[g.modality] || g.modality}</span>
+            {g.regimenAction && <span className='pill' style={actionColor[g.regimenAction] || {}}>{actionLabel[g.regimenAction] || g.regimenAction}</span>}
+          </div>
+          <div style={{ marginBottom: 4 }}><strong>Đánh giá:</strong> {g.assessment}</div>
+          <div style={{ marginBottom: 4 }}><strong>Xử trí:</strong> {g.management}</div>
+          {g.medication && <div style={{ marginBottom: 4 }}><strong>Thuốc:</strong> {g.medication}</div>}
+          {g.referral && <div style={{ marginBottom: 4 }}><strong>Chuyển khoa:</strong> {g.referral}</div>}
+          {g.patientAdvice && <div style={{ color: 'var(--teal-deep)', fontStyle: 'italic' }}>Lời khuyên BN: {g.patientAdvice}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DoctorSideEffectsPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openSheets, setOpenSheets] = useState<Record<string, boolean>>({});
   const [sheets, setSheets] = useState<Record<string, Sheet>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showGuide, setShowGuide] = useState<Record<string, boolean>>({});
 
   async function loadReports() {
     setLoading(true);
@@ -233,7 +285,25 @@ export default function DoctorSideEffectsPage() {
 
                   {open && (
                     <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px dashed var(--line)', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>Phiếu xử trí tác dụng phụ</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>Phiếu xử trí tác dụng phụ</div>
+                        <button
+                          type='button'
+                          className='ghostbtn'
+                          style={{ fontSize: 12, padding: '5px 12px', color: 'var(--teal)', borderColor: 'var(--teal)' }}
+                          onClick={() => setShowGuide((g) => ({ ...g, [r.id]: !g[r.id] }))}
+                        >
+                          {showGuide[r.id] ? 'Ẩn hướng dẫn' : '📋 Tra cứu hướng dẫn xử trí'}
+                        </button>
+                      </div>
+                      {showGuide[r.id] && (
+                        <div style={{ border: '1px solid var(--teal)', borderRadius: 12, padding: 14, background: '#f0faf8' }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--teal-deep)' }}>
+                            Hướng dẫn xử trí — {r.symptom} {r.ctcaeGrade ? `(Độ ${r.ctcaeGrade})` : ''}
+                          </div>
+                          <GuidelinePanel symptom={r.symptom} grade={r.ctcaeGrade} />
+                        </div>
+                      )}
                       <div>
                         <label className='field-label'>Biện pháp xử trí, can thiệp</label>
                         <textarea

@@ -262,6 +262,25 @@ model CtcaeTerm {
   version           String  @default("v6.0")
 
   @@index([term])
+  guidelines ManagementGuideline[]
+}
+
+// Hướng dẫn xử trí tác dụng phụ theo CTCAE term, grade, phương pháp điều trị
+model ManagementGuideline {
+  id              String  @id @default(cuid())
+  ctcaeTermId     String
+  ctcaeTerm       CtcaeTerm @relation(fields: [ctcaeTermId], references: [id], onDelete: Cascade)
+  grade           Int     // 1-4 (grade 5 = death, không có guideline)
+  modality        String  // CHEMO | RADIATION | TARGETED | IMMUNOTHERAPY | HORMONAL | ALL
+  assessment      String  // đánh giá / triệu chứng cần kiểm tra
+  management      String  // biện pháp xử trí
+  medication      String? // thuốc điều trị hỗ trợ nếu có
+  regimenAction   String? // CONTINUE | MONITOR | HOLD | REDUCE | STOP
+  referral        String? // chuyển khoa nếu cần
+  patientAdvice   String? // lời khuyên cho bệnh nhân (tiếng Việt)
+
+  @@unique([ctcaeTermId, grade, modality])
+  @@index([modality])
 }
 
 model SideEffectReport {

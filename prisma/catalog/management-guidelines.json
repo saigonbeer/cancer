@@ -1,0 +1,385 @@
+[
+  {
+    "lltCode": "10028813",
+    "term": "Nausea",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Buồn nôn nhẹ, ăn được", "management": "Thuốc chống nôn dự phòng theo phân loại nguy cơ gây nôn của phác đồ", "medication": "Ondansetron 8mg x 2-3 lần/ngày PO; Dexamethasone 8mg/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Chia nhỏ bữa ăn, tránh thức ăn dầu mỡ, uống nước gừng" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Buồn nôn giảm ăn nhưng chưa sụt cân", "management": "Phối hợp thuốc chống nôn; bù nước điện giải; đánh giá dinh dưỡng", "medication": "Ondansetron 8mg x 3 lần/ngày + Dexamethasone 8mg + Metoclopramide 10mg PRN", "regimenAction": "CONTINUE", "patientAdvice": "Ăn thức ăn lạnh/nguội, tránh mùi nấu ăn, nghỉ ngơi sau ăn" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Buồn nôn nặng, không ăn được, cần nhập viện bù dịch", "management": "Nhập viện bù dịch TM; phối hợp chống nôn 3 thuốc; hội chẩn dinh dưỡng", "medication": "Aprepitant 125mg ngày 1 → 80mg ngày 2-3 + Ondansetron IV + Dexamethasone IV", "regimenAction": "HOLD", "referral": "Dinh dưỡng lâm sàng", "patientAdvice": "Đến cơ sở y tế ngay nếu không uống được nước > 12 giờ" },
+      { "grade": 1, "modality": "RADIATION", "assessment": "Buồn nôn nhẹ khi xạ vùng bụng/chậu", "management": "Thuốc chống nôn trước mỗi buổi xạ", "medication": "Ondansetron 8mg PO 30 phút trước xạ", "regimenAction": "CONTINUE", "patientAdvice": "Ăn nhẹ 1-2 giờ trước xạ, không xạ lúc đói" },
+      { "grade": 2, "modality": "RADIATION", "assessment": "Buồn nôn ảnh hưởng ăn uống, xạ vùng bụng trên", "management": "Chống nôn thường quy + PRN; đánh giá tình trạng mất nước", "medication": "Ondansetron 8mg x 2 lần/ngày + Dexamethasone 4mg trước xạ", "regimenAction": "CONTINUE", "patientAdvice": "Uống đủ 1.5-2L nước/ngày, ăn nhiều bữa nhỏ" }
+    ]
+  },
+  {
+    "lltCode": "10047700",
+    "term": "Vomiting",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Nôn 1-2 lần/24h", "management": "Thuốc chống nôn theo phác đồ; bù nước uống", "medication": "Ondansetron 8mg PO PRN + Dexamethasone", "regimenAction": "CONTINUE", "patientAdvice": "Uống từng ngụm nhỏ nước ấm, tránh nằm ngay sau ăn" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Nôn 3-5 lần/24h, cần bù dịch TM < 24h", "management": "Bù dịch TM ngắn hạn; tăng cường chống nôn; theo dõi điện giải", "medication": "Ondansetron 8mg IV + Dexamethasone 8mg IV + Metoclopramide 10mg IV", "regimenAction": "MONITOR", "patientAdvice": "Đến phòng khám/cấp cứu nếu nôn > 3 lần" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Nôn ≥ 6 lần/24h, cần nhập viện bù dịch", "management": "Nhập viện; bù dịch TM; phối hợp 3 thuốc chống nôn; kiểm tra điện giải", "medication": "Aprepitant + Ondansetron IV + Dexamethasone IV; truyền NaCl 0.9% + KCl", "regimenAction": "HOLD", "referral": "Khoa nội tiêu hóa nếu kéo dài > 48h", "patientAdvice": "Nhập viện điều trị, không tự uống thuốc tại nhà" }
+    ]
+  },
+  {
+    "lltCode": "10012727",
+    "term": "Diarrhea",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Tăng < 4 lần/ngày so với bình thường", "management": "Bù nước uống; chế độ ăn BRAT; theo dõi", "medication": "Loperamide 4mg liều đầu → 2mg sau mỗi lần tiêu chảy (tối đa 16mg/ngày)", "regimenAction": "CONTINUE", "patientAdvice": "Uống nhiều nước, ăn cơm, chuối, bánh mì nướng, tránh sữa" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Tăng 4-6 lần/ngày, cần bù dịch TM < 24h", "management": "Bù dịch TM ngắn; Loperamide tích cực; xét nghiệm phân tìm Clostridium", "medication": "Loperamide tích cực + Octreotide 100-150mcg TDD x 3 nếu Loperamide thất bại", "regimenAction": "MONITOR", "patientAdvice": "Đến khám nếu tiêu chảy > 4 lần/ngày hoặc có máu" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Tăng ≥ 7 lần/ngày, nhập viện, mất nước nặng", "management": "Nhập viện; bù dịch TM; xét nghiệm phân + CTM + điện giải; kháng sinh nếu nhiễm trùng", "medication": "Octreotide 100-500mcg TDD x 3 + Bù dịch TM + Kháng sinh phổ rộng nếu sốt", "regimenAction": "HOLD", "referral": "Khoa tiêu hóa", "patientAdvice": "Nhập viện điều trị ngay" },
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "Tiêu chảy nhẹ, cần loại trừ colitis miễn dịch", "management": "Theo dõi sát; xét nghiệm phân; Loperamide nếu không có colitis", "medication": "Loperamide 2-4mg PRN", "regimenAction": "CONTINUE", "patientAdvice": "Báo bác sĩ ngay nếu có máu trong phân hoặc đau bụng dữ dội" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Tiêu chảy 4-6 lần/ngày, nghi colitis miễn dịch", "management": "Nội soi đại tràng; bắt đầu corticosteroid; tạm ngưng immunotherapy", "medication": "Prednisolone 1mg/kg/ngày PO; giảm dần trong 4-6 tuần", "regimenAction": "HOLD", "referral": "Khoa tiêu hóa nội soi", "patientAdvice": "Tạm ngưng điều trị miễn dịch, uống corticosteroid theo chỉ dẫn" },
+      { "grade": 1, "modality": "TARGETED", "assessment": "Tiêu chảy do thuốc đích (TKI, anti-EGFR)", "management": "Loperamide sớm; chế độ ăn ít chất xơ", "medication": "Loperamide 4mg → 2mg sau mỗi lần", "regimenAction": "CONTINUE", "patientAdvice": "Bắt đầu Loperamide ngay từ lần tiêu chảy đầu tiên" },
+      { "grade": 2, "modality": "RADIATION", "assessment": "Tiêu chảy do xạ vùng chậu/bụng", "management": "Bù nước + Loperamide; đánh giá cần nghỉ xạ", "medication": "Loperamide + Cholestyramine 4g x 2-3 nếu tiêu chảy mỡ", "regimenAction": "MONITOR", "patientAdvice": "Ăn ít chất xơ, tránh sữa, uống đủ nước" }
+    ]
+  },
+  {
+    "lltCode": "10016256",
+    "term": "Fatigue",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Mệt mỏi nhẹ, hoạt động bình thường", "management": "Khuyến khích tập thể dục nhẹ 150 phút/tuần; giữ giấc ngủ đều; đánh giá thiếu máu, tuyến giáp", "medication": "Bổ sung sắt nếu thiếu máu; Levothyroxine nếu suy giáp", "regimenAction": "CONTINUE", "patientAdvice": "Đi bộ 20-30 phút/ngày, ngủ đủ giấc, tránh caffeine chiều tối" },
+      { "grade": 2, "modality": "ALL", "assessment": "Mệt mỏi vừa, giảm khả năng sinh hoạt nhưng tự chăm sóc được", "management": "Xét nghiệm CTM, TSH, cortisol, điện giải; tư vấn dinh dưỡng; tâm lý hỗ trợ", "medication": "Điều trị nguyên nhân: truyền máu nếu Hb < 8; Methylphenidate 5-10mg sáng nếu không có nguyên nhân khác", "regimenAction": "CONTINUE", "referral": "Phục hồi chức năng; Tâm lý", "patientAdvice": "Ưu tiên hoạt động quan trọng buổi sáng, nghỉ ngắn 15-20 phút" },
+      { "grade": 3, "modality": "ALL", "assessment": "Mệt mỏi nặng, không tự chăm sóc được", "management": "Tìm và điều trị nguyên nhân tích cực; cân nhắc giảm liều/hoãn điều trị; hỗ trợ xã hội", "medication": "Truyền máu nếu thiếu máu nặng; Dexamethasone 4mg/ngày ngắn hạn", "regimenAction": "HOLD", "referral": "Hội chẩn đa chuyên khoa", "patientAdvice": "Cần người hỗ trợ chăm sóc, nghỉ ngơi tại giường, báo bác sĩ ngay" }
+    ]
+  },
+  {
+    "lltCode": "10002272",
+    "term": "Anemia",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Hb 10-LLN g/dL; không triệu chứng", "management": "Theo dõi CTM mỗi chu kỳ; bổ sung sắt nếu thiếu", "medication": "Sắt uống (Ferrous sulfate 325mg/ngày) nếu ferritin < 100", "regimenAction": "CONTINUE", "patientAdvice": "Ăn thực phẩm giàu sắt: thịt đỏ, rau xanh đậm, đậu" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Hb 8-10 g/dL; mệt mỏi khi gắng sức", "management": "Xét nghiệm sắt, B12, folate; cân nhắc ESA hoặc truyền máu", "medication": "Epoetin alfa 40,000 IU/tuần TDD hoặc Darbepoetin 200mcg/2 tuần; Sắt TM nếu ferritin < 100", "regimenAction": "MONITOR", "patientAdvice": "Hạn chế gắng sức, nghỉ ngơi nhiều, ăn đủ dinh dưỡng" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Hb 6.5-8 g/dL; cần truyền máu", "management": "Truyền KHC; hoãn chu kỳ hóa trị; giảm liều khi tiếp tục", "medication": "Truyền KHC 2 đơn vị; Epoetin alfa", "regimenAction": "HOLD", "referral": "Khoa huyết học", "patientAdvice": "Nhập viện truyền máu, tránh đứng đột ngột, có người đi kèm" },
+      { "grade": 4, "modality": "CHEMO", "assessment": "Hb < 6.5 g/dL; đe dọa tính mạng", "management": "Cấp cứu truyền máu; theo dõi sinh hiệu liên tục; hội chẩn", "medication": "Truyền KHC khẩn; bù dịch", "regimenAction": "STOP", "referral": "Cấp cứu + Huyết học", "patientAdvice": "Cấp cứu ngay lập tức" }
+    ]
+  },
+  {
+    "lltCode": "10029366",
+    "term": "Neutrophil count decreased",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "ANC 1500-LLN/mm³", "management": "Theo dõi CTM; không cần can thiệp", "regimenAction": "CONTINUE", "patientAdvice": "Rửa tay thường xuyên, tránh nơi đông người" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "ANC 1000-1500/mm³", "management": "Theo dõi CTM 2 lần/tuần; cân nhắc G-CSF dự phòng chu kỳ sau", "medication": "Filgrastim 5mcg/kg/ngày TDD nếu nguy cơ sốt giảm bạch cầu ≥ 20%", "regimenAction": "MONITOR", "patientAdvice": "Đo nhiệt độ 2 lần/ngày, đến viện ngay nếu sốt ≥ 38.3°C" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "ANC 500-1000/mm³", "management": "G-CSF bắt buộc; hoãn chu kỳ cho đến ANC > 1500; xem xét giảm liều", "medication": "Filgrastim 5-10mcg/kg/ngày TDD hoặc Pegfilgrastim 6mg 1 lần/chu kỳ", "regimenAction": "HOLD", "patientAdvice": "Cách ly tương đối, không ăn đồ sống, đeo khẩu trang, sốt = cấp cứu" },
+      { "grade": 4, "modality": "CHEMO", "assessment": "ANC < 500/mm³", "management": "Nhập viện cách ly; G-CSF; kháng sinh dự phòng nếu chưa sốt; giảm liều bắt buộc chu kỳ sau", "medication": "Filgrastim 10mcg/kg/ngày + Levofloxacin 500mg/ngày dự phòng", "regimenAction": "HOLD", "referral": "Huyết học", "patientAdvice": "Nhập viện, cách ly nghiêm ngặt, sốt bất kỳ = kháng sinh tĩnh mạch ngay" }
+    ]
+  },
+  {
+    "lltCode": "10016288",
+    "term": "Febrile neutropenia",
+    "guidelines": [
+      { "grade": 3, "modality": "CHEMO", "assessment": "ANC < 1000 + sốt ≥ 38.3°C hoặc ≥ 38°C kéo dài > 1h", "management": "CẤP CỨU: cấy máu → kháng sinh TM phổ rộng trong 1 giờ; G-CSF; nhập viện", "medication": "Piperacillin-Tazobactam 4.5g IV q6h hoặc Meropenem 1g IV q8h + Filgrastim 10mcg/kg/ngày", "regimenAction": "HOLD", "referral": "Khoa nhiễm + Huyết học", "patientAdvice": "Cấp cứu khẩn cấp, không chờ đợi, mang theo sổ điều trị" },
+      { "grade": 4, "modality": "CHEMO", "assessment": "Sốt giảm bạch cầu với sốc nhiễm trùng hoặc suy cơ quan", "management": "ICU; kháng sinh phổ rộng + kháng nấm; bù dịch tích cực; G-CSF; hội chẩn ngưng hóa trị", "medication": "Meropenem + Vancomycin + Caspofungin nếu > 72h; Noradrenaline nếu sốc", "regimenAction": "STOP", "referral": "ICU + Huyết học + Nhiễm", "patientAdvice": "Hồi sức tích cực ICU" }
+    ]
+  },
+  {
+    "lltCode": "10028130",
+    "term": "Mucositis oral",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Loét nhỏ, hồng ban, không đau khi ăn", "management": "Súc miệng muối bicarbonat 4-6 lần/ngày; vệ sinh răng miệng nhẹ nhàng", "medication": "Nước súc miệng NaHCO₃ 1% + NaCl 0.9%; Benzydamine", "regimenAction": "CONTINUE", "patientAdvice": "Dùng bàn chải mềm, tránh thức ăn cay nóng chua" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Loét vừa, đau khi ăn nhưng ăn mềm được", "management": "Thuốc giảm đau tại chỗ + toàn thân; đánh giá dinh dưỡng; cân nhắc laser mức thấp", "medication": "Morphine 2mg súc miệng hoặc Lidocaine viscous 2% + Paracetamol 1g x 4/ngày", "regimenAction": "MONITOR", "referral": "Răng hàm mặt; Dinh dưỡng", "patientAdvice": "Ăn thức ăn mềm nguội, uống qua ống hút nếu đau" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Loét nặng, không ăn uống được, cần nuôi dưỡng TM/ống", "management": "Nhập viện; nuôi dưỡng TM hoặc qua sonde; giảm đau opioid; hoãn hóa trị", "medication": "Morphine PCA hoặc Fentanyl patch; TPN hoặc sonde cho ăn", "regimenAction": "HOLD", "referral": "Dinh dưỡng + Giảm đau", "patientAdvice": "Nhập viện nuôi dưỡng tĩnh mạch" },
+      { "grade": 2, "modality": "RADIATION", "assessment": "Viêm niêm mạc do xạ đầu cổ, đau khi ăn", "management": "Giảm đau tại chỗ; dinh dưỡng bổ sung; đánh giá cần nghỉ xạ", "medication": "Benzydamine súc miệng + Paracetamol/Codeine; Bổ sung dinh dưỡng Ensure", "regimenAction": "MONITOR", "referral": "Dinh dưỡng", "patientAdvice": "Ăn thức ăn mềm ấm, tránh rượu bia, súc miệng sau mỗi bữa" }
+    ]
+  },
+  {
+    "lltCode": "10061103",
+    "term": "Dermatitis radiation",
+    "guidelines": [
+      { "grade": 1, "modality": "RADIATION", "assessment": "Hồng ban nhẹ, khô da, giảm tiết mồ hôi", "management": "Dưỡng ẩm vùng xạ; tránh ma sát; mặc quần áo cotton rộng", "medication": "Kem dưỡng ẩm Aquaphor hoặc Aloe vera; Hydrocortisone 1% nếu ngứa", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dưỡng ẩm 2-3 lần/ngày, không gãi, không dùng xà phòng mạnh" },
+      { "grade": 2, "modality": "RADIATION", "assessment": "Hồng ban vừa đến nặng, phù nề, bong da ẩm khu trú", "management": "Chăm sóc vết thương; Silver sulfadiazine nếu bong da ẩm; đánh giá nghỉ xạ", "medication": "Silver sulfadiazine 1% hoặc Mepitel Film; Mometasone 0.1%", "regimenAction": "MONITOR", "referral": "Chăm sóc vết thương", "patientAdvice": "Không bóc da bong, giữ vùng da sạch thoáng, báo bác sĩ nếu chảy dịch" },
+      { "grade": 3, "modality": "RADIATION", "assessment": "Bong da ẩm lan rộng, loét, chảy máu; rất đau", "management": "Ngưng xạ tạm thời; chăm sóc vết thương chuyên sâu; giảm đau", "medication": "Gạc Mepilex Ag + Morphine uống/TDD; Kháng sinh nếu nhiễm trùng", "regimenAction": "HOLD", "referral": "Bỏng/vết thương + Xạ trị", "patientAdvice": "Nghỉ xạ cho da lành, chăm sóc vết thương hàng ngày tại viện" }
+    ]
+  },
+  {
+    "lltCode": "10037868",
+    "term": "Rash maculo-papular",
+    "guidelines": [
+      { "grade": 1, "modality": "TARGETED", "assessment": "Ban sẩn < 10% BSA, không triệu chứng", "management": "Dưỡng ẩm; kem corticoid nhẹ", "medication": "Hydrocortisone 1% cream x 2 lần/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dưỡng ẩm, tránh nắng, không gãi" },
+      { "grade": 2, "modality": "TARGETED", "assessment": "Ban sẩn 10-30% BSA, ngứa, ảnh hưởng sinh hoạt", "management": "Corticoid mạnh tại chỗ + kháng histamine; cân nhắc kháng sinh nếu nghi bội nhiễm", "medication": "Mometasone 0.1% cream + Cetirizine 10mg/ngày + Doxycycline 100mg x 2 nếu mụn mủ", "regimenAction": "CONTINUE", "patientAdvice": "Dùng thuốc đều đặn, mặc quần áo cotton, tránh nước nóng" },
+      { "grade": 3, "modality": "TARGETED", "assessment": "Ban sẩn > 30% BSA, bong da, loét", "management": "Tạm ngưng thuốc đích; corticoid toàn thân; hội chẩn da liễu", "medication": "Prednisolone 0.5-1mg/kg/ngày x 5-7 ngày rồi giảm dần", "regimenAction": "HOLD", "referral": "Da liễu", "patientAdvice": "Ngưng thuốc đích, uống corticoid theo chỉ dẫn, tái khám sớm" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Ban sẩn miễn dịch 10-30% BSA", "management": "Corticoid tại chỗ mạnh; kháng histamine; theo dõi sát tiến triển", "medication": "Triamcinolone 0.1% cream + Hydroxyzine 25mg/đêm", "regimenAction": "CONTINUE", "patientAdvice": "Theo dõi, báo ngay nếu ban lan nhanh hoặc có bọng nước" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "Ban lan rộng > 30% BSA, nghi Stevens-Johnson", "management": "NGƯNG immunotherapy ngay; nhập viện; corticoid TM liều cao; loại trừ SJS/TEN", "medication": "Methylprednisolone 1-2mg/kg/ngày IV", "regimenAction": "STOP", "referral": "Da liễu khẩn + Dị ứng miễn dịch", "patientAdvice": "Nhập viện ngay, đây là phản ứng miễn dịch nghiêm trọng" }
+    ]
+  },
+  {
+    "lltCode": "10001760",
+    "term": "Alopecia",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Rụng tóc < 50%, nhìn thấy được", "management": "Tư vấn tâm lý; cân nhắc làm lạnh da đầu (scalp cooling) nếu phác đồ phù hợp", "medication": "Không có thuốc hiệu quả; Minoxidil 2% có thể thử sau khi kết thúc hóa trị", "regimenAction": "CONTINUE", "patientAdvice": "Tóc sẽ mọc lại sau khi kết thúc điều trị; dùng khăn/mũ/tóc giả nếu muốn" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Rụng tóc > 50%, cần tóc giả", "management": "Hỗ trợ tâm lý; giới thiệu tóc giả; tư vấn về thời gian mọc lại", "regimenAction": "CONTINUE", "patientAdvice": "Tóc thường mọc lại 3-6 tháng sau hóa trị, có thể khác màu/kết cấu ban đầu" },
+      { "grade": 1, "modality": "HORMONAL", "assessment": "Tóc mỏng dần", "management": "Theo dõi; tư vấn chăm sóc tóc nhẹ nhàng", "medication": "Biotin 2.5mg/ngày (hiệu quả chưa rõ); Minoxidil 2%", "regimenAction": "CONTINUE", "patientAdvice": "Gội đầu nhẹ nhàng, không nhuộm/sấy nóng, bổ sung protein" }
+    ]
+  },
+  {
+    "lltCode": "10034620",
+    "term": "Peripheral sensory neuropathy",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Tê bì đầu chi, không đau, không ảnh hưởng chức năng", "management": "Theo dõi mỗi chu kỳ; ghi nhận phân độ baseline", "medication": "Duloxetine 30mg/ngày (dự phòng cho Oxaliplatin/Taxane)", "regimenAction": "CONTINUE", "patientAdvice": "Tránh lạnh (Oxaliplatin), mang tất/găng, kiểm tra chân hàng ngày" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Tê đau ảnh hưởng sinh hoạt (cài nút, cầm đũa khó)", "management": "Cân nhắc giảm liều 25%; Duloxetine điều trị; vật lý trị liệu", "medication": "Duloxetine 60mg/ngày hoặc Gabapentin 300-900mg/ngày", "regimenAction": "REDUCE", "referral": "Phục hồi chức năng", "patientAdvice": "Báo bác sĩ ngay, có thể cần giảm liều thuốc để tránh tổn thương vĩnh viễn" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Mất chức năng tay/chân, không tự chăm sóc được", "management": "NGƯNG thuốc gây neuropathy; giảm đau tích cực; phục hồi chức năng", "medication": "Duloxetine 60mg + Gabapentin 600-1200mg/ngày; Opioid nếu đau nặng", "regimenAction": "STOP", "referral": "Thần kinh + PHCN", "patientAdvice": "Ngưng thuốc gây tê, tổn thương có thể hồi phục một phần sau vài tháng" }
+    ]
+  },
+  {
+    "lltCode": "10054524",
+    "term": "Palmar-plantar erythrodysesthesia syndrome",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Đỏ da, tê nhẹ lòng bàn tay/chân", "management": "Dưỡng ẩm tích cực; tránh ma sát, nước nóng", "medication": "Kem Urea 10-20% x 3 lần/ngày; Pyridoxine 50-100mg/ngày (Capecitabine)", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dưỡng ẩm dày, mang giày mềm, tránh nước nóng" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Đỏ đau, phù nề, ảnh hưởng đi lại/cầm nắm", "management": "Giảm liều 25%; nghỉ thuốc 1 tuần cho đến grade ≤ 1", "medication": "Kem Urea + Clobetasol 0.05% cream + Paracetamol", "regimenAction": "REDUCE", "patientAdvice": "Nghỉ thuốc tạm, bôi kem, ngâm tay chân nước mát" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Phồng rộp, loét, không đi được/cầm nắm", "management": "Ngưng thuốc cho đến grade ≤ 1; giảm liều 50% khi tái sử dụng hoặc đổi phác đồ", "medication": "Giảm đau opioid nếu cần + Chăm sóc vết thương", "regimenAction": "HOLD", "patientAdvice": "Ngưng thuốc, chăm sóc vết thương, tái khám khi bớt" },
+      { "grade": 1, "modality": "TARGETED", "assessment": "Hội chứng bàn tay-chân do Sorafenib/Sunitinib", "management": "Dưỡng ẩm; giảm áp lực lên tay chân; kiểm tra mỗi 2 tuần", "medication": "Kem Urea 10% + Clobetasol nếu đỏ", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dày trước khi ngủ, mang tất cotton, tránh đi bộ xa" }
+    ]
+  },
+  {
+    "lltCode": "10020772",
+    "term": "Hypertension",
+    "guidelines": [
+      { "grade": 1, "modality": "TARGETED", "assessment": "THA tăng HA tâm thu 120-139 hoặc tâm trương 80-89", "management": "Theo dõi HA hàng ngày; thay đổi lối sống", "regimenAction": "CONTINUE", "patientAdvice": "Đo HA sáng tối, ăn nhạt, hạn chế muối < 5g/ngày" },
+      { "grade": 2, "modality": "TARGETED", "assessment": "HA tâm thu 140-159 hoặc tâm trương 90-99, cần thuốc", "management": "Bắt đầu thuốc hạ áp; theo dõi HA 2 lần/ngày", "medication": "Amlodipine 5-10mg/ngày hoặc Enalapril 5-10mg/ngày (ưu tiên ACEI/ARB nếu có protein niệu)", "regimenAction": "CONTINUE", "patientAdvice": "Uống thuốc hạ áp đều đặn, ghi sổ HA, tái khám 2 tuần" },
+      { "grade": 3, "modality": "TARGETED", "assessment": "HA tâm thu ≥ 160 hoặc tâm trương ≥ 100, cần phối hợp thuốc", "management": "Tạm ngưng thuốc đích; kiểm soát HA bằng phối hợp thuốc; tái sử dụng khi HA < 140/90", "medication": "Amlodipine 10mg + Enalapril 10mg + HCTZ 12.5mg nếu cần", "regimenAction": "HOLD", "referral": "Tim mạch", "patientAdvice": "Ngưng thuốc đích tạm, uống thuốc HA đều, đến viện nếu nhức đầu dữ dội" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Tăng HA do corticoid điều trị irAE", "management": "Thuốc hạ áp; theo dõi; giảm corticoid sớm nhất có thể", "medication": "Amlodipine 5mg/ngày", "regimenAction": "CONTINUE", "patientAdvice": "HA sẽ cải thiện khi giảm corticoid" }
+    ]
+  },
+  {
+    "lltCode": "10035742",
+    "term": "Pneumonitis",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "Viêm phổi miễn dịch không triệu chứng, chỉ phát hiện trên CT", "management": "Theo dõi SpO2, triệu chứng hô hấp; CT ngực kiểm tra sau 3-4 tuần", "regimenAction": "HOLD", "patientAdvice": "Tạm ngưng thuốc miễn dịch, tái khám CT ngực, báo ngay nếu khó thở" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Khó thở nhẹ-vừa, cần oxy hỗ trợ", "management": "NGƯNG immunotherapy; Corticoid liều cao; CT ngực; theo dõi sát", "medication": "Prednisolone 1-2mg/kg/ngày PO; giảm dần ≥ 6 tuần", "regimenAction": "HOLD", "referral": "Hô hấp", "patientAdvice": "Ngưng điều trị miễn dịch, uống corticoid theo chỉ dẫn, tái khám mỗi tuần" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "Suy hô hấp nặng, cần O2 liều cao hoặc thở máy", "management": "Nhập viện; Methylprednisolone TM liều cao; cân nhắc Infliximab/MMF nếu kháng corticoid", "medication": "Methylprednisolone 2-4mg/kg/ngày IV → Prednisolone PO giảm dần 8-12 tuần; Infliximab 5mg/kg nếu không đáp ứng 48h", "regimenAction": "STOP", "referral": "Hô hấp + ICU", "patientAdvice": "Nhập viện khẩn, đây là biến chứng nghiêm trọng của immunotherapy" },
+      { "grade": 2, "modality": "RADIATION", "assessment": "Viêm phổi do xạ, ho khan, khó thở nhẹ", "management": "Corticoid; theo dõi chức năng phổi; đánh giá xơ hóa", "medication": "Prednisolone 40-60mg/ngày → giảm dần 4-6 tuần", "regimenAction": "MONITOR", "referral": "Hô hấp", "patientAdvice": "Uống corticoid đủ liều, tái khám phổi, tránh khói thuốc" }
+    ]
+  },
+  {
+    "lltCode": "10009887",
+    "term": "Colitis",
+    "guidelines": [
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Tiêu chảy 4-6 lần + đau bụng; nghi colitis miễn dịch", "management": "Tạm ngưng immunotherapy; nội soi nếu kéo dài > 3 ngày; corticoid", "medication": "Prednisolone 1mg/kg/ngày; Loperamide tránh nếu nghi colitis", "regimenAction": "HOLD", "referral": "Tiêu hóa nội soi", "patientAdvice": "Ngưng thuốc miễn dịch, không tự uống Loperamide, đến viện khám" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "Tiêu chảy ≥ 7 lần, đau bụng nặng, có máu", "management": "NGƯNG immunotherapy vĩnh viễn; nhập viện; Methylprednisolone TM; nội soi; Infliximab nếu kháng corticoid", "medication": "Methylprednisolone 2mg/kg/ngày IV → giảm dần 8 tuần; Infliximab 5mg/kg nếu không đáp ứng 3 ngày", "regimenAction": "STOP", "referral": "Tiêu hóa + Miễn dịch", "patientAdvice": "Nhập viện khẩn, ngưng immunotherapy vĩnh viễn với thuốc này" }
+    ]
+  },
+  {
+    "lltCode": "10019717",
+    "term": "Hepatitis",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "AST/ALT 1-3x ULN, không triệu chứng", "management": "Kiểm tra men gan mỗi tuần; loại trừ virus, thuốc khác", "regimenAction": "CONTINUE", "patientAdvice": "Xét nghiệm máu mỗi tuần, không uống rượu, báo thuốc đang dùng" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "AST/ALT 3-5x ULN", "management": "Tạm ngưng immunotherapy; corticoid; kiểm tra men gan 2 lần/tuần", "medication": "Prednisolone 0.5-1mg/kg/ngày", "regimenAction": "HOLD", "referral": "Gan mật", "patientAdvice": "Ngưng thuốc miễn dịch, uống corticoid, xét nghiệm sát" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "AST/ALT 5-20x ULN hoặc Bilirubin 3-10x ULN", "management": "NGƯNG immunotherapy; Methylprednisolone TM; MMF nếu kháng corticoid; siêu âm gan", "medication": "Methylprednisolone 2mg/kg/ngày IV; MMF 500-1000mg x 2 nếu không đáp ứng 3 ngày", "regimenAction": "STOP", "referral": "Gan mật khẩn", "patientAdvice": "Nhập viện, đây là tổn thương gan do miễn dịch cần điều trị tích cực" },
+      { "grade": 2, "modality": "TARGETED", "assessment": "Tăng men gan do TKI", "management": "Tạm ngưng thuốc đích; theo dõi men gan mỗi tuần; tái sử dụng khi về grade ≤ 1", "regimenAction": "HOLD", "patientAdvice": "Ngưng thuốc tạm, xét nghiệm máu theo lịch" }
+    ]
+  },
+  {
+    "lltCode": "10021114",
+    "term": "Hypothyroidism",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "TSH tăng nhẹ, FT4 bình thường", "management": "Theo dõi TSH mỗi 4-6 tuần; chưa cần điều trị", "regimenAction": "CONTINUE", "patientAdvice": "Xét nghiệm tuyến giáp định kỳ, báo nếu mệt mỏi/lạnh/tăng cân" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "TSH tăng + FT4 giảm, có triệu chứng (mệt, lạnh, táo bón)", "management": "Bắt đầu Levothyroxine; tiếp tục immunotherapy; theo dõi TSH mỗi 6 tuần", "medication": "Levothyroxine 25-50mcg/ngày (tăng dần mỗi 4-6 tuần)", "regimenAction": "CONTINUE", "patientAdvice": "Uống Levothyroxine lúc đói buổi sáng, cách ăn 30 phút, điều trị suốt đời có thể" },
+      { "grade": 2, "modality": "HORMONAL", "assessment": "Suy giáp do Tamoxifen hoặc aromatase inhibitor", "management": "Xét nghiệm TSH, FT4; bắt đầu Levothyroxine nếu lâm sàng rõ", "medication": "Levothyroxine 25-50mcg/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Uống thuốc tuyến giáp đều đặn" }
+    ]
+  },
+  {
+    "lltCode": "10020850",
+    "term": "Hyperthyroidism",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "TSH giảm, FT4 bình thường hoặc tăng nhẹ, không triệu chứng", "management": "Theo dõi TSH, FT4 mỗi 2 tuần; thường tiến triển sang suy giáp", "regimenAction": "CONTINUE", "patientAdvice": "Theo dõi nhịp tim, báo nếu hồi hộp/run tay/sụt cân nhanh" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Cường giáp có triệu chứng (tim nhanh, run, sụt cân)", "management": "Beta-blocker kiểm soát triệu chứng; theo dõi sát → thường chuyển sang suy giáp", "medication": "Propranolol 10-40mg x 3 lần/ngày; KHÔNG dùng thuốc kháng giáp trừ khi kéo dài", "regimenAction": "HOLD", "referral": "Nội tiết", "patientAdvice": "Uống thuốc giảm nhịp tim, giai đoạn này thường tạm thời" }
+    ]
+  },
+  {
+    "lltCode": "10001367",
+    "term": "Adrenal insufficiency",
+    "guidelines": [
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Mệt mỏi, hạ HA tư thế, cortisol sáng thấp", "management": "Bắt đầu hydrocortisone thay thế; tạm ngưng immunotherapy đến ổn định", "medication": "Hydrocortisone 10mg sáng + 5mg chiều; Fludrocortisone 0.05-0.1mg nếu cần", "regimenAction": "HOLD", "referral": "Nội tiết", "patientAdvice": "Uống thuốc thay thế cortisol suốt đời, mang thẻ suy thượng thận" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "Suy thượng thận cấp (crisis): hạ HA, sốc, rối loạn ý thức", "management": "CẤP CỨU: Hydrocortisone TM liều stress; bù dịch NaCl; theo dõi ICU", "medication": "Hydrocortisone 100mg IV bolus → 50mg IV q8h; NaCl 0.9% bù dịch", "regimenAction": "STOP", "referral": "Cấp cứu + Nội tiết", "patientAdvice": "Cấp cứu khẩn cấp, mang theo lọ Hydrocortisone tiêm" }
+    ]
+  },
+  {
+    "lltCode": "10020407",
+    "term": "Hot flashes",
+    "guidelines": [
+      { "grade": 1, "modality": "HORMONAL", "assessment": "Bốc hỏa nhẹ, không ảnh hưởng sinh hoạt", "management": "Thay đổi lối sống; mặc quần áo thoáng; tránh caffeine/rượu", "regimenAction": "CONTINUE", "patientAdvice": "Mặc nhiều lớp mỏng, quạt cầm tay, uống nước mát, tập thể dục đều" },
+      { "grade": 2, "modality": "HORMONAL", "assessment": "Bốc hỏa ảnh hưởng giấc ngủ và sinh hoạt", "management": "Thuốc không nội tiết giảm bốc hỏa; tư vấn tâm lý nếu cần", "medication": "Venlafaxine 37.5-75mg/ngày hoặc Gabapentin 300mg/đêm hoặc Oxybutynin 2.5mg x 2", "regimenAction": "CONTINUE", "patientAdvice": "Thuốc giảm bốc hỏa hiệu quả 50-60%, cần 2-4 tuần mới thấy tác dụng" }
+    ]
+  },
+  {
+    "lltCode": "10003239",
+    "term": "Arthralgia",
+    "guidelines": [
+      { "grade": 1, "modality": "HORMONAL", "assessment": "Đau khớp nhẹ (do Aromatase Inhibitor)", "management": "Tập thể dục đều 150 phút/tuần; giảm đau đơn giản", "medication": "Paracetamol 500mg x 3-4/ngày PRN", "regimenAction": "CONTINUE", "patientAdvice": "Tập yoga/bơi/đi bộ giảm đau khớp hiệu quả hơn nghỉ ngơi" },
+      { "grade": 2, "modality": "HORMONAL", "assessment": "Đau khớp ảnh hưởng chức năng, cần giảm đau thường xuyên", "management": "NSAID ngắn hạn; vật lý trị liệu; cân nhắc đổi AI hoặc chuyển Tamoxifen", "medication": "Ibuprofen 400mg x 3/ngày x 2 tuần; Duloxetine 30-60mg/ngày nếu kéo dài", "regimenAction": "CONTINUE", "referral": "Cơ xương khớp + PHCN", "patientAdvice": "Thử NSAID 2 tuần, nếu không đỡ có thể đổi thuốc nội tiết" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Đau khớp do viêm khớp miễn dịch", "management": "NSAID liều đầy đủ; nếu không đáp ứng → corticoid liều thấp", "medication": "Naproxen 500mg x 2/ngày → Prednisolone 10-20mg/ngày nếu thất bại", "regimenAction": "CONTINUE", "referral": "Cơ xương khớp", "patientAdvice": "Viêm khớp miễn dịch thường đáp ứng tốt với thuốc" }
+    ]
+  },
+  {
+    "lltCode": "10002646",
+    "term": "Anorexia",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Giảm cảm giác ngon miệng, chưa sụt cân", "management": "Tư vấn dinh dưỡng; chia nhỏ bữa ăn 6 lần/ngày; bổ sung dinh dưỡng uống", "medication": "Bổ sung dinh dưỡng uống (Ensure/Boost) 1-2 hộp/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Ăn bất cứ khi nào thấy đói, ưu tiên protein, uống sữa dinh dưỡng" },
+      { "grade": 2, "modality": "ALL", "assessment": "Giảm cân 5-10%; cần thay đổi chế độ ăn", "management": "Hội chẩn dinh dưỡng; cân nhắc thuốc kích thích ăn; theo dõi cân nặng hàng tuần", "medication": "Megestrol acetate 160-400mg/ngày hoặc Dexamethasone 2-4mg/ngày ngắn hạn", "regimenAction": "MONITOR", "referral": "Dinh dưỡng lâm sàng", "patientAdvice": "Cân mỗi tuần, ghi nhật ký ăn uống, uống bổ sung dinh dưỡng" },
+      { "grade": 3, "modality": "ALL", "assessment": "Sụt cân > 10%; cần nuôi dưỡng bổ sung", "management": "Nhập viện; đặt sonde cho ăn hoặc TPN; đánh giá nguyên nhân toàn diện", "medication": "TPN hoặc sonde; Megestrol + Dexamethasone", "regimenAction": "HOLD", "referral": "Dinh dưỡng + Tiêu hóa", "patientAdvice": "Cần nuôi dưỡng tích cực tại viện" }
+    ]
+  },
+  {
+    "lltCode": "10010774",
+    "term": "Constipation",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Táo bón nhẹ, giảm tần suất đi tiêu", "management": "Tăng chất xơ, nước; thuốc nhuận tràng thẩm thấu", "medication": "Lactulose 15-30ml/ngày hoặc Macrogol (PEG) 1 gói/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Uống ≥ 2L nước/ngày, ăn rau xanh trái cây, đi bộ" },
+      { "grade": 2, "modality": "ALL", "assessment": "Táo bón cần thuốc nhuận tràng thường xuyên", "management": "Phối hợp nhuận tràng; loại trừ tắc ruột nếu đau bụng; đánh giá thuốc opioid", "medication": "Lactulose + Bisacodyl 5-10mg/tối; Methylnaltrexone nếu do opioid", "regimenAction": "CONTINUE", "patientAdvice": "Uống thuốc nhuận tràng đều, không nhịn đi vệ sinh, báo nếu > 3 ngày" }
+    ]
+  },
+  {
+    "lltCode": "10051792",
+    "term": "Infusion related reaction",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Phản ứng nhẹ khi truyền: ngứa, phát ban nhẹ, sốt nhẹ", "management": "Giảm tốc độ truyền 50%; thuốc tiền mê cho lần sau", "medication": "Dexamethasone 10mg + Diphenhydramine 25-50mg + Paracetamol 1g tiền mê", "regimenAction": "CONTINUE", "patientAdvice": "Phản ứng nhẹ thường kiểm soát được, lần sau sẽ cho thuốc dự phòng" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Phản ứng vừa: khó thở, tụt HA, co thắt phế quản", "management": "NGƯNG truyền ngay; điều trị triệu chứng; truyền lại chậm hơn nếu ổn", "medication": "Hydrocortisone 100mg IV + Chlorpheniramine 10mg IV + Salbutamol khí dung nếu co thắt", "regimenAction": "MONITOR", "patientAdvice": "Báo nhân viên ngay nếu khó thở/ngứa/chóng mặt khi đang truyền" },
+      { "grade": 3, "modality": "CHEMO", "assessment": "Phản ứng nặng: sốc phản vệ", "management": "DỪNG truyền ngay; Adrenaline; kê desensitization hoặc đổi thuốc", "medication": "Adrenaline 0.3-0.5mg IM + Hydrocortisone 200mg IV + NaCl 0.9% bù dịch", "regimenAction": "STOP", "referral": "Dị ứng (desensitization protocol)", "patientAdvice": "Không dùng lại thuốc này trừ khi có protocol giải mẫn cảm" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Phản ứng truyền immunotherapy", "management": "Ngưng truyền; điều trị triệu chứng; tái truyền chậm hơn 50%", "medication": "Dexamethasone 10mg IV + Diphenhydramine 50mg IV", "regimenAction": "MONITOR", "patientAdvice": "Phản ứng truyền immunotherapy thường nhẹ hơn các lần sau" }
+    ]
+  },
+  {
+    "lltCode": "10052015",
+    "term": "Cytokine release syndrome",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "Sốt ≥ 38°C, không hạ HA", "management": "Theo dõi sát; hạ sốt; xét nghiệm CRP, ferritin, LDH", "medication": "Paracetamol 1g; bù dịch uống", "regimenAction": "MONITOR", "patientAdvice": "Sốt sau immunotherapy cần báo bác sĩ ngay" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Sốt + hạ HA đáp ứng bù dịch, SpO2 > 90%", "management": "Nhập viện; bù dịch TM; cân nhắc Tocilizumab", "medication": "Tocilizumab 8mg/kg IV (tối đa 800mg); Dexamethasone 10mg IV nếu nặng", "regimenAction": "HOLD", "referral": "Huyết học/Ung bướu", "patientAdvice": "Nhập viện theo dõi, cần điều trị kịp thời" },
+      { "grade": 3, "modality": "IMMUNOTHERAPY", "assessment": "Hạ HA cần vận mạch, SpO2 < 90% cần O2", "management": "ICU; Tocilizumab + corticoid; vận mạch; thở oxy/máy thở", "medication": "Tocilizumab 8mg/kg + Dexamethasone 10mg IV q12h + Noradrenaline", "regimenAction": "STOP", "referral": "ICU", "patientAdvice": "Hồi sức tích cực ICU" }
+    ]
+  },
+  {
+    "lltCode": "10013786",
+    "term": "Dry skin",
+    "guidelines": [
+      { "grade": 1, "modality": "TARGETED", "assessment": "Da khô do anti-EGFR, TKI", "management": "Dưỡng ẩm tích cực ngay từ đầu điều trị", "medication": "Kem dưỡng ẩm Cetaphil/Eucerin x 2-3 lần/ngày; tránh xà phòng mạnh", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dưỡng ẩm ngay sau tắm, tắm nước ấm không nóng" },
+      { "grade": 2, "modality": "TARGETED", "assessment": "Da khô nứt nẻ, ngứa, ảnh hưởng sinh hoạt", "management": "Dưỡng ẩm + corticoid tại chỗ; kháng histamine ban đêm", "medication": "Kem Urea 10% + Mometasone 0.1% vùng nứt + Hydroxyzine 25mg/đêm", "regimenAction": "CONTINUE", "patientAdvice": "Bôi kem dày trước ngủ, mang bao tay cotton, cắt móng ngắn" }
+    ]
+  },
+  {
+    "lltCode": "10037087",
+    "term": "Pruritus",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Ngứa nhẹ, khu trú", "management": "Dưỡng ẩm; kháng histamine PRN; tránh gãi", "medication": "Cetirizine 10mg/ngày hoặc Loratadine 10mg/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Tắm nước mát, bôi kem dưỡng ẩm, không gãi" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Ngứa lan rộng, ảnh hưởng giấc ngủ", "management": "Kháng histamine liều cao; corticoid tại chỗ; cân nhắc Gabapentin", "medication": "Cetirizine 10mg x 2 + Hydroxyzine 25mg/đêm + Triamcinolone cream", "regimenAction": "CONTINUE", "patientAdvice": "Dùng thuốc đều, mặc cotton, giữ phòng mát" }
+    ]
+  },
+  {
+    "lltCode": "10013963",
+    "term": "Dyspnea",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Khó thở nhẹ khi gắng sức", "management": "Đánh giá nguyên nhân: thiếu máu, tràn dịch, thuyên tắc phổi, viêm phổi; SpO2", "regimenAction": "CONTINUE", "patientAdvice": "Tập thở chậm sâu, nghỉ ngơi khi khó thở" },
+      { "grade": 2, "modality": "ALL", "assessment": "Khó thở khi sinh hoạt thường ngày", "management": "Xquang ngực / CT ngực; CTM; BNP nếu nghi suy tim; xử trí nguyên nhân", "medication": "O2 qua cannula nếu SpO2 < 94%; Morphine 2.5-5mg PO nếu ung thư tiến triển", "regimenAction": "MONITOR", "referral": "Hô hấp / Tim mạch tùy nguyên nhân", "patientAdvice": "Đến khám ngay, mang theo kết quả XN gần nhất" },
+      { "grade": 3, "modality": "ALL", "assessment": "Khó thở khi nghỉ, cần O2 liên tục", "management": "Nhập viện; tìm và xử trí nguyên nhân khẩn; O2; giảm đau nếu ung thư tiến triển", "medication": "O2 mask/CPAP; Morphine IV nếu cần; Dexamethasone nếu tắc nghẽn", "regimenAction": "HOLD", "referral": "Cấp cứu", "patientAdvice": "Gọi cấp cứu 115 nếu khó thở nặng đột ngột" }
+    ]
+  },
+  {
+    "lltCode": "10013911",
+    "term": "Dysgeusia",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Thay đổi vị giác nhẹ (kim loại, đắng)", "management": "Tư vấn dinh dưỡng; thử gia vị khác; kẹo bạc hà", "medication": "Kẽm sulfate 220mg/ngày (thử 4-6 tuần)", "regimenAction": "CONTINUE", "patientAdvice": "Dùng thìa nhựa thay kim loại, thêm chanh/gừng vào món ăn, nhai kẹo bạc hà" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Mất vị giác ảnh hưởng ăn uống, sụt cân", "management": "Hội chẩn dinh dưỡng; bổ sung dinh dưỡng uống; theo dõi cân nặng", "medication": "Kẽm sulfate 220mg + Bổ sung dinh dưỡng Ensure", "regimenAction": "CONTINUE", "referral": "Dinh dưỡng", "patientAdvice": "Vị giác thường phục hồi 2-3 tháng sau khi kết thúc hóa trị" },
+      { "grade": 1, "modality": "RADIATION", "assessment": "Mất vị giác do xạ đầu cổ", "management": "Dự phòng: bổ sung kẽm từ đầu; tư vấn dinh dưỡng", "medication": "Kẽm sulfate 220mg/ngày + Amifostine nếu có chỉ định", "regimenAction": "CONTINUE", "patientAdvice": "Vị giác có thể mất 6-12 tháng phục hồi sau xạ đầu cổ" }
+    ]
+  },
+  {
+    "lltCode": "10047900",
+    "term": "Weight loss",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Sụt cân 5-10% so với trước điều trị", "management": "Tư vấn dinh dưỡng; bổ sung protein; cân hàng tuần", "medication": "Bổ sung dinh dưỡng uống 1-2 hộp/ngày; Megestrol 160mg nếu kéo dài", "regimenAction": "CONTINUE", "referral": "Dinh dưỡng", "patientAdvice": "Ăn nhiều protein (trứng, thịt, cá), uống sữa dinh dưỡng giữa bữa" },
+      { "grade": 2, "modality": "ALL", "assessment": "Sụt cân 10-20%, suy dinh dưỡng rõ", "management": "Hội chẩn dinh dưỡng khẩn; cân nhắc sonde/TPN; đánh giá nguyên nhân", "medication": "TPN hoặc sonde nếu ăn uống < 60% nhu cầu; Megestrol 400mg + Dexamethasone 2mg", "regimenAction": "MONITOR", "referral": "Dinh dưỡng + Tiêu hóa", "patientAdvice": "Cần can thiệp dinh dưỡng tích cực để tiếp tục điều trị ung thư" }
+    ]
+  },
+  {
+    "lltCode": "10022437",
+    "term": "Insomnia",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Khó ngủ nhẹ, không ảnh hưởng ban ngày", "management": "Vệ sinh giấc ngủ; tránh caffeine sau 14h; tập thể dục buổi sáng", "regimenAction": "CONTINUE", "patientAdvice": "Ngủ cùng giờ mỗi tối, tắt điện thoại 1h trước ngủ, phòng tối mát" },
+      { "grade": 2, "modality": "ALL", "assessment": "Mất ngủ ảnh hưởng chức năng ban ngày", "management": "CBT-I (liệu pháp nhận thức hành vi); thuốc ngắn hạn", "medication": "Melatonin 3-5mg trước ngủ hoặc Zolpidem 5-10mg ngắn hạn (< 4 tuần)", "regimenAction": "CONTINUE", "referral": "Tâm lý (CBT-I)", "patientAdvice": "Thuốc ngủ chỉ dùng ngắn hạn, ưu tiên liệu pháp hành vi" }
+    ]
+  },
+  {
+    "lltCode": "10012378",
+    "term": "Depression",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Buồn chán nhẹ, chưa ảnh hưởng điều trị", "management": "Sàng lọc PHQ-9; tư vấn tâm lý hỗ trợ; khuyến khích hoạt động", "regimenAction": "CONTINUE", "patientAdvice": "Nói chuyện với người thân, tham gia nhóm hỗ trợ bệnh nhân ung thư" },
+      { "grade": 2, "modality": "ALL", "assessment": "Trầm cảm vừa, ảnh hưởng sinh hoạt và tuân thủ điều trị", "management": "Thuốc chống trầm cảm + tâm lý trị liệu; theo dõi tuân thủ điều trị ung thư", "medication": "Sertraline 50mg/ngày hoặc Mirtazapine 15mg/đêm (nếu kèm chán ăn/mất ngủ)", "regimenAction": "CONTINUE", "referral": "Tâm thần / Tâm lý ung thư", "patientAdvice": "Thuốc trầm cảm an toàn dùng cùng hóa trị, cần 2-4 tuần có hiệu quả" }
+    ]
+  },
+  {
+    "lltCode": "10002855",
+    "term": "Anxiety",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Lo âu nhẹ liên quan điều trị", "management": "Tư vấn tâm lý; kỹ thuật thư giãn; thở sâu", "regimenAction": "CONTINUE", "patientAdvice": "Lo lắng khi điều trị ung thư là bình thường, tập thở sâu 4-7-8" },
+      { "grade": 2, "modality": "ALL", "assessment": "Lo âu ảnh hưởng giấc ngủ, sinh hoạt", "management": "Thuốc giải lo + tâm lý trị liệu", "medication": "Lorazepam 0.5-1mg PRN (ngắn hạn) + Sertraline 50mg/ngày dài hạn", "regimenAction": "CONTINUE", "referral": "Tâm lý ung thư", "patientAdvice": "Benzodiazepine chỉ dùng ngắn hạn, SSRI cho dài hạn" }
+    ]
+  },
+  {
+    "lltCode": "10006002",
+    "term": "Bone pain",
+    "guidelines": [
+      { "grade": 1, "modality": "HORMONAL", "assessment": "Đau xương nhẹ do Aromatase Inhibitor", "management": "Paracetamol; bổ sung Calcium + Vitamin D; tập chịu lực", "medication": "Paracetamol 500mg x 3/ngày + Calcium 1000mg + Vitamin D 800IU/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Tập đi bộ, uống đủ canxi, đo mật độ xương hàng năm" },
+      { "grade": 2, "modality": "CHEMO", "assessment": "Đau xương do G-CSF (sau Filgrastim/Pegfilgrastim)", "management": "NSAID hoặc antihistamine trước G-CSF; đau thường tự hết 2-3 ngày", "medication": "Loratadine 10mg/ngày x 5 ngày từ ngày tiêm G-CSF; Ibuprofen 400mg PRN", "regimenAction": "CONTINUE", "patientAdvice": "Đau xương do G-CSF là bình thường, uống Loratadine dự phòng" }
+    ]
+  },
+  {
+    "lltCode": "10040947",
+    "term": "Skin ulceration",
+    "guidelines": [
+      { "grade": 2, "modality": "TARGETED", "assessment": "Loét da do TKI (Sorafenib, Sunitinib)", "management": "Chăm sóc vết thương; giảm liều nếu ảnh hưởng sinh hoạt", "medication": "Gạc Mepilex + Mupirocin nếu nhiễm; giảm liều thuốc đích 25%", "regimenAction": "REDUCE", "referral": "Chăm sóc vết thương", "patientAdvice": "Giữ vết loét sạch, thay băng hàng ngày, báo nếu sưng đỏ lan rộng" }
+    ]
+  },
+  {
+    "lltCode": "10046553",
+    "term": "Urinary protein increased",
+    "guidelines": [
+      { "grade": 1, "modality": "TARGETED", "assessment": "Protein niệu 1+ hoặc < 1g/24h (do anti-VEGF)", "management": "Theo dõi protein niệu mỗi chu kỳ; dipstick trước mỗi lần truyền", "regimenAction": "CONTINUE", "patientAdvice": "Xét nghiệm nước tiểu trước mỗi lần truyền thuốc" },
+      { "grade": 2, "modality": "TARGETED", "assessment": "Protein niệu 2+ hoặc 1-3.5g/24h", "management": "Thu thập nước tiểu 24h; tiếp tục nếu < 2g; tạm ngưng nếu ≥ 2g", "medication": "ACEI: Enalapril 5-10mg nếu kèm THA", "regimenAction": "MONITOR", "patientAdvice": "Thu nước tiểu 24h theo hướng dẫn, kết quả quyết định tiếp tục thuốc" },
+      { "grade": 3, "modality": "TARGETED", "assessment": "Protein niệu > 3.5g/24h hoặc hội chứng thận hư", "management": "NGƯNG thuốc anti-VEGF; hội chẩn thận; theo dõi chức năng thận", "regimenAction": "STOP", "referral": "Thận học", "patientAdvice": "Ngưng thuốc đích, khám thận chuyên khoa" }
+    ]
+  },
+  {
+    "lltCode": "10043778",
+    "term": "Thyroiditis",
+    "guidelines": [
+      { "grade": 1, "modality": "IMMUNOTHERAPY", "assessment": "Viêm tuyến giáp không triệu chứng, TSH bất thường", "management": "Xét nghiệm FT3, FT4, TSH mỗi 2-4 tuần; thường tự chuyển sang suy giáp", "regimenAction": "CONTINUE", "patientAdvice": "Xét nghiệm theo lịch, viêm giáp miễn dịch thường hết tự nhiên" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Viêm giáp có triệu chứng (đau cổ, sốt, cường giáp thoáng qua)", "management": "NSAID giảm đau; Beta-blocker nếu cường giáp; chờ chuyển sang suy giáp", "medication": "Ibuprofen 400mg x 3/ngày + Propranolol 20mg x 3 nếu tim nhanh", "regimenAction": "CONTINUE", "referral": "Nội tiết", "patientAdvice": "Viêm giáp thường tạm thời, sẽ cần Levothyroxine nếu suy giáp sau đó" }
+    ]
+  },
+  {
+    "lltCode": "10028411",
+    "term": "Myalgia",
+    "guidelines": [
+      { "grade": 1, "modality": "CHEMO", "assessment": "Đau cơ nhẹ sau hóa trị (Taxane)", "management": "Giảm đau đơn giản; tắm nước ấm; kéo giãn nhẹ", "medication": "Paracetamol 500mg x 4/ngày PRN", "regimenAction": "CONTINUE", "patientAdvice": "Đau cơ thường hết sau 3-5 ngày, nghỉ ngơi và tắm ấm" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Đau cơ do viêm cơ miễn dịch — kiểm tra CK!", "management": "Xét nghiệm CK, LDH, Aldolase; nếu CK tăng > 5x → corticoid; loại trừ myasthenia", "medication": "Prednisolone 1mg/kg nếu CK tăng rõ; giảm dần 4-6 tuần", "regimenAction": "HOLD", "referral": "Thần kinh cơ", "patientAdvice": "Đau cơ kèm yếu cơ cần khám ngay — có thể là viêm cơ miễn dịch" }
+    ]
+  },
+  {
+    "lltCode": "10033371",
+    "term": "Pain",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Đau nhẹ (VAS 1-3)", "management": "Giảm đau bậc 1 WHO; đánh giá nguyên nhân", "medication": "Paracetamol 1g x 3-4/ngày ± Ibuprofen 400mg x 3/ngày", "regimenAction": "CONTINUE", "patientAdvice": "Uống thuốc đều đặn, đừng chờ đau nặng mới uống" },
+      { "grade": 2, "modality": "ALL", "assessment": "Đau vừa (VAS 4-6)", "management": "Giảm đau bậc 2 WHO; cân nhắc opioid yếu; tìm nguyên nhân", "medication": "Tramadol 50-100mg x 3-4/ngày hoặc Codeine 30-60mg x 4/ngày + Paracetamol", "regimenAction": "CONTINUE", "patientAdvice": "Ghi nhật ký đau, báo bác sĩ nếu thuốc không kiểm soát được" },
+      { "grade": 3, "modality": "ALL", "assessment": "Đau nặng (VAS 7-10), ảnh hưởng giấc ngủ và sinh hoạt", "management": "Opioid mạnh bậc 3 WHO; cân nhắc can thiệp giảm đau; hội chẩn chăm sóc giảm nhẹ", "medication": "Morphine uống 5-10mg q4h (điều chỉnh theo đáp ứng) + Paracetamol + Lactulose dự phòng táo bón", "regimenAction": "CONTINUE", "referral": "Giảm đau + Chăm sóc giảm nhẹ", "patientAdvice": "Morphine an toàn khi dùng đúng liều, không gây nghiện khi dùng giảm đau ung thư" }
+    ]
+  },
+  {
+    "lltCode": "10019211",
+    "term": "Headache",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Nhức đầu nhẹ", "management": "Giảm đau đơn giản; nghỉ ngơi; đánh giá HA, mắt", "medication": "Paracetamol 1g PRN", "regimenAction": "CONTINUE", "patientAdvice": "Uống đủ nước, nghỉ ngơi, báo nếu đau nặng đột ngột" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Nhức đầu kéo dài, nghi viêm tuyến yên (hypophysitis)", "management": "MRI sella turcica; xét nghiệm cortisol, TSH, LH/FSH, testosterone; hội chẩn nội tiết", "medication": "Dexamethasone 4mg x 2/ngày nếu xác nhận hypophysitis", "regimenAction": "HOLD", "referral": "Nội tiết + MRI", "patientAdvice": "Nhức đầu kéo dài + mệt mỏi khi dùng immunotherapy cần kiểm tra tuyến yên" }
+    ]
+  },
+  {
+    "lltCode": "10013573",
+    "term": "Dizziness",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Chóng mặt nhẹ", "management": "Đánh giá HA tư thế, thiếu máu, mất nước; bù dịch", "regimenAction": "CONTINUE", "patientAdvice": "Đứng dậy từ từ, uống đủ nước, ngồi nghỉ nếu chóng mặt" },
+      { "grade": 2, "modality": "ALL", "assessment": "Chóng mặt ảnh hưởng đi lại", "management": "Xét nghiệm CTM, điện giải, glucose; điều chỉnh thuốc hạ áp nếu cần", "medication": "Bù dịch + điều trị nguyên nhân", "regimenAction": "MONITOR", "patientAdvice": "Không lái xe, có người đi kèm, đến khám nếu không đỡ" }
+    ]
+  },
+  {
+    "lltCode": "10011224",
+    "term": "Cough",
+    "guidelines": [
+      { "grade": 1, "modality": "ALL", "assessment": "Ho nhẹ", "management": "Tìm nguyên nhân: nhiễm trùng, trào ngược, thuốc ACEI; điều trị nguyên nhân", "medication": "Dextromethorphan 15-30mg x 3/ngày PRN", "regimenAction": "CONTINUE", "patientAdvice": "Uống nước ấm, mật ong, báo bác sĩ nếu ho ra máu hoặc khó thở" },
+      { "grade": 2, "modality": "IMMUNOTHERAPY", "assessment": "Ho kéo dài khi dùng immunotherapy — loại trừ pneumonitis!", "management": "CT ngực để loại trừ viêm phổi miễn dịch; xét nghiệm SpO2", "regimenAction": "MONITOR", "referral": "Hô hấp + CT ngực", "patientAdvice": "Ho kéo dài > 2 tuần khi dùng immunotherapy cần chụp CT ngực" }
+    ]
+  }
+]

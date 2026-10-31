@@ -193,10 +193,70 @@ async function importCtcae() {
   console.log(`CTCAE v6.0: ${terms.length} thuật ngữ`);
 }
 
+async function importManagementGuidelines() {
+  const data = JSON.parse(readFileSync(join(__dirname, 'management-guidelines.json'), 'utf8')) as Array<{
+    lltCode: string;
+    term: string;
+    guidelines: Array<{
+      grade: number;
+      modality: string;
+      assessment: string;
+      management: string;
+      medication?: string;
+      regimenAction?: string;
+      referral?: string;
+      patientAdvice?: string;
+    }>;
+  }>;
+
+  let total = 0;
+  for (const entry of data) {
+    const ctcaeTerm = await prisma.ctcaeTerm.findUnique({ where: { lltCode: entry.lltCode } });
+    if (!ctcaeTerm) {
+      console.warn(`CTCAE term not found: ${entry.lltCode} (${entry.term})`);
+      continue;
+    }
+
+    for (const g of entry.guidelines) {
+      await prisma.managementGuideline.upsert({
+        where: {
+          ctcaeTermId_grade_modality: {
+            ctcaeTermId: ctcaeTerm.id,
+            grade: g.grade,
+            modality: g.modality,
+          },
+        },
+        create: {
+          ctcaeTermId: ctcaeTerm.id,
+          grade: g.grade,
+          modality: g.modality,
+          assessment: g.assessment,
+          management: g.management,
+          medication: g.medication ?? null,
+          regimenAction: g.regimenAction ?? null,
+          referral: g.referral ?? null,
+          patientAdvice: g.patientAdvice ?? null,
+        },
+        update: {
+          assessment: g.assessment,
+          management: g.management,
+          medication: g.medication ?? null,
+          regimenAction: g.regimenAction ?? null,
+          referral: g.referral ?? null,
+          patientAdvice: g.patientAdvice ?? null,
+        },
+      });
+      total++;
+    }
+  }
+  console.log(`Hướng dẫn xử trí: ${total} entries cho ${data.length} CTCAE terms`);
+}
+
 async function main() {
   await importDrugs();
   await importRegimens();
   await importCtcae();
+  await importManagementGuidelines();
 }
 
 main()
