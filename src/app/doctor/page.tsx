@@ -72,7 +72,7 @@ export default async function DoctorDashboard() {
           <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 12px 0' }}>An toàn lâm sàng & Quy chuẩn</h2>
           <div style={{ fontSize: 13.5, color: 'var(--ink-soft)', lineHeight: 1.6 }}>
             • Hệ thống tự động kiểm tra tương tác thuốc 2 chiều trước khi phát hành đơn.<br />
-            • Cảnh báo CTCAE v5.0 mức độ nặng được đẩy tự động lên hàng đợi ưu tiên.<br />
+            • Cảnh báo CTCAE v6.0 mức độ nặng được đẩy tự động lên hàng đợi ưu tiên.<br />
             • Bảo vệ dữ liệu y tế nhạy cảm (Nghị định 13/2023/NĐ-CP).
           </div>
         </div>

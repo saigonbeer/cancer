@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Tab = 'history' | 'new';
 
@@ -17,6 +17,67 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
   );
 }
 
+function DrugAutocomplete({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [suggestions, setSuggestions] = useState<Array<{ id: string; name: string; group: string | null; abbreviation: string | null }>>([]);
+  const [open, setOpen] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  function search(q: string) {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (q.trim().length < 2) { setSuggestions([]); setOpen(false); return; }
+    timerRef.current = setTimeout(async () => {
+      const res = await fetch('/api/doctor/medications/search?q=' + encodeURIComponent(q.trim()));
+      const data = await res.json();
+      setSuggestions(data.drugs || []);
+      setOpen((data.drugs || []).length > 0);
+    }, 250);
+  }
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ position: 'relative' }}>
+      <label className='field-label'>Tên thuốc</label>
+      <input
+        type='text'
+        value={value}
+        placeholder='Nhập ≥2 ký tự để tìm thuốc NCI...'
+        onChange={(e) => { onChange(e.target.value); search(e.target.value); }}
+        onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
+      />
+      {open && suggestions.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 8,
+          maxHeight: 220, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,.1)'
+        }}>
+          {suggestions.map((d) => (
+            <div
+              key={d.id}
+              style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13, borderBottom: '1px solid var(--line-soft)' }}
+              onMouseDown={() => { onChange(d.name); setOpen(false); }}
+            >
+              <div style={{ fontWeight: 600 }}>{d.name}</div>
+              {(d.group || d.abbreviation) && (
+                <div style={{ fontSize: 11.5, color: 'var(--ink-soft)', marginTop: 2 }}>
+                  {[d.abbreviation, d.group].filter(Boolean).join(' • ')}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DoctorMedicationsPage() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +90,7 @@ export default function DoctorMedicationsPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const selected = patients.find((p) => p.id === selectedId) || null;
   const results = patients
@@ -77,7 +139,8 @@ export default function DoctorMedicationsPage() {
   }
 
   async function savePrescription() {
-    if (!selected) return;
+    if (!selected || saving) return;
+    setSaving(true);
     setError(null);
     setMessage(null);
     setWarnings([]);
@@ -86,40 +149,44 @@ export default function DoctorMedicationsPage() {
       .filter((r) => r.drugName);
     if (items.length === 0) {
       setError('Vui lòng nhập ít nhất một thuốc.');
+      setSaving(false);
       return;
     }
 
-    // Đơn thuốc phải gắn với một lượt khám; nếu chưa có lượt nào thì tạo lượt tái khám kê đơn.
-    let visitId = visits[0]?.id as string | undefined;
-    if (!visitId) {
-      const vr = await fetch('/api/doctor/visits', {
+    try {
+      let visitId = visits[0]?.id as string | undefined;
+      if (!visitId) {
+        const vr = await fetch('/api/doctor/visits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ patientId: selected.id, type: 'FOLLOWUP', note: 'Kê đơn thuốc' }),
+        });
+        const vd = await vr.json().catch(() => ({}));
+        if (!vr.ok) {
+          setError(vd.error || 'Không tạo được lượt khám để gắn đơn thuốc.');
+          return;
+        }
+        visitId = vd.visit.id;
+      }
+
+      const res = await fetch('/api/doctor/medications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientId: selected.id, type: 'FOLLOWUP', note: 'Kê đơn thuốc' }),
+        body: JSON.stringify({ visitId, items }),
       });
-      const vd = await vr.json().catch(() => ({}));
-      if (!vr.ok) {
-        setError(vd.error || 'Không tạo được lượt khám để gắn đơn thuốc.');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Không lưu được đơn thuốc.');
         return;
       }
-      visitId = vd.visit.id;
+      if (data.interactions?.length) setWarnings(data.interactions);
+      setMessage('Đã lưu đơn thuốc.');
+      setRows([emptyRow()]);
+      loadPatientData(selected.id);
+      setTab('history');
+    } finally {
+      setSaving(false);
     }
-
-    const res = await fetch('/api/doctor/medications', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visitId, items }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(data.error || 'Không lưu được đơn thuốc.');
-      return;
-    }
-    if (data.interactions?.length) setWarnings(data.interactions);
-    setMessage('Đã lưu đơn thuốc.');
-    setRows([emptyRow()]);
-    loadPatientData(selected.id);
-    setTab('history');
   }
 
   const tabStyle = (on: boolean): React.CSSProperties => ({
@@ -230,7 +297,7 @@ export default function DoctorMedicationsPage() {
               <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {rows.map((r, i) => (
                   <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.6fr 0.7fr 0.7fr 1fr 1fr 0.8fr 1fr auto', gap: 8, alignItems: 'end' }}>
-                    <Field label='Tên thuốc' value={r.drugName} onChange={(v) => updateRow(i, 'drugName', v)} placeholder='VD: Ondansetron' />
+                    <DrugAutocomplete value={r.drugName} onChange={(v) => updateRow(i, 'drugName', v)} />
                     <Field label='Liều' value={r.dose} onChange={(v) => updateRow(i, 'dose', v)} placeholder='8' />
                     <Field label='Đơn vị' value={r.unit} onChange={(v) => updateRow(i, 'unit', v)} placeholder='mg' />
                     <Field label='Tần suất' value={r.frequency} onChange={(v) => updateRow(i, 'frequency', v)} placeholder='2 lần/ngày' />
@@ -242,7 +309,7 @@ export default function DoctorMedicationsPage() {
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <button type='button' className='ghostbtn' onClick={() => setRows([...rows, emptyRow()])}>+ Thêm thuốc</button>
-                  <button type='button' className='addbtn' onClick={savePrescription}>Lưu đơn thuốc</button>
+                  <button type='button' className='addbtn' onClick={savePrescription} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu đơn thuốc'}</button>
                 </div>
               </div>
             </section>

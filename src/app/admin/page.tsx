@@ -73,6 +73,8 @@ export default function AdminAccountsPage() {
   }
 
   async function removeAccount(id: string) {
+    const acc = accounts.find((a) => a.id === id);
+    if (!confirm(`Xác nhận xóa tài khoản "${acc?.name || id}"? Hành động này không thể hoàn tác.`)) return;
     await fetch(`/api/admin/accounts/${id}`, { method: "DELETE" });
     load();
   }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
 import { createAppointment, getAppointments } from '@/services/appointment.service';
@@ -49,4 +50,28 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 403 });
   }
+}
+
+const cancelSchema = z.object({ appointmentId: z.string().min(1) });
+
+export async function DELETE(req: NextRequest) {
+  const auth = await requireRole('PATIENT');
+  if ('response' in auth) return auth.response;
+
+  const body = await req.json().catch(() => null);
+  const parsed = cancelSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Thiếu mã lịch hẹn.' }, { status: 400 });
+  }
+
+  const appointment = await prisma.appointment.findUnique({ where: { id: parsed.data.appointmentId } });
+  if (!appointment || appointment.patientId !== auth.session.userId) {
+    return NextResponse.json({ error: 'Không tìm thấy lịch hẹn.' }, { status: 404 });
+  }
+  if (appointment.status !== 'PENDING') {
+    return NextResponse.json({ error: 'Chỉ có thể hủy lịch hẹn đang chờ duyệt.' }, { status: 400 });
+  }
+
+  await prisma.appointment.delete({ where: { id: parsed.data.appointmentId } });
+  return NextResponse.json({ ok: true });
 }

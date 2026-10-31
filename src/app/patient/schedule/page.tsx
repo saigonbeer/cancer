@@ -10,6 +10,7 @@ export default function PatientSchedulePage() {
   const [type, setType] = useState('Tái khám định kỳ');
   const [datetime, setDatetime] = useState('');
   const [reason, setReason] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -23,18 +24,33 @@ export default function PatientSchedulePage() {
     load();
   }, []);
 
-  async function handleSubmit() {
-    if (!datetime) return;
-    const res = await fetch('/api/patient/appointments', {
-      method: 'POST',
+  async function cancelAppointment(id: string) {
+    if (!confirm('Bạn có chắc muốn hủy lịch hẹn này?')) return;
+    await fetch('/api/patient/appointments', {
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, datetime, reason })
+      body: JSON.stringify({ appointmentId: id })
     });
-    if (res.ok) {
-      setShowModal(false);
-      setDatetime('');
-      setReason('');
-      load();
+    load();
+  }
+
+  async function handleSubmit() {
+    if (!datetime || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/patient/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, datetime, reason })
+      });
+      if (res.ok) {
+        setShowModal(false);
+        setDatetime('');
+        setReason('');
+        load();
+      }
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -86,29 +102,41 @@ export default function PatientSchedulePage() {
                   )}
                 </div>
 
-                <span
-                  className='pill'
-                  style={{
-                    background:
-                      a.status === 'APPROVED'
-                        ? 'var(--teal-tint)'
-                        : a.status === 'REJECTED'
-                        ? 'var(--red-tint)'
-                        : 'var(--amber-tint)',
-                    color:
-                      a.status === 'APPROVED'
-                        ? 'var(--teal)'
-                        : a.status === 'REJECTED'
-                        ? 'var(--red)'
-                        : 'var(--amber)'
-                  }}
-                >
-                  {a.status === 'APPROVED'
-                    ? 'Bác sĩ đã xác nhận'
-                    : a.status === 'REJECTED'
-                    ? 'Bị từ chối'
-                    : 'Đang chờ bác sĩ duyệt'}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    className='pill'
+                    style={{
+                      background:
+                        a.status === 'APPROVED'
+                          ? 'var(--teal-tint)'
+                          : a.status === 'REJECTED'
+                          ? 'var(--red-tint)'
+                          : 'var(--amber-tint)',
+                      color:
+                        a.status === 'APPROVED'
+                          ? 'var(--teal)'
+                          : a.status === 'REJECTED'
+                          ? 'var(--red)'
+                          : 'var(--amber)'
+                    }}
+                  >
+                    {a.status === 'APPROVED'
+                      ? 'Bác sĩ đã xác nhận'
+                      : a.status === 'REJECTED'
+                      ? 'Bị từ chối'
+                      : 'Đang chờ bác sĩ duyệt'}
+                  </span>
+                  {a.status === 'PENDING' && (
+                    <button
+                      type='button'
+                      className='ghostbtn'
+                      style={{ fontSize: 12, padding: '5px 12px', color: 'var(--red)', borderColor: 'var(--red)' }}
+                      onClick={() => cancelAppointment(a.id)}
+                    >
+                      Hủy
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -151,7 +179,7 @@ export default function PatientSchedulePage() {
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
                 <button type='button' className='ghostbtn' onClick={() => setShowModal(false)}>Hủy</button>
-                <button type='button' className='addbtn' onClick={handleSubmit}>Gửi Yêu Cầu Hẹn</button>
+                <button type='button' className='addbtn' onClick={handleSubmit} disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi Yêu Cầu Hẹn'}</button>
               </div>
             </div>
           </div>
