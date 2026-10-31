@@ -67,6 +67,7 @@ model DoctorProfile {
   department String?
 
   patients PatientProfile[] @relation("TreatingDoctor")
+  visits   Visit[]          @relation("VisitDoctor")
 }
 
 model PatientProfile {
@@ -90,6 +91,8 @@ model Visit {
   id         String    @id @default(cuid())
   patientId  String
   patient    PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId   String?
+  doctor     DoctorProfile? @relation("VisitDoctor", fields: [doctorId], references: [id])
   type       VisitType
   visitDate  DateTime  @default(now())
 

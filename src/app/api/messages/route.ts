@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
-import { getUserConversations, sendMessage, getOrCreateConversation } from '@/services/message.service';
-import { prisma } from '@/lib/db';
+import {
+  getUserConversations, sendMessage, getOrCreateConversation,
+  getConversationMessages, getDoctorChatablePatients, getPatientDoctors
+} from '@/services/message.service';
 
 export async function GET(req: NextRequest) {
   const auth = await requireRole('DOCTOR', 'PATIENT');
@@ -9,13 +11,38 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const targetUserId = searchParams.get('targetUserId');
+  const conversationId = searchParams.get('conversationId');
+  const action = searchParams.get('action');
+
+  if (action === 'contacts') {
+    if (auth.session.role === 'DOCTOR') {
+      const patients = await getDoctorChatablePatients(auth.session.userId);
+      return NextResponse.json({ contacts: patients });
+    } else {
+      const doctors = await getPatientDoctors(auth.session.userId);
+      return NextResponse.json({ contacts: doctors });
+    }
+  }
+
+  if (conversationId) {
+    try {
+      const messages = await getConversationMessages(conversationId, auth.session.userId);
+      return NextResponse.json({ messages });
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message }, { status: 403 });
+    }
+  }
 
   if (targetUserId) {
-    const conv = await getOrCreateConversation(
-      auth.session.role === 'PATIENT' ? auth.session.userId : targetUserId,
-      auth.session.role === 'DOCTOR' ? auth.session.userId : targetUserId
-    );
-    return NextResponse.json({ conversation: conv });
+    try {
+      const conv = await getOrCreateConversation(
+        auth.session.role === 'PATIENT' ? auth.session.userId : targetUserId,
+        auth.session.role === 'DOCTOR' ? auth.session.userId : targetUserId
+      );
+      return NextResponse.json({ conversation: conv });
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message }, { status: 403 });
+    }
   }
 
   const conversations = await getUserConversations(auth.session.userId, auth.session.role);

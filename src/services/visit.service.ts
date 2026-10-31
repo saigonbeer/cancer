@@ -5,6 +5,7 @@ import type { Role } from '@/lib/auth';
 export async function createVisit(
   data: {
     patientId: string;
+    doctorId?: string;
     type: 'FIRST' | 'FOLLOWUP';
     history?: string;
     illness?: string;
@@ -36,6 +37,7 @@ export async function createVisit(
   const visit = await prisma.visit.create({
     data: {
       patientId: data.patientId,
+      doctorId: data.doctorId,
       type: data.type,
       history: data.history,
       illness: data.illness,

@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const { appointment, ...visitData } = body;
-    const visit = await createVisit(visitData, auth.session.role);
+    const docProfile = await prisma.doctorProfile.findUnique({ where: { userId: auth.session.userId }, select: { id: true } });
+    const visit = await createVisit({ ...visitData, doctorId: docProfile?.id }, auth.session.role);
 
     // Đặt lịch tái khám: lịch được tạo cho cả bác sĩ và bệnh nhân (bệnh nhân xem ở mục Lịch hẹn).
     let scheduled = null;
