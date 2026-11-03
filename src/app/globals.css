@@ -15,6 +15,18 @@
   --red-tint: #fbeae8;
   --purple: #6b5ca5;
   --purple-tint: #ece9f7;
+
+  /* Màu phân độ CTCAE: Độ 1 (nhẹ) -> Độ 5 (tử vong) */
+  --grade1: #0e6e66;
+  --grade1-tint: #e6f2f0;
+  --grade2: #c8a53a;
+  --grade2-tint: #fbf3df;
+  --grade3: #c8743a;
+  --grade3-tint: #fbeee4;
+  --grade4: #b8433b;
+  --grade4-tint: #fbeae8;
+  --grade5: #6b1a1a;
+  --grade5-tint: #f4e2e1;
 }
 
 * {

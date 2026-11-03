@@ -249,8 +249,8 @@ model RegimenDrug {
 model CtcaeTerm {
   id                String  @id @default(cuid())
   lltCode           String  @unique // MedDRA LLT code
-  soc               String  // nhóm cơ quan (System Organ Class)
-  term              String
+  soc               String  // nhóm cơ quan (System Organ Class) - tiếng Anh gốc
+  term              String  // thuật ngữ - tiếng Anh gốc
   grade1            String?
   grade2            String?
   grade3            String?
@@ -261,7 +261,21 @@ model CtcaeTerm {
   changeNote        String?
   version           String  @default("v6.0")
 
+  // Bản dịch tiếng Việt (nguồn: CTCAE_v6.0_Tieng_Viet.xlsx, khớp theo lltCode).
+  // Giữ song song với bản tiếng Anh để đối chiếu trong báo cáo chính thức.
+  socVi              String?
+  termVi             String?
+  grade1Vi           String?
+  grade2Vi           String?
+  grade3Vi           String?
+  grade4Vi           String?
+  grade5Vi           String?
+  definitionVi       String?
+  navigationalNoteVi String?
+  changeNoteVi       String?
+
   @@index([term])
+  @@index([termVi])
   guidelines ManagementGuideline[]
 }
 

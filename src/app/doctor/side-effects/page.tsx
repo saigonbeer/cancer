@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { gradeStyle, gradeLabel } from '@/lib/ctcaeGrade';
 
 const GRADES = [1, 2, 3, 4, 5];
 const DECISIONS = [
@@ -34,6 +35,81 @@ function sheetFrom(r: any): Sheet {
     regimenDecision: r.regimenDecision || 'NO_CHANGE',
     decisionReason: r.decisionReason || '',
   };
+}
+
+function CtcaeCatalogSearch() {
+  const [q, setQ] = useState('');
+  const [terms, setTerms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  async function search(query: string) {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (query.trim()) params.set('q', query.trim());
+    const res = await fetch('/api/doctor/ctcae?' + params.toString());
+    const data = await res.json();
+    setTerms(data.terms || []);
+    setLoading(false);
+  }
+
+  return (
+    <section className='sec-card'>
+      <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Danh mục tác dụng phụ (CTCAE)</h2>
+        <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Tra cứu phân độ theo thuật ngữ</span>
+      </div>
+      <div style={{ padding: '14px 22px' }}>
+        <input
+          type='text'
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') search(q); }}
+          placeholder='Nhập tên triệu chứng (VD: buồn nôn, viêm da, sốt...) rồi Enter'
+          style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 12px', fontSize: 14, fontFamily: 'inherit' }}
+        />
+      </div>
+      {loading && <div style={{ padding: '0 22px 16px', color: 'var(--ink-soft)', fontSize: 13 }}>Đang tìm...</div>}
+      {!loading && terms.length > 0 && (
+        <div style={{ padding: '0 22px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {terms.map((t) => (
+            <div key={t.id} style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: '10px 14px' }}>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                onClick={() => setOpenId(openId === t.id ? null : t.id)}
+              >
+                <div>
+                  <strong style={{ fontSize: 13.5 }}>{t.termVi || t.term}</strong>
+                  <span style={{ fontSize: 12, color: 'var(--ink-soft)', marginLeft: 8 }}>{t.socVi || t.soc}</span>
+                </div>
+                <span style={{ fontSize: 12, color: 'var(--teal)' }}>{openId === t.id ? 'Thu gọn' : 'Xem độ 1-5'}</span>
+              </div>
+              {openId === t.id && (
+                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {[1, 2, 3, 4, 5].map((g) => {
+                    const text = (t as any)[`grade${g}Vi`] || (t as any)[`grade${g}`];
+                    if (!text) return null;
+                    return (
+                      <div key={g} style={{ display: 'flex', gap: 8, fontSize: 12.5 }}>
+                        <span className='pill' style={{ ...gradeStyle(g), flexShrink: 0, height: 'fit-content' }}>Độ {g}</span>
+                        <span style={{ color: 'var(--ink-soft)' }}>{text}</span>
+                      </div>
+                    );
+                  })}
+                  {t.definitionVi && (
+                    <div style={{ fontSize: 12.5, marginTop: 4, fontStyle: 'italic', color: 'var(--ink-soft)' }}>{t.definitionVi}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {!loading && q && terms.length === 0 && (
+        <div style={{ padding: '0 22px 18px', color: 'var(--ink-soft)', fontSize: 13 }}>Không tìm thấy thuật ngữ phù hợp.</div>
+      )}
+    </section>
+  );
 }
 
 function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | null }) {
@@ -72,7 +148,7 @@ function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | n
       {guidelines.map((g, i) => (
         <div key={i} style={{ background: 'var(--bg)', borderRadius: 10, padding: '12px 14px', fontSize: 13 }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-            <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>Độ {g.grade}</span>
+            <span className='pill' style={gradeStyle(g.grade)}>Độ {g.grade}</span>
             <span className='pill' style={{ background: '#e8f4f8', color: '#1a5276' }}>{modalityLabel[g.modality] || g.modality}</span>
             {g.regimenAction && <span className='pill' style={actionColor[g.regimenAction] || {}}>{actionLabel[g.regimenAction] || g.regimenAction}</span>}
           </div>
@@ -176,6 +252,8 @@ export default function DoctorSideEffectsPage() {
         </div>
       </section>
 
+      <CtcaeCatalogSearch />
+
       {/* Ô giám sát theo bệnh nhân */}
       <section>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>Bệnh nhân đang giám sát tác dụng phụ</div>
@@ -231,6 +309,11 @@ export default function DoctorSideEffectsPage() {
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'}</span>
+                      {r.ctcaeGrade ? (
+                        <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
+                      ) : (
+                        <span className='pill' style={{ background: 'var(--bg)', color: 'var(--ink-soft)' }}>Chưa phân độ CTCAE</span>
+                      )}
                       <span
                         className='pill'
                         style={resolved ? { background: 'var(--teal-tint)', color: 'var(--teal-deep)' } : { background: 'var(--amber-tint)', color: 'var(--amber)' }}
@@ -253,10 +336,14 @@ export default function DoctorSideEffectsPage() {
                       <select
                         value={r.ctcaeGrade ?? ''}
                         onChange={(e) => patch(r.id, { status: r.status, ctcaeGrade: Number(e.target.value) })}
-                        style={{ border: '1px solid var(--line)', borderRadius: 8, padding: '6px 8px', fontSize: 13, background: '#fff' }}
+                        style={{
+                          border: `1.5px solid ${r.ctcaeGrade ? (gradeStyle(r.ctcaeGrade).color as string) : 'var(--line)'}`,
+                          borderRadius: 8, padding: '6px 8px', fontSize: 13, fontWeight: 600,
+                          ...(r.ctcaeGrade ? gradeStyle(r.ctcaeGrade) : { background: '#fff' }),
+                        }}
                       >
                         <option value='' disabled>—</option>
-                        {GRADES.map((g) => <option key={g} value={g}>Độ {g}</option>)}
+                        {GRADES.map((g) => <option key={g} value={g}>{gradeLabel(g)}</option>)}
                       </select>
                     </label>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -299,7 +386,7 @@ export default function DoctorSideEffectsPage() {
                       {showGuide[r.id] && (
                         <div style={{ border: '1px solid var(--teal)', borderRadius: 12, padding: 14, background: '#f0faf8' }}>
                           <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--teal-deep)' }}>
-                            Hướng dẫn xử trí — {r.symptom} {r.ctcaeGrade ? `(Độ ${r.ctcaeGrade})` : ''}
+                            Hướng dẫn xử trí — {r.symptom} {r.ctcaeGrade ? `(${gradeLabel(r.ctcaeGrade)})` : ''}
                           </div>
                           <GuidelinePanel symptom={r.symptom} grade={r.ctcaeGrade} />
                         </div>

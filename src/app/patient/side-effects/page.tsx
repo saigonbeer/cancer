@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { gradeStyle, gradeLabel } from '@/lib/ctcaeGrade';
 
-const SYMPTOMS = ['Buồn nôn', 'Sốt', 'Mệt mỏi', 'Tiêu chảy', 'Táo bón', 'Đau', 'Ho', 'Viêm da', 'Chán ăn', 'Khác'];
+const COMMON_SYMPTOMS = ['Buồn nôn', 'Sốt', 'Mệt mỏi', 'Tiêu chảy', 'Táo bón', 'Đau', 'Ho', 'Viêm da', 'Chán ăn'];
 const SEVERITIES = ['Nhẹ', 'Trung bình', 'Nặng'];
 
 const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString('vi-VN');
@@ -16,7 +17,10 @@ function severityStyle(severity?: string | null) {
 export default function PatientSideEffectsPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [symptom, setSymptom] = useState(SYMPTOMS[0]);
+  const [symptom, setSymptom] = useState(COMMON_SYMPTOMS[0]);
+  const [symptomQuery, setSymptomQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<{ id: string; termVi: string; socVi: string | null }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [severity, setSeverity] = useState('Nhẹ');
   const [note, setNote] = useState('');
   const [photo, setPhoto] = useState<File | null>(null);
@@ -35,6 +39,19 @@ export default function PatientSideEffectsPage() {
   useEffect(() => {
     load();
   }, []);
+
+  useEffect(() => {
+    if (!symptomQuery.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      const res = await fetch('/api/patient/ctcae?q=' + encodeURIComponent(symptomQuery.trim()));
+      const data = await res.json().catch(() => ({ items: [] }));
+      setSuggestions(data.items || []);
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [symptomQuery]);
 
   async function submit() {
     setError(null);
@@ -91,13 +108,55 @@ export default function PatientSideEffectsPage() {
             <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Ghi nhận triệu chứng mới</h2>
           </div>
           <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
-              <div>
-                <label className='field-label'>Triệu chứng</label>
-                <select value={symptom} onChange={(e) => setSymptom(e.target.value)} style={fieldStyle}>
-                  {SYMPTOMS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+            <div>
+              <label className='field-label'>Triệu chứng đang chọn: <strong style={{ color: 'var(--teal-deep)' }}>{symptom}</strong></label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                {COMMON_SYMPTOMS.map((s) => (
+                  <button
+                    key={s}
+                    type='button'
+                    onClick={() => { setSymptom(s); setSymptomQuery(''); setShowSuggestions(false); }}
+                    className='pill'
+                    style={{
+                      cursor: 'pointer', border: 'none',
+                      background: symptom === s ? 'var(--teal)' : 'var(--bg)',
+                      color: symptom === s ? '#fff' : 'var(--ink-soft)',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type='text'
+                  value={symptomQuery}
+                  onChange={(e) => { setSymptomQuery(e.target.value); setShowSuggestions(true); }}
+                  onFocus={() => setShowSuggestions(true)}
+                  placeholder='Hoặc tìm trong danh mục 850 triệu chứng (VD: tê bì, rụng tóc...)'
+                  style={fieldStyle}
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10, marginTop: 4,
+                    background: '#fff', border: '1px solid var(--line)', borderRadius: 8, maxHeight: 220, overflowY: 'auto',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  }}>
+                    {suggestions.map((s) => (
+                      <div
+                        key={s.id}
+                        onClick={() => { setSymptom(s.termVi); setSymptomQuery(''); setShowSuggestions(false); setSuggestions([]); }}
+                        style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13.5, borderBottom: '1px solid var(--line-soft)' }}
+                      >
+                        <div style={{ fontWeight: 600 }}>{s.termVi}</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{s.socVi}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
               <div>
                 <label className='field-label'>Mức độ tự đánh giá</label>
                 <select value={severity} onChange={(e) => setSeverity(e.target.value)} style={fieldStyle}>
@@ -164,9 +223,7 @@ export default function PatientSideEffectsPage() {
                     </a>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                      CTCAE: {r.ctcaeGrade ? `Độ ${r.ctcaeGrade}` : 'Chưa phân độ'}
-                    </span>
+                    <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
                     <span
                       className='pill'
                       style={resolved ? { background: 'var(--teal-tint)', color: 'var(--teal-deep)' } : { background: 'var(--bg)', color: 'var(--ink-soft)' }}

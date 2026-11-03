@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CatalogTab from "@/components/CatalogTab";
+import CtcaeCatalogTab from "@/components/CtcaeCatalogTab";
 
 const TABS = [
   { id: "drugs", label: "Thuốc", api: "/api/admin/catalog/drugs", addLabel: "Thêm thuốc", fields: [
@@ -14,11 +15,7 @@ const TABS = [
     { key: "stage", label: "Giai đoạn", placeholder: "I / II / III / IV" },
     { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
   ] },
-  { id: "symptoms", label: "Triệu chứng", api: "/api/admin/catalog/symptoms", addLabel: "Thêm triệu chứng", fields: [
-    { key: "name", label: "Tên triệu chứng", placeholder: "Buồn nôn" },
-    { key: "group", label: "Nhóm", placeholder: "Tiêu hóa..." },
-    { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
-  ] },
+  { id: "ctcae", label: "Tác dụng phụ (CTCAE)", api: "", addLabel: "", fields: [] },
   { id: "regimens", label: "Phác đồ", api: "/api/admin/catalog/regimens", addLabel: "Thêm phác đồ", fields: [
     { key: "name", label: "Tên phác đồ", placeholder: "FOLFOX" },
     { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
@@ -61,7 +58,11 @@ export default function CatalogPage() {
         ))}
       </div>
 
-      <CatalogTab apiBase={active.api} fields={active.fields as unknown as { key: string; label: string; placeholder?: string }[]} addLabel={active.addLabel} />
+      {active.id === "ctcae" ? (
+        <CtcaeCatalogTab />
+      ) : (
+        <CatalogTab apiBase={active.api} fields={active.fields as unknown as { key: string; label: string; placeholder?: string }[]} addLabel={active.addLabel} />
+      )}
     </>
   );
 }
