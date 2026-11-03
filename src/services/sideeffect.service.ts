@@ -16,16 +16,13 @@ export async function reportSideEffect(
 ) {
   await assertPermission('sideeffects', role);
 
-  let grade = 1;
-  if (data.severity === 'Trung bình') grade = 2;
-  if (data.severity === 'Nặng') grade = 3;
-
+  // ctcaeGrade không được gán tự động từ mức tự đánh giá của bệnh nhân —
+  // phân độ CTCAE là đánh giá lâm sàng do bác sĩ thực hiện riêng (xem UI note).
   const report = await prisma.sideEffectReport.create({
     data: {
       patientId: data.patientId,
       symptom: data.symptom,
       severity: data.severity,
-      ctcaeGrade: grade,
       site: data.site,
       photoUrl: data.photoUrl,
       cycle: data.cycle,

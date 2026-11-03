@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
+import { toCtcaeSearchTerm } from '@/lib/ctcaeSymptomMap';
 
 export async function GET(req: NextRequest) {
   const auth = await requireRole('DOCTOR', 'ADMIN');
@@ -12,8 +13,9 @@ export async function GET(req: NextRequest) {
   const modality = searchParams.get('modality');
 
   if (symptom) {
+    const searchTerm = toCtcaeSearchTerm(symptom);
     const terms = await prisma.ctcaeTerm.findMany({
-      where: { term: { contains: symptom, mode: 'insensitive' } },
+      where: { term: { contains: searchTerm, mode: 'insensitive' } },
       include: {
         guidelines: {
           where: {
