@@ -131,6 +131,57 @@ export async function getDoctorChatablePatients(doctorUserId: string) {
   return Array.from(map.values());
 }
 
+export async function getOrCreateDoctorConversation(doctorAUserId: string, doctorBUserId: string) {
+  if (doctorAUserId === doctorBUserId) throw new Error('Không thể nhắn tin cho chính mình.');
+
+  const profileA = await prisma.doctorProfile.findUnique({ where: { userId: doctorAUserId }, select: { id: true } });
+  const profileB = await prisma.doctorProfile.findUnique({ where: { userId: doctorBUserId }, select: { id: true } });
+  if (!profileA || !profileB) throw new Error('Không tìm thấy hồ sơ bác sĩ.');
+
+  let conversation = await prisma.conversation.findFirst({
+    where: {
+      AND: [
+        { participants: { some: { userId: doctorAUserId } } },
+        { participants: { some: { userId: doctorBUserId } } }
+      ]
+    },
+    include: {
+      participants: { include: { user: { select: { id: true, name: true, role: true } } } },
+      messages: { orderBy: { createdAt: 'asc' } }
+    }
+  });
+
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        participants: { create: [{ userId: doctorAUserId }, { userId: doctorBUserId }] }
+      },
+      include: {
+        participants: { include: { user: { select: { id: true, name: true, role: true } } } },
+        messages: { orderBy: { createdAt: 'asc' } }
+      }
+    });
+  }
+
+  return conversation;
+}
+
+export async function getChatableDoctors(currentDoctorUserId: string) {
+  const doctors = await prisma.doctorProfile.findMany({
+    where: { userId: { not: currentDoctorUserId } },
+    select: {
+      userId: true,
+      department: true,
+      user: { select: { id: true, name: true } }
+    }
+  });
+  return doctors.map((d) => ({
+    userId: d.userId,
+    name: d.user.name,
+    department: d.department || 'Chưa phân khoa',
+  }));
+}
+
 export async function getPatientDoctors(patientUserId: string) {
   const patProfile = await prisma.patientProfile.findUnique({
     where: { userId: patientUserId },

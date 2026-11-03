@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
 import {
   getUserConversations, sendMessage, getOrCreateConversation,
-  getConversationMessages, getDoctorChatablePatients, getPatientDoctors
+  getConversationMessages, getDoctorChatablePatients, getPatientDoctors,
+  getOrCreateDoctorConversation, getChatableDoctors
 } from '@/services/message.service';
 
 export async function GET(req: NextRequest) {
@@ -24,6 +25,14 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  if (action === 'doctors') {
+    if (auth.session.role !== 'DOCTOR') {
+      return NextResponse.json({ error: 'Chỉ bác sĩ mới có thể xem danh sách bác sĩ.' }, { status: 403 });
+    }
+    const doctors = await getChatableDoctors(auth.session.userId);
+    return NextResponse.json({ doctors });
+  }
+
   if (conversationId) {
     try {
       const messages = await getConversationMessages(conversationId, auth.session.userId);
@@ -34,11 +43,17 @@ export async function GET(req: NextRequest) {
   }
 
   if (targetUserId) {
+    const targetType = searchParams.get('targetType');
     try {
-      const conv = await getOrCreateConversation(
-        auth.session.role === 'PATIENT' ? auth.session.userId : targetUserId,
-        auth.session.role === 'DOCTOR' ? auth.session.userId : targetUserId
-      );
+      let conv;
+      if (targetType === 'doctor' && auth.session.role === 'DOCTOR') {
+        conv = await getOrCreateDoctorConversation(auth.session.userId, targetUserId);
+      } else {
+        conv = await getOrCreateConversation(
+          auth.session.role === 'PATIENT' ? auth.session.userId : targetUserId,
+          auth.session.role === 'DOCTOR' ? auth.session.userId : targetUserId
+        );
+      }
       return NextResponse.json({ conversation: conv });
     } catch (err: any) {
       return NextResponse.json({ error: err.message }, { status: 403 });

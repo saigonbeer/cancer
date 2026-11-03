@@ -8,12 +8,19 @@ export default function DoctorMessagesPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [inputContent, setInputContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
 
   const [showSearch, setShowSearch] = useState(false);
+  const [searchTab, setSearchTab] = useState<'patient' | 'doctor'>('patient');
   const [patients, setPatients] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [starting, setStarting] = useState(false);
   const activeIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me').then((r) => r.json()).then((d) => setMyUserId(d.user?.userId || null));
+  }, []);
 
   async function loadConversations(isRefresh = false) {
     if (!isRefresh) setLoading(true);
@@ -55,10 +62,18 @@ export default function DoctorMessagesPage() {
     setPatients(data.contacts || []);
   }
 
-  async function startChat(patientUserId: string) {
+  async function loadDoctors() {
+    const res = await fetch('/api/messages?action=doctors');
+    const data = await res.json();
+    setDoctors(data.doctors || []);
+  }
+
+  async function startChat(targetUserId: string, targetType?: 'doctor') {
     setStarting(true);
     try {
-      const res = await fetch('/api/messages?targetUserId=' + patientUserId);
+      const params = new URLSearchParams({ targetUserId });
+      if (targetType) params.set('targetType', targetType);
+      const res = await fetch('/api/messages?' + params.toString());
       const data = await res.json();
       if (data.error) { alert(data.error); return; }
       if (data.conversation) {
@@ -90,26 +105,39 @@ export default function DoctorMessagesPage() {
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.patientCode.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const filteredDoctors = doctors.filter((d) =>
+    d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (d.department || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const existingPatientIds = new Set(
+  const existingContactIds = new Set(
     conversations.flatMap((c) =>
-      c.participants?.filter((p: any) => p.user?.role === 'PATIENT').map((p: any) => p.user.id) || []
+      c.participants?.filter((p: any) => p.user?.id !== myUserId).map((p: any) => p.user.id) || []
     )
   );
+
+  function otherParticipant(c: any) {
+    return c.participants?.find((p: any) => p.user?.id !== myUserId)?.user;
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Liên lạc Bệnh nhân Điều trị</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Liên lạc</h1>
           <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
-            Kênh trao đổi nội bộ an toàn tuân thủ phân quyền điều trị
+            Trao đổi với bệnh nhân đang điều trị và bác sĩ khác trong khoa
           </div>
         </div>
         <button
           type='button'
           className='addbtn'
-          onClick={() => { setShowSearch(!showSearch); if (!showSearch) loadPatients(); }}
+          onClick={() => {
+            const next = !showSearch;
+            setShowSearch(next);
+            setSearchTerm('');
+            if (next) { loadPatients(); loadDoctors(); }
+          }}
         >
           + Nhắn tin mới
         </button>
@@ -117,44 +145,104 @@ export default function DoctorMessagesPage() {
 
       {showSearch && (
         <div className='sec-card' style={{ padding: 16 }}>
-          <div style={{ fontWeight: 600, marginBottom: 10 }}>Chọn bệnh nhân để nhắn tin</div>
+          <div style={{ display: 'flex', gap: 16, marginBottom: 12, borderBottom: '1px solid var(--line-soft)' }}>
+            <button
+              type='button'
+              onClick={() => { setSearchTab('patient'); setSearchTerm(''); }}
+              style={{
+                border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 13.5, fontWeight: 600,
+                padding: '6px 2px 10px', cursor: 'pointer',
+                borderBottom: searchTab === 'patient' ? '2px solid var(--teal)' : '2px solid transparent',
+                color: searchTab === 'patient' ? 'var(--teal-deep)' : 'var(--ink-soft)',
+              }}
+            >
+              Bệnh nhân đang điều trị
+            </button>
+            <button
+              type='button'
+              onClick={() => { setSearchTab('doctor'); setSearchTerm(''); }}
+              style={{
+                border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 13.5, fontWeight: 600,
+                padding: '6px 2px 10px', cursor: 'pointer',
+                borderBottom: searchTab === 'doctor' ? '2px solid var(--teal)' : '2px solid transparent',
+                color: searchTab === 'doctor' ? 'var(--teal-deep)' : 'var(--ink-soft)',
+              }}
+            >
+              Bác sĩ khác
+            </button>
+          </div>
+
           <input
             type='text'
-            placeholder='Tìm theo tên hoặc mã bệnh nhân...'
+            placeholder={searchTab === 'patient' ? 'Tìm theo tên hoặc mã bệnh nhân...' : 'Tìm theo tên hoặc khoa...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ marginBottom: 10 }}
           />
+
           <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {filteredPatients.length === 0 ? (
-              <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
-                {patients.length === 0 ? 'Chưa có bệnh nhân nào đang điều trị.' : 'Không tìm thấy bệnh nhân phù hợp.'}
-              </div>
-            ) : (
-              filteredPatients.map((p) => (
-                <div
-                  key={p.userId}
-                  style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)',
-                    background: existingPatientIds.has(p.userId) ? 'var(--teal-tint)' : '#fff'
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 600, fontSize: 13.5 }}>{p.name}</span>
-                    <span style={{ color: 'var(--ink-soft)', fontSize: 12, marginLeft: 8 }}>{p.patientCode}</span>
-                  </div>
-                  <button
-                    type='button'
-                    className='addbtn'
-                    style={{ fontSize: 12, padding: '4px 12px' }}
-                    disabled={starting}
-                    onClick={() => startChat(p.userId)}
-                  >
-                    {existingPatientIds.has(p.userId) ? 'Mở' : 'Nhắn tin'}
-                  </button>
+            {searchTab === 'patient' ? (
+              filteredPatients.length === 0 ? (
+                <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
+                  {patients.length === 0 ? 'Chưa có bệnh nhân nào đang điều trị.' : 'Không tìm thấy bệnh nhân phù hợp.'}
                 </div>
-              ))
+              ) : (
+                filteredPatients.map((p) => (
+                  <div
+                    key={p.userId}
+                    style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)',
+                      background: existingContactIds.has(p.userId) ? 'var(--teal-tint)' : '#fff'
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontWeight: 600, fontSize: 13.5 }}>{p.name}</span>
+                      <span style={{ color: 'var(--ink-soft)', fontSize: 12, marginLeft: 8 }}>{p.patientCode}</span>
+                    </div>
+                    <button
+                      type='button'
+                      className='addbtn'
+                      style={{ fontSize: 12, padding: '4px 12px' }}
+                      disabled={starting}
+                      onClick={() => startChat(p.userId)}
+                    >
+                      {existingContactIds.has(p.userId) ? 'Mở' : 'Nhắn tin'}
+                    </button>
+                  </div>
+                ))
+              )
+            ) : (
+              filteredDoctors.length === 0 ? (
+                <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
+                  {doctors.length === 0 ? 'Không có bác sĩ nào khác trong hệ thống.' : 'Không tìm thấy bác sĩ phù hợp.'}
+                </div>
+              ) : (
+                filteredDoctors.map((d) => (
+                  <div
+                    key={d.userId}
+                    style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)',
+                      background: existingContactIds.has(d.userId) ? 'var(--teal-tint)' : '#fff'
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontWeight: 600, fontSize: 13.5 }}>{d.name}</span>
+                      <span style={{ color: 'var(--ink-soft)', fontSize: 12, marginLeft: 8 }}>{d.department}</span>
+                    </div>
+                    <button
+                      type='button'
+                      className='addbtn'
+                      style={{ fontSize: 12, padding: '4px 12px' }}
+                      disabled={starting}
+                      onClick={() => startChat(d.userId, 'doctor')}
+                    >
+                      {existingContactIds.has(d.userId) ? 'Mở' : 'Nhắn tin'}
+                    </button>
+                  </div>
+                ))
+              )
             )}
           </div>
         </div>
@@ -170,8 +258,9 @@ export default function DoctorMessagesPage() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {conversations.map((c) => {
-                const other = c.participants?.find((p: any) => p.user?.role === 'PATIENT')?.user;
+                const other = otherParticipant(c);
                 const lastMsg = c.messages?.[0];
+                const isOtherDoctor = other?.role === 'DOCTOR';
                 return (
                   <div
                     key={c.id}
@@ -184,9 +273,14 @@ export default function DoctorMessagesPage() {
                       border: '1px solid var(--line)'
                     }}
                   >
-                    <div style={{ fontWeight: 600, fontSize: 13.5 }}>{other?.name || 'Bệnh nhân'}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontWeight: 600, fontSize: 13.5 }}>{other?.name || 'Người dùng'}</span>
+                      {isOtherDoctor && (
+                        <span className='pill' style={{ fontSize: 10, background: 'var(--purple-tint)', color: 'var(--purple)' }}>BS</span>
+                      )}
+                    </div>
                     <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {lastMsg ? `${lastMsg.sender?.role === 'DOCTOR' ? 'Bạn' : other?.name || 'BN'}: ${lastMsg.content}` : 'Nhấn để xem tin nhắn'}
+                      {lastMsg ? `${lastMsg.senderId === myUserId ? 'Bạn' : other?.name || ''}: ${lastMsg.content}` : 'Nhấn để xem tin nhắn'}
                     </div>
                   </div>
                 );
@@ -209,14 +303,14 @@ export default function DoctorMessagesPage() {
                   </div>
                 ) : (
                   messages.map((m) => {
-                    const isDoctor = m.sender?.role === 'DOCTOR';
+                    const isMe = m.senderId === myUserId;
                     return (
                       <div
                         key={m.id}
                         style={{
-                          alignSelf: isDoctor ? 'flex-end' : 'flex-start',
-                          background: isDoctor ? 'var(--teal)' : 'var(--bg)',
-                          color: isDoctor ? '#fff' : 'var(--ink)',
+                          alignSelf: isMe ? 'flex-end' : 'flex-start',
+                          background: isMe ? 'var(--teal)' : 'var(--bg)',
+                          color: isMe ? '#fff' : 'var(--ink)',
                           borderRadius: 12,
                           padding: '8px 14px',
                           maxWidth: '75%',
