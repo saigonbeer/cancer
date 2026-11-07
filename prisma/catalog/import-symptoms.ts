@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const terms = await prisma.ctcaeTerm.findMany({
-    select: { term: true, soc: true, definition: true },
+    select: { term: true, termVi: true, soc: true, socVi: true, definition: true },
   });
 
   let created = 0;
@@ -22,15 +22,21 @@ async function main() {
   let skipped = 0;
 
   for (const t of terms) {
+    const name = t.termVi || t.term;
+    if (!name) {
+      skipped++;
+      continue;
+    }
+
     const existing = await prisma.catalogSymptom.findFirst({
-      where: { name: { equals: t.term, mode: 'insensitive' } },
+      where: { name: { equals: name, mode: 'insensitive' } },
     });
 
     if (!existing) {
       await prisma.catalogSymptom.create({
         data: {
-          name: t.term,
-          group: t.soc || null,
+          name,
+          group: t.socVi || t.soc || null,
           description: t.definition || null,
         },
       });
@@ -39,7 +45,7 @@ async function main() {
     }
 
     const patch: Record<string, string> = {};
-    if (!existing.group && t.soc) patch.group = t.soc;
+    if (!existing.group && (t.socVi || t.soc)) patch.group = t.socVi || t.soc!;
     if (!existing.description && t.definition) patch.description = t.definition;
     if (Object.keys(patch).length > 0) {
       await prisma.catalogSymptom.update({ where: { id: existing.id }, data: patch });
