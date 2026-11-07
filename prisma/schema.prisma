@@ -30,11 +30,19 @@ enum AppointmentStatus {
   APPROVED
   REJECTED
   SCHEDULED
+  COMPLETED
+  CANCELLED
 }
 
 enum ReportStatus {
   PENDING
   RESOLVED
+}
+
+enum AlertStatus {
+  PENDING
+  CONFIRMED
+  DISMISSED
 }
 
 model User {
@@ -85,6 +93,7 @@ model PatientProfile {
   visits             Visit[]
   sideEffectReports  SideEffectReport[]
   doseLogs           DoseLog[]
+  clinicalAlerts     ClinicalAlert[]
 }
 
 model Visit {
@@ -141,6 +150,9 @@ model Prescription {
   visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
   prescribedBy String
   prescribedAt DateTime @default(now())
+
+  interactionAckAt   DateTime? // thời điểm bác sĩ xác nhận đã biết tương tác thuốc và vẫn quyết định kê
+  interactionAckNote String?   // lý do bác sĩ ghi khi xác nhận kê đơn dù có tương tác
 
   items PrescriptionItem[]
 }
@@ -248,9 +260,10 @@ model RegimenDrug {
 
 model CtcaeTerm {
   id                String  @id @default(cuid())
-  lltCode           String  @unique // MedDRA LLT code
-  soc               String  // nhóm cơ quan (System Organ Class) - tiếng Anh gốc
-  term              String  // thuật ngữ - tiếng Anh gốc
+  order             Int?    // Thứ tự hiển thị (nhập tay hoặc từ file Excel import)
+  lltCode           String? @unique // MedDRA LLT code (để trống nếu nhập thủ công/import ngoài CTCAE gốc)
+  soc               String? // nhóm cơ quan (System Organ Class) - tiếng Anh gốc (tuỳ chọn)
+  term              String? // thuật ngữ - tiếng Anh gốc (tuỳ chọn)
   grade1            String?
   grade2            String?
   grade3            String?
@@ -317,6 +330,24 @@ model SideEffectReport {
   managedAt       DateTime?
   note       String?
   createdAt  DateTime     @default(now())
+}
+
+// Cảnh báo sinh ra từ bộ luật rule-based (tần suất báo cáo, leo thang mức độ, độ CTCAE nặng chưa xử trí...).
+// Mỗi (patientId, type) chỉ giữ 1 bản ghi đang hiệu lực; bác sĩ xác nhận hoặc bỏ qua.
+model ClinicalAlert {
+  id        String      @id @default(cuid())
+  patientId String
+  patient   PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  type      String      // mã luật: REPORT_SPIKE | SEVERITY_ESCALATION | GRADE3_UNHANDLED
+  severity  Severity
+  message   String
+  status    AlertStatus @default(PENDING)
+  note      String?     // lý do bác sĩ ghi khi xác nhận/bỏ qua
+  decidedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([patientId, type])
 }
 
 model Appointment {

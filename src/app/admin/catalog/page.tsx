@@ -30,7 +30,7 @@ export default function CatalogPage() {
     <>
       <div>
         <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.08em", color: "var(--teal)", textTransform: "uppercase" }}>
-          Onco EMR
+          108|Future
         </div>
         <h1 style={{ margin: "4px 0 0", fontSize: 26, fontWeight: 700 }}>Danh mục</h1>
       </div>

@@ -12,7 +12,7 @@ export default async function DoctorDashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
         <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>
-          Khoa Xạ trị & Ung bướu
+          Khoa Xạ trị & Xạ phẫu
         </div>
         <h1 style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700 }}>Chào Bác sĩ {session?.name}</h1>
       </div>
@@ -72,8 +72,7 @@ export default async function DoctorDashboard() {
           <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 12px 0' }}>An toàn lâm sàng & Quy chuẩn</h2>
           <div style={{ fontSize: 13.5, color: 'var(--ink-soft)', lineHeight: 1.6 }}>
             • Hệ thống tự động kiểm tra tương tác thuốc 2 chiều trước khi phát hành đơn.<br />
-            • Cảnh báo CTCAE v6.0 mức độ nặng được đẩy tự động lên hàng đợi ưu tiên.<br />
-            • Bảo vệ dữ liệu y tế nhạy cảm (Nghị định 13/2023/NĐ-CP).
+            • Cảnh báo CTCAE v6.0 mức độ nặng được đẩy tự động lên hàng đợi ưu tiên.
           </div>
         </div>
       </div>

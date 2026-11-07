@@ -27,14 +27,24 @@ type TodayDose = {
 
 type HistoryRow = { id: string; scheduledAt: string; drugName: string; status: 'TAKEN' | 'MISSED' };
 
+type Interaction = { id: string; severity: 'LOW' | 'MEDIUM' | 'HIGH'; description: string; drugA: string; drugB: string };
+
 type MedicationView = {
   activeItems: ActiveItem[];
   today: TodayDose[];
   adherence: { taken: number; expected: number; percent: number | null };
   history: HistoryRow[];
+  interactions: Interaction[];
 };
 
-const EMPTY: MedicationView = { activeItems: [], today: [], adherence: { taken: 0, expected: 0, percent: null }, history: [] };
+const EMPTY: MedicationView = { activeItems: [], today: [], adherence: { taken: 0, expected: 0, percent: null }, history: [], interactions: [] };
+
+const SEVERITY_LABEL: Record<Interaction['severity'], string> = { LOW: 'Nhẹ', MEDIUM: 'Trung bình', HIGH: 'Nghiêm trọng' };
+function severityPillStyle(sev: Interaction['severity']): React.CSSProperties {
+  if (sev === 'HIGH') return { background: 'var(--red-tint)', color: 'var(--red)' };
+  if (sev === 'MEDIUM') return { background: 'var(--amber-tint)', color: 'var(--amber)' };
+  return { background: 'var(--teal-tint)', color: 'var(--teal-deep)' };
+}
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const fmtDate = (iso: string) => {
@@ -120,6 +130,29 @@ export default function PatientMedicationsPage() {
       </div>
 
       {error && <div className='sec-card' style={{ ...card, padding: 14, color: 'var(--red)' }}>{error}</div>}
+
+      {!loading && view.interactions.length > 0 && (
+        <section className='sec-card' style={{ borderColor: 'var(--red)' }}>
+          <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--red)' }}>Tương tác thuốc cần lưu ý</h2>
+            <span className='pill' style={{ background: 'var(--red-tint)', color: 'var(--red)' }}>{view.interactions.length} cặp thuốc</span>
+          </div>
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {view.interactions.map((i) => (
+              <div key={i.id} style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ fontWeight: 600, fontSize: 13.5 }}>{i.drugA} + {i.drugB}</div>
+                  <span className='pill' style={severityPillStyle(i.severity)}>{SEVERITY_LABEL[i.severity]}</span>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 6 }}>{i.description}</div>
+              </div>
+            ))}
+            <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+              Đây là thông tin tham khảo. Vui lòng trao đổi với bác sĩ điều trị trước khi tự ý thay đổi cách dùng thuốc.
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Đơn thuốc hiện hành */}
       <section className='sec-card'>

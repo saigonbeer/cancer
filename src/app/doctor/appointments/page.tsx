@@ -2,6 +2,24 @@
 
 import { useEffect, useState } from 'react';
 
+const STATUS_LABEL: Record<string, string> = {
+  PENDING: 'Chờ duyệt',
+  APPROVED: 'Đã duyệt',
+  REJECTED: 'Từ chối',
+  SCHEDULED: 'Đã xếp lịch',
+  COMPLETED: 'Đã khám xong',
+  CANCELLED: 'Đã hủy',
+};
+
+const STATUS_STYLE: Record<string, React.CSSProperties> = {
+  PENDING: { background: 'var(--amber-tint)', color: 'var(--amber)' },
+  APPROVED: { background: 'var(--teal-tint)', color: 'var(--teal)' },
+  REJECTED: { background: 'var(--red-tint)', color: 'var(--red)' },
+  SCHEDULED: { background: 'var(--teal-tint)', color: 'var(--teal)' },
+  COMPLETED: { background: 'var(--purple-tint)', color: 'var(--purple)' },
+  CANCELLED: { background: 'var(--bg)', color: 'var(--ink-soft)' },
+};
+
 export default function DoctorAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,28 +88,8 @@ export default function DoctorAppointmentsPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span
-                    className='pill'
-                    style={{
-                      background:
-                        a.status === 'APPROVED'
-                          ? 'var(--teal-tint)'
-                          : a.status === 'REJECTED'
-                          ? 'var(--red-tint)'
-                          : 'var(--amber-tint)',
-                      color:
-                        a.status === 'APPROVED'
-                          ? 'var(--teal)'
-                          : a.status === 'REJECTED'
-                          ? 'var(--red)'
-                          : 'var(--amber)'
-                    }}
-                  >
-                    {a.status === 'APPROVED'
-                      ? 'Đã duyệt'
-                      : a.status === 'REJECTED'
-                      ? 'Từ chối'
-                      : 'Chờ duyệt'}
+                  <span className='pill' style={STATUS_STYLE[a.status as string] || STATUS_STYLE.PENDING}>
+                    {STATUS_LABEL[a.status as string] || 'Chờ duyệt'}
                   </span>
 
                   {a.status === 'PENDING' && (
@@ -111,6 +109,27 @@ export default function DoctorAppointmentsPage() {
                         onClick={() => updateStatus(a.id, 'REJECTED')}
                       >
                         Từ chối
+                      </button>
+                    </div>
+                  )}
+
+                  {a.status === 'APPROVED' && (
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        type='button'
+                        className='addbtn'
+                        style={{ fontSize: 12, padding: '6px 12px' }}
+                        onClick={() => updateStatus(a.id, 'COMPLETED')}
+                      >
+                        Đánh dấu đã khám
+                      </button>
+                      <button
+                        type='button'
+                        className='ghostbtn'
+                        style={{ fontSize: 12, padding: '6px 12px', color: 'var(--red)' }}
+                        onClick={() => updateStatus(a.id, 'CANCELLED')}
+                      >
+                        Hủy
                       </button>
                     </div>
                   )}

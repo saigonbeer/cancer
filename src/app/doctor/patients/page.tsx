@@ -441,7 +441,7 @@ export default function DoctorPatientsPage() {
   return (
     <>
       <div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>Khoa Xạ trị &amp; Ung bướu</div>
+        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>Khoa Xạ trị &amp; Xạ phẫu</div>
         <h1 style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700 }}>Bệnh nhân</h1>
       </div>
 

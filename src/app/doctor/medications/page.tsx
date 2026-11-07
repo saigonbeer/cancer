@@ -85,12 +85,18 @@ export default function DoctorMedicationsPage() {
   const [selectedId, setSelectedId] = useState('');
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [visits, setVisits] = useState<any[]>([]);
+  const [myPrescriptions, setMyPrescriptions] = useState<any[]>([]);
+  const [loadingMine, setLoadingMine] = useState(true);
+  const [rxQuery, setRxQuery] = useState('');
   const [tab, setTab] = useState<Tab>('history');
   const [rows, setRows] = useState<any[]>([emptyRow()]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
+  const [pendingAck, setPendingAck] = useState<{ visitId: string; items: any[]; interactions: any[] } | null>(null);
+  const [ackNote, setAckNote] = useState('');
+  const [confirming, setConfirming] = useState(false);
 
   const selected = patients.find((p) => p.id === selectedId) || null;
   const results = patients
@@ -101,12 +107,29 @@ export default function DoctorMedicationsPage() {
     })
     .slice(0, 50);
 
+  const filteredMyPrescriptions = myPrescriptions.filter((pr) => {
+    const q = rxQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (pr.visit?.patient?.user?.name || '').toLowerCase().includes(q) ||
+      (pr.visit?.patient?.patientCode || '').toLowerCase().includes(q)
+    );
+  });
+
   async function loadPatients() {
     setLoading(true);
     const res = await fetch('/api/doctor/patients', { cache: 'no-store' });
     const data = await res.json();
     setPatients(data.patients || []);
     setLoading(false);
+  }
+
+  async function loadMyPrescriptions() {
+    setLoadingMine(true);
+    const res = await fetch('/api/doctor/medications', { cache: 'no-store' });
+    const data = await res.json();
+    setMyPrescriptions(data.prescriptions || []);
+    setLoadingMine(false);
   }
 
   async function loadPatientData(pid: string) {
@@ -120,6 +143,7 @@ export default function DoctorMedicationsPage() {
 
   useEffect(() => {
     loadPatients();
+    loadMyPrescriptions();
   }, []);
 
   useEffect(() => {
@@ -179,13 +203,52 @@ export default function DoctorMedicationsPage() {
         setError(data.error || 'Không lưu được đơn thuốc.');
         return;
       }
+      if (data.needsAck) {
+        setPendingAck({ visitId: visitId!, items, interactions: data.interactions || [] });
+        setAckNote('');
+        return;
+      }
       if (data.interactions?.length) setWarnings(data.interactions);
       setMessage('Đã lưu đơn thuốc.');
       setRows([emptyRow()]);
       loadPatientData(selected.id);
+      loadMyPrescriptions();
       setTab('history');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function confirmAck() {
+    if (!pendingAck || confirming) return;
+    setConfirming(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/doctor/medications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitId: pendingAck.visitId,
+          items: pendingAck.items,
+          ackInteractions: true,
+          ackNote: ackNote.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Không lưu được đơn thuốc.');
+        return;
+      }
+      setWarnings(pendingAck.interactions);
+      setPendingAck(null);
+      setAckNote('');
+      setMessage('Đã lưu đơn thuốc (đã xác nhận tương tác thuốc).');
+      setRows([emptyRow()]);
+      if (selected) loadPatientData(selected.id);
+      loadMyPrescriptions();
+      setTab('history');
+    } finally {
+      setConfirming(false);
     }
   }
 
@@ -197,7 +260,7 @@ export default function DoctorMedicationsPage() {
   return (
     <>
       <div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>Khoa Xạ trị &amp; Ung bướu</div>
+        <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--teal)', textTransform: 'uppercase' }}>Khoa Xạ trị &amp; Xạ phẫu</div>
         <h1 style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 700 }}>Thuốc</h1>
       </div>
 
@@ -229,6 +292,63 @@ export default function DoctorMedicationsPage() {
           </div>
         )}
       </section>
+
+      {!selected && (
+        <section className='sec-card'>
+          <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Đơn thuốc đã kê gần đây</h2>
+            <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>{filteredMyPrescriptions.length}/{myPrescriptions.length} đơn</span>
+          </div>
+          <div style={{ padding: '14px 22px 0' }}>
+            <input
+              type='text'
+              value={rxQuery}
+              onChange={(e) => setRxQuery(e.target.value)}
+              placeholder='Tìm đơn thuốc theo tên hoặc mã bệnh nhân...'
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--line)' }}
+            />
+          </div>
+          {loadingMine && <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Đang tải...</div>}
+          {!loadingMine && myPrescriptions.length === 0 && (
+            <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Bạn chưa kê đơn thuốc nào.</div>
+          )}
+          {!loadingMine && myPrescriptions.length > 0 && filteredMyPrescriptions.length === 0 && (
+            <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Không tìm thấy đơn thuốc phù hợp.</div>
+          )}
+          {!loadingMine && filteredMyPrescriptions.map((pr) => (
+            <div key={pr.id} style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
+                <button
+                  type='button'
+                  style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontWeight: 600, color: 'var(--teal-deep)', fontSize: 14 }}
+                  onClick={() => setSelectedId(pr.visit?.patient?.id)}
+                >
+                  {pr.visit?.patient?.user?.name || 'Bệnh nhân'} ({pr.visit?.patient?.patientCode})
+                </button>
+                <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Ngày kê: {fmtDate(pr.prescribedAt)}</span>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: 'var(--ink-soft)', fontSize: 12 }}>
+                    <th style={{ padding: '6px 4px' }}>STT</th><th>Tên thuốc</th><th>Liều</th><th>Tần suất</th><th>Số lượng</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pr.items?.map((it: any, idx: number) => (
+                    <tr key={it.id} style={{ borderTop: '1px solid var(--line-soft)' }}>
+                      <td style={{ padding: '6px 4px' }}>{idx + 1}</td>
+                      <td style={{ fontWeight: 600 }}>{it.drugName}</td>
+                      <td>{[it.dose, it.unit].filter(Boolean).join(' ') || '—'}</td>
+                      <td>{it.frequency || '—'}</td>
+                      <td>{it.quantity || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </section>
+      )}
 
       {selected && (
         <>
@@ -286,6 +406,11 @@ export default function DoctorMedicationsPage() {
                       ))}
                     </tbody>
                   </table>
+                  {pr.interactionAckAt && (
+                    <div style={{ marginTop: 8, fontSize: 12.5, color: 'var(--red)', background: 'var(--red-tint)', borderRadius: 8, padding: '8px 10px' }}>
+                      ⚠ Bác sĩ đã xác nhận kê đơn dù có tương tác thuốc ({fmtDate(pr.interactionAckAt)}){pr.interactionAckNote ? `: ${pr.interactionAckNote}` : '.'}
+                    </div>
+                  )}
                 </div>
               ))}
             </section>
@@ -315,6 +440,39 @@ export default function DoctorMedicationsPage() {
             </section>
           )}
         </>
+      )}
+
+      {pendingAck && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div className='sec-card' style={{ width: 520, maxWidth: '90vw', padding: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0, color: 'var(--red)' }}>⚠ Phát hiện tương tác thuốc</h2>
+            <div style={{ fontSize: 13.5, color: 'var(--ink-soft)', marginBottom: 12 }}>
+              Đơn thuốc này có tương tác với thuốc khác. Xác nhận bạn đã biết và vẫn muốn kê đơn.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16, maxHeight: 220, overflowY: 'auto' }}>
+              {pendingAck.interactions.map((w: any, i: number) => (
+                <div key={i} style={{ border: '1px solid var(--red)', background: 'var(--red-tint)', borderRadius: 8, padding: 10, fontSize: 13 }}>
+                  <strong>{w.drugA?.name}</strong> với <strong>{w.drugB?.name}</strong> — mức độ: <strong>{w.severity}</strong>
+                  <div style={{ marginTop: 4 }}>{w.description}</div>
+                </div>
+              ))}
+            </div>
+            <label className='field-label'>Lý do vẫn kê đơn (khuyến nghị ghi rõ, đặc biệt nếu mức độ nặng)</label>
+            <textarea
+              rows={3}
+              value={ackNote}
+              onChange={(e) => setAckNote(e.target.value)}
+              placeholder='VD: Đã cân nhắc lợi ích/nguy cơ, theo dõi sát chức năng gan...'
+            />
+            {error && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 8 }}>{error}</div>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button type='button' className='ghostbtn' onClick={() => { setPendingAck(null); setAckNote(''); }}>Hủy, không kê</button>
+              <button type='button' className='addbtn' style={{ background: 'var(--red)', borderColor: 'var(--red)' }} onClick={confirmAck} disabled={confirming}>
+                {confirming ? 'Đang lưu...' : 'Xác nhận, vẫn kê đơn'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

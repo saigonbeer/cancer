@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { checkDrugInteractions } from './prescription.service';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export type DoseStatusValue = 'TAKEN' | 'MISSED';
@@ -49,7 +50,7 @@ async function patientProfileId(userId: string) {
 export async function getPatientMedicationView(userId: string) {
   const patientId = await patientProfileId(userId);
   if (!patientId) {
-    return { activeItems: [], today: [], adherence: { taken: 0, expected: 0, percent: null }, history: [] };
+    return { activeItems: [], today: [], adherence: { taken: 0, expected: 0, percent: null }, history: [], interactions: [] };
   }
 
   const now = new Date();
@@ -135,11 +136,23 @@ export async function getPatientMedicationView(userId: string) {
     status: l.status,
   }));
 
+  // Tương tác thuốc: đối chiếu toàn bộ thuốc đang dùng hiện hành, không chỉ trong 1 đơn.
+  const activeDrugNames = Array.from(new Set(activeItems.map((it) => it.drugName)));
+  const rawInteractions = await checkDrugInteractions(activeDrugNames);
+  const interactions = rawInteractions.map((i) => ({
+    id: i.id,
+    severity: i.severity,
+    description: i.description,
+    drugA: i.drugA.name,
+    drugB: i.drugB.name,
+  }));
+
   return {
     activeItems,
     today: todayDoses,
     adherence: { taken, expected, percent: expected > 0 ? Math.round((taken / expected) * 100) : null },
     history,
+    interactions,
   };
 }
 

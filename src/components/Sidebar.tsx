@@ -36,24 +36,8 @@ export default function Sidebar({
         minHeight: "100vh",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 6px" }}>
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: "#fff",
-            color: "var(--teal-deep)",
-            fontWeight: 700,
-            fontSize: 14,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          OE
-        </div>
-        <div style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>{brandLabel}</div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0 6px" }}>
+        <div style={{ color: "#fff", fontWeight: 700, fontSize: 19, textAlign: "center" }}>{brandLabel}</div>
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>

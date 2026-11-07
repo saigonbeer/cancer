@@ -39,17 +39,25 @@ export async function createPrescription(
     quantity?: string;
     reminderTimes?: string;
   }>,
-  role: Role
+  role: Role,
+  ack?: { confirmed: boolean; note?: string }
 ) {
   await assertPermission('medications', role);
 
   const drugNames = items.map((i) => i.drugName);
   const interactions = await checkDrugInteractions(drugNames);
 
+  // Có tương tác nhưng bác sĩ chưa xác nhận: không lưu đơn, trả cảnh báo để bác sĩ xác nhận trước.
+  if (interactions.length > 0 && !ack?.confirmed) {
+    return { needsAck: true as const, interactions };
+  }
+
   const prescription = await prisma.prescription.create({
     data: {
       visitId,
       prescribedBy,
+      interactionAckAt: interactions.length > 0 ? new Date() : undefined,
+      interactionAckNote: interactions.length > 0 ? ack?.note || undefined : undefined,
       items: {
         create: items.map((item) => ({
           drugName: item.drugName,
@@ -65,7 +73,7 @@ export async function createPrescription(
     include: { items: true }
   });
 
-  return { prescription, interactions };
+  return { needsAck: false as const, prescription, interactions };
 }
 
 export async function getPrescriptionsByPatient(patientId: string) {
@@ -80,5 +88,27 @@ export async function getPrescriptionsByPatient(patientId: string) {
       }
     },
     orderBy: { prescribedAt: 'desc' }
+  });
+}
+
+/** Các đơn thuốc do chính bác sĩ này kê (tra theo Visit.doctorId), không giới hạn theo bệnh nhân. */
+export async function getPrescriptionsByDoctor(doctorUserId: string, take = 50) {
+  const profile = await prisma.doctorProfile.findUnique({ where: { userId: doctorUserId }, select: { id: true } });
+  if (!profile) return [];
+
+  return prisma.prescription.findMany({
+    where: { visit: { doctorId: profile.id } },
+    include: {
+      items: true,
+      visit: {
+        select: {
+          visitDate: true,
+          type: true,
+          patient: { select: { id: true, patientCode: true, user: { select: { name: true } } } },
+        },
+      },
+    },
+    orderBy: { prescribedAt: 'desc' },
+    take,
   });
 }

@@ -79,18 +79,26 @@ export default function AdminAccountsPage() {
     load();
   }
 
-  async function saveEdit(acc: Account) {
-    await fetch(`/api/admin/accounts/${acc.id}`, {
+  async function saveEdit(acc: Account & { password?: string }) {
+    setError(null);
+    const body: Record<string, unknown> = {
+      name: acc.name,
+      dob: acc.dob || undefined,
+      email: acc.email || "",
+      role: acc.role,
+      username: acc.username,
+    };
+    if (acc.password && acc.password.trim()) body.password = acc.password.trim();
+    const res = await fetch(`/api/admin/accounts/${acc.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: acc.name,
-        dob: acc.dob || undefined,
-        email: acc.email || "",
-        role: acc.role,
-        username: acc.username,
-      }),
+      body: JSON.stringify(body),
     });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error || "Không lưu được thay đổi.");
+      return;
+    }
     setEditingId(null);
     load();
   }
@@ -103,7 +111,7 @@ export default function AdminAccountsPage() {
     <>
       <div>
         <div style={{ fontSize: 12.5, fontWeight: 600, letterSpacing: "0.08em", color: "var(--teal)", textTransform: "uppercase" }}>
-          Onco EMR
+          108|Future
         </div>
         <h1 style={{ margin: "4px 0 0", fontSize: 26, fontWeight: 700 }}>Quản lý tài khoản</h1>
       </div>
@@ -258,31 +266,44 @@ function EditRow({
 }: {
   account: Account;
   onCancel: () => void;
-  onSave: (a: Account) => void;
+  onSave: (a: Account & { password?: string }) => void;
 }) {
-  const [draft, setDraft] = useState(account);
+  const [draft, setDraft] = useState<Account & { password?: string }>({ ...account, password: "" });
   return (
-    <div style={gridRow}>
-      <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-      <input value={draft.dob || ""} onChange={(e) => setDraft({ ...draft, dob: e.target.value })} />
-      <input value={draft.email || ""} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
-      <select
-        value={draft.role}
-        onChange={(e) => setDraft({ ...draft, role: e.target.value as Role })}
-        style={{ padding: "7px 10px", borderRadius: 7, border: "1px solid var(--line)" }}
-      >
-        <option value="DOCTOR">Bác sĩ</option>
-        <option value="PATIENT">Bệnh nhân</option>
-        <option value="ADMIN">Quản trị viên</option>
-      </select>
-      <input value={draft.username} onChange={(e) => setDraft({ ...draft, username: e.target.value })} />
-      <div style={{ display: "flex", gap: 8 }}>
-        <button type="button" className="ghostbtn" onClick={() => onSave(draft)}>
-          Xong
-        </button>
-        <button type="button" className="ghostbtn" onClick={onCancel}>
-          Hủy
-        </button>
+    <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--line-soft)" }}>
+      <div style={{ ...gridRow, padding: 0, border: "none" }}>
+        <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+        <input value={draft.dob || ""} onChange={(e) => setDraft({ ...draft, dob: e.target.value })} />
+        <input value={draft.email || ""} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
+        <select
+          value={draft.role}
+          onChange={(e) => setDraft({ ...draft, role: e.target.value as Role })}
+          style={{ padding: "7px 10px", borderRadius: 7, border: "1px solid var(--line)" }}
+        >
+          <option value="DOCTOR">Bác sĩ</option>
+          <option value="PATIENT">Bệnh nhân</option>
+          <option value="ADMIN">Quản trị viên</option>
+        </select>
+        <input value={draft.username} onChange={(e) => setDraft({ ...draft, username: e.target.value })} />
+        <div style={{ display: "flex", gap: 8 }}>
+          <button type="button" className="ghostbtn" onClick={() => onSave(draft)}>
+            Xong
+          </button>
+          <button type="button" className="ghostbtn" onClick={onCancel}>
+            Hủy
+          </button>
+        </div>
+      </div>
+      <div style={{ marginTop: 10, display: "flex", alignItems: "end", gap: 8, maxWidth: 260 }}>
+        <div style={{ flex: 1 }}>
+          <label className="field-label">Mật khẩu mới (để trống nếu không đổi)</label>
+          <input
+            type="password"
+            value={draft.password}
+            onChange={(e) => setDraft({ ...draft, password: e.target.value })}
+            placeholder="••••••"
+          />
+        </div>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ const items = [
 export default function DoctorLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh", width: "100%" }}>
-      <Sidebar brandLabel="Onco EMR" items={items} />
+      <Sidebar brandLabel="108|Future" items={items} />
       <main style={{ flex: "1 1 0", minWidth: 0, padding: "32px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
         {children}
       </main>

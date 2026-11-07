@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
-import { createAppointment, getAppointments } from '@/services/appointment.service';
+import { createAppointment, getAppointments, updateAppointmentStatus } from '@/services/appointment.service';
 
 export async function GET() {
   const auth = await requireRole('PATIENT');
@@ -68,10 +68,13 @@ export async function DELETE(req: NextRequest) {
   if (!appointment || appointment.patientId !== auth.session.userId) {
     return NextResponse.json({ error: 'Không tìm thấy lịch hẹn.' }, { status: 404 });
   }
-  if (appointment.status !== 'PENDING') {
-    return NextResponse.json({ error: 'Chỉ có thể hủy lịch hẹn đang chờ duyệt.' }, { status: 400 });
+  if (appointment.status !== 'PENDING' && appointment.status !== 'APPROVED') {
+    return NextResponse.json({ error: 'Lịch hẹn này không thể hủy.' }, { status: 400 });
+  }
+  if (appointment.datetime && appointment.datetime.getTime() < Date.now()) {
+    return NextResponse.json({ error: 'Không thể hủy lịch hẹn đã qua.' }, { status: 400 });
   }
 
-  await prisma.appointment.delete({ where: { id: parsed.data.appointmentId } });
-  return NextResponse.json({ ok: true });
+  const updated = await updateAppointmentStatus(parsed.data.appointmentId, 'CANCELLED', auth.session.role);
+  return NextResponse.json({ ok: true, appointment: updated });
 }

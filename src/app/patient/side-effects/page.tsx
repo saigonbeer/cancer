@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { gradeStyle, gradeLabel } from '@/lib/ctcaeGrade';
 
-const COMMON_SYMPTOMS = ['Buồn nôn', 'Sốt', 'Mệt mỏi', 'Tiêu chảy', 'Táo bón', 'Đau', 'Ho', 'Viêm da', 'Chán ăn'];
 const SEVERITIES = ['Nhẹ', 'Trung bình', 'Nặng'];
 
 const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString('vi-VN');
@@ -14,13 +13,24 @@ function severityStyle(severity?: string | null) {
   return { background: 'var(--teal-tint)', color: 'var(--teal-deep)' };
 }
 
+const ALERT_SEVERITY_STYLE: Record<string, React.CSSProperties> = {
+  HIGH: { background: 'var(--red-tint)', color: 'var(--red)' },
+  MEDIUM: { background: 'var(--amber-tint)', color: 'var(--amber)' },
+  LOW: { background: 'var(--bg)', color: 'var(--ink-soft)' },
+};
+const ALERT_SEVERITY_LABEL: Record<string, string> = { HIGH: 'Mức cao', MEDIUM: 'Mức trung bình', LOW: 'Mức thấp' };
+const ALERT_STATUS_LABEL: Record<string, string> = { PENDING: 'Chờ bác sĩ xác nhận', CONFIRMED: 'Bác sĩ đã xác nhận', DISMISSED: 'Bác sĩ đã xem, không đáng ngại' };
+
 export default function PatientSideEffectsPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [symptom, setSymptom] = useState(COMMON_SYMPTOMS[0]);
-  const [symptomQuery, setSymptomQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<{ id: string; termVi: string; socVi: string | null }[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
+  const [groups, setGroups] = useState<string[]>([]);
+  const [group, setGroup] = useState('');
+  const [locations, setLocations] = useState<{ id: string; termVi: string; socVi: string | null }[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [location, setLocation] = useState('');
   const [severity, setSeverity] = useState('Nhẹ');
   const [note, setNote] = useState('');
   const [photo, setPhoto] = useState<File | null>(null);
@@ -38,27 +48,38 @@ export default function PatientSideEffectsPage() {
 
   useEffect(() => {
     load();
+    fetch('/api/patient/ctcae/groups')
+      .then((r) => r.json())
+      .then((data) => setGroups(data.groups || []));
+    setAlertsLoading(true);
+    fetch('/api/patient/alerts', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => setAlerts((data.alerts || []).filter((a: any) => a.status !== 'DISMISSED')))
+      .finally(() => setAlertsLoading(false));
   }, []);
 
   useEffect(() => {
-    if (!symptomQuery.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    const handle = setTimeout(async () => {
-      const res = await fetch('/api/patient/ctcae?q=' + encodeURIComponent(symptomQuery.trim()));
-      const data = await res.json().catch(() => ({ items: [] }));
-      setSuggestions(data.items || []);
-    }, 300);
-    return () => clearTimeout(handle);
-  }, [symptomQuery]);
+    setLocation('');
+    setLocations([]);
+    if (!group) return;
+    setLoadingLocations(true);
+    fetch('/api/patient/ctcae?soc=' + encodeURIComponent(group))
+      .then((r) => r.json())
+      .then((data) => setLocations(data.items || []))
+      .finally(() => setLoadingLocations(false));
+  }, [group]);
 
   async function submit() {
     setError(null);
     setMessage(null);
+    if (!group || !location) {
+      setError('Vui lòng chọn Khu vực ảnh hưởng và Vị trí ảnh hưởng.');
+      return;
+    }
     setSending(true);
     const form = new FormData();
-    form.append('symptom', symptom);
+    form.append('symptom', location);
+    form.append('site', group);
     form.append('severity', severity);
     form.append('note', note.trim());
     if (photo) form.append('photo', photo);
@@ -70,6 +91,8 @@ export default function PatientSideEffectsPage() {
       return;
     }
     setMessage('Đã gửi báo cáo cho bác sĩ.');
+    setGroup('');
+    setLocation('');
     setSeverity('Nhẹ');
     setNote('');
     setPhoto(null);
@@ -96,9 +119,25 @@ export default function PatientSideEffectsPage() {
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Cảnh báo sớm bằng AI</h2>
           <span className='pill' style={{ background: 'var(--amber-tint)', color: 'var(--amber)' }}>Gợi ý, chờ BS xác nhận</span>
         </div>
-        <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>
-          Chưa có cảnh báo nào. Khi hệ thống phát hiện xu hướng bất thường từ các báo cáo của bạn, gợi ý sẽ hiển thị tại đây và chờ bác sĩ xác nhận.
-        </div>
+        {alertsLoading ? (
+          <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>Đang tải...</div>
+        ) : alerts.length === 0 ? (
+          <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>
+            Chưa có cảnh báo nào. Khi hệ thống phát hiện xu hướng bất thường từ các báo cáo của bạn, gợi ý sẽ hiển thị tại đây và chờ bác sĩ xác nhận.
+          </div>
+        ) : (
+          <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {alerts.map((a) => (
+              <div key={a.id} style={{ border: '1px solid var(--line)', borderRadius: 10, padding: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <span className='pill' style={ALERT_SEVERITY_STYLE[a.severity] || {}}>{ALERT_SEVERITY_LABEL[a.severity] || a.severity}</span>
+                  <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>{ALERT_STATUS_LABEL[a.status] || a.status}</span>
+                </div>
+                <div style={{ fontSize: 13.5, marginTop: 6 }}>{a.message}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20, alignItems: 'start' }}>
@@ -108,54 +147,28 @@ export default function PatientSideEffectsPage() {
             <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Ghi nhận triệu chứng mới</h2>
           </div>
           <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div>
-              <label className='field-label'>Triệu chứng đang chọn: <strong style={{ color: 'var(--teal-deep)' }}>{symptom}</strong></label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                {COMMON_SYMPTOMS.map((s) => (
-                  <button
-                    key={s}
-                    type='button'
-                    onClick={() => { setSymptom(s); setSymptomQuery(''); setShowSuggestions(false); }}
-                    className='pill'
-                    style={{
-                      cursor: 'pointer', border: 'none',
-                      background: symptom === s ? 'var(--teal)' : 'var(--bg)',
-                      color: symptom === s ? '#fff' : 'var(--ink-soft)',
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
+              <div>
+                <label className='field-label'>Khu vực ảnh hưởng</label>
+                <select value={group} onChange={(e) => setGroup(e.target.value)} style={fieldStyle}>
+                  <option value=''>Chọn khu vực...</option>
+                  {groups.map((g) => <option key={g} value={g}>{g}</option>)}
+                </select>
               </div>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type='text'
-                  value={symptomQuery}
-                  onChange={(e) => { setSymptomQuery(e.target.value); setShowSuggestions(true); }}
-                  onFocus={() => setShowSuggestions(true)}
-                  placeholder='Hoặc tìm trong danh mục 850 triệu chứng (VD: tê bì, rụng tóc...)'
+              <div>
+                <label className='field-label'>Vị trí ảnh hưởng</label>
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  disabled={!group || loadingLocations}
                   style={fieldStyle}
-                />
-                {showSuggestions && suggestions.length > 0 && (
-                  <div style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10, marginTop: 4,
-                    background: '#fff', border: '1px solid var(--line)', borderRadius: 8, maxHeight: 220, overflowY: 'auto',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                  }}>
-                    {suggestions.map((s) => (
-                      <div
-                        key={s.id}
-                        onClick={() => { setSymptom(s.termVi); setSymptomQuery(''); setShowSuggestions(false); setSuggestions([]); }}
-                        style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13.5, borderBottom: '1px solid var(--line-soft)' }}
-                      >
-                        <div style={{ fontWeight: 600 }}>{s.termVi}</div>
-                        <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{s.socVi}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                >
+                  <option value=''>{!group ? 'Chọn khu vực trước' : loadingLocations ? 'Đang tải...' : 'Chọn vị trí...'}</option>
+                  {locations.map((l) => <option key={l.id} value={l.termVi}>{l.termVi}</option>)}
+                </select>
               </div>
             </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
               <div>
                 <label className='field-label'>Mức độ tự đánh giá</label>
@@ -166,7 +179,7 @@ export default function PatientSideEffectsPage() {
             </div>
 
             <div>
-              <label className='field-label'>Ghi chú (tuỳ chọn)</label>
+              <label className='field-label'>Mô tả (tuỳ chọn)</label>
               <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder='Mô tả thêm...' style={{ ...fieldStyle, resize: 'vertical' }} />
             </div>
 
@@ -213,6 +226,7 @@ export default function PatientSideEffectsPage() {
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{r.symptom}</div>
                     <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'}</span>
                   </div>
+                  {r.site && <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 2 }}>{r.site}</div>}
                   <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4, fontFamily: 'ui-monospace, monospace' }}>
                     {fmtDate(r.createdAt)}
                   </div>

@@ -14,7 +14,7 @@ export async function searchCtcaeTerms(q: string | undefined, limit = 20) {
 
   return prisma.ctcaeTerm.findMany({
     where,
-    orderBy: { termVi: 'asc' },
+    orderBy: [{ order: 'asc' }, { termVi: 'asc' }],
     take: limit,
   });
 }

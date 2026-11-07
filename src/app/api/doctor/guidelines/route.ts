@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
-import { toCtcaeSearchTerm } from '@/lib/ctcaeSymptomMap';
 
 export async function GET(req: NextRequest) {
   const auth = await requireRole('DOCTOR', 'ADMIN');
@@ -13,9 +12,8 @@ export async function GET(req: NextRequest) {
   const modality = searchParams.get('modality');
 
   if (symptom) {
-    const searchTerm = toCtcaeSearchTerm(symptom);
     const terms = await prisma.ctcaeTerm.findMany({
-      where: { term: { contains: searchTerm, mode: 'insensitive' } },
+      where: { termVi: { contains: symptom, mode: 'insensitive' } },
       include: {
         guidelines: {
           where: {
@@ -38,7 +36,7 @@ export async function GET(req: NextRequest) {
         ...(grade ? { grade: parseInt(grade) } : {}),
         ...(modality ? { modality: { in: [modality, 'ALL'] } } : {}),
       },
-      include: { ctcaeTerm: { select: { term: true, soc: true, lltCode: true } } },
+      include: { ctcaeTerm: { select: { term: true, soc: true, termVi: true, socVi: true, lltCode: true } } },
       orderBy: [{ grade: 'asc' }, { modality: 'asc' }],
     });
     return NextResponse.json({ guidelines });

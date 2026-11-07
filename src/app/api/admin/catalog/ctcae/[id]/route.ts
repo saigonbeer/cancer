@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
 
 const schema = z.object({
+  order: z.number().int().optional().nullable(),
   termVi: z.string().min(1).optional(),
   socVi: z.string().min(1).optional(),
   grade1Vi: z.string().optional().nullable(),
@@ -30,6 +31,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const item = await prisma.ctcaeTerm.update({ where: { id }, data: parsed.data });
     return NextResponse.json({ item });
+  } catch {
+    return NextResponse.json({ error: 'Không tìm thấy mục CTCAE.' }, { status: 404 });
+  }
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireRole('ADMIN');
+  if ('response' in auth) return auth.response;
+
+  const { id } = await params;
+  try {
+    await prisma.ctcaeTerm.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Không tìm thấy mục CTCAE.' }, { status: 404 });
   }

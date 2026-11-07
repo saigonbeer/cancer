@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/requireRole';
-import { createPrescription, getPrescriptionsByPatient, checkDrugInteractions } from '@/services/prescription.service';
+import { createPrescription, getPrescriptionsByPatient, getPrescriptionsByDoctor, checkDrugInteractions } from '@/services/prescription.service';
 
 export async function GET(req: NextRequest) {
   const auth = await requireRole('DOCTOR', 'ADMIN');
@@ -8,8 +8,10 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const patientId = searchParams.get('patientId');
+
   if (!patientId) {
-    return NextResponse.json({ error: 'Thiếu patientId' }, { status: 400 });
+    const prescriptions = await getPrescriptionsByDoctor(auth.session.userId);
+    return NextResponse.json({ prescriptions });
   }
 
   const prescriptions = await getPrescriptionsByPatient(patientId);
@@ -26,13 +28,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const ack = body.ackInteractions ? { confirmed: true, note: typeof body.ackNote === 'string' ? body.ackNote : undefined } : undefined;
     const result = await createPrescription(
       body.visitId,
       auth.session.name || 'Bác sĩ điều trị',
       body.items,
-      auth.session.role
+      auth.session.role,
+      ack
     );
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(result, { status: result.needsAck ? 200 : 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 403 });
   }

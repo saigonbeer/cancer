@@ -76,14 +76,44 @@ describe('createPrescription', () => {
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('returns interactions alongside prescription', async () => {
+  it('blocks save and returns needsAck when interactions found but not confirmed', async () => {
     mockAssert.mockResolvedValue(undefined);
     mockDrugFind.mockResolvedValue([{ id: 'd1' }, { id: 'd2' }]);
     mockInterFind.mockResolvedValue([{ id: 'i1', severity: 'MEDIUM' }]);
-    mockCreate.mockResolvedValue({ id: 'rx1', items: [] });
 
     const result = await createPrescription('v1', 'BS.', [{ drugName: 'A' }, { drugName: 'B' }], 'DOCTOR');
+    expect(result.needsAck).toBe(true);
     expect(result.interactions).toHaveLength(1);
-    expect(result.prescription.id).toBe('rx1');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('creates and records interaction acknowledgment when confirmed', async () => {
+    mockAssert.mockResolvedValue(undefined);
+    mockDrugFind.mockResolvedValue([{ id: 'd1' }, { id: 'd2' }]);
+    mockInterFind.mockResolvedValue([{ id: 'i1', severity: 'HIGH' }]);
+    mockCreate.mockResolvedValue({ id: 'rx1', items: [] });
+
+    const result = await createPrescription(
+      'v1', 'BS.', [{ drugName: 'A' }, { drugName: 'B' }], 'DOCTOR',
+      { confirmed: true, note: 'Đã cân nhắc lợi ích/nguy cơ' }
+    );
+    expect(result.needsAck).toBe(false);
+    expect(result.prescription?.id).toBe('rx1');
+    expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        interactionAckNote: 'Đã cân nhắc lợi ích/nguy cơ',
+      }),
+    }));
+  });
+
+  it('creates without acknowledgment fields when no interactions exist', async () => {
+    mockAssert.mockResolvedValue(undefined);
+    mockDrugFind.mockResolvedValue([]);
+    mockInterFind.mockResolvedValue([]);
+    mockCreate.mockResolvedValue({ id: 'rx2', items: [] });
+
+    const result = await createPrescription('v1', 'BS.', [{ drugName: 'Paracetamol' }], 'DOCTOR');
+    expect(result.needsAck).toBe(false);
+    expect(result.prescription?.id).toBe('rx2');
   });
 });

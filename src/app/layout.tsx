@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Onco EMR",
+  title: "108|Future",
   description: "Hệ thống quản lý điều trị bệnh nhân ung thư",
 };
 

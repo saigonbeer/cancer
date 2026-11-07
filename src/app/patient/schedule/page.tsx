@@ -2,10 +2,35 @@
 
 import { useEffect, useState } from 'react';
 
+const STATUS_LABEL: Record<string, string> = {
+  PENDING: 'Đang chờ bác sĩ duyệt',
+  APPROVED: 'Bác sĩ đã xác nhận',
+  REJECTED: 'Bị từ chối',
+  SCHEDULED: 'Đã xếp lịch',
+  COMPLETED: 'Đã khám xong',
+  CANCELLED: 'Đã hủy',
+};
+
+const STATUS_STYLE: Record<string, React.CSSProperties> = {
+  PENDING: { background: 'var(--amber-tint)', color: 'var(--amber)' },
+  APPROVED: { background: 'var(--teal-tint)', color: 'var(--teal)' },
+  REJECTED: { background: 'var(--red-tint)', color: 'var(--red)' },
+  SCHEDULED: { background: 'var(--teal-tint)', color: 'var(--teal)' },
+  COMPLETED: { background: 'var(--purple-tint)', color: 'var(--purple)' },
+  CANCELLED: { background: 'var(--bg)', color: 'var(--ink-soft)' },
+};
+
+function isUpcoming(a: any) {
+  const notFinal = a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && a.status !== 'REJECTED';
+  const notPast = !a.datetime || new Date(a.datetime).getTime() >= Date.now();
+  return notFinal && notPast;
+}
+
 export default function PatientSchedulePage() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [type, setType] = useState('Tái khám định kỳ');
   const [datetime, setDatetime] = useState('');
@@ -26,11 +51,17 @@ export default function PatientSchedulePage() {
 
   async function cancelAppointment(id: string) {
     if (!confirm('Bạn có chắc muốn hủy lịch hẹn này?')) return;
-    await fetch('/api/patient/appointments', {
+    setError(null);
+    const res = await fetch('/api/patient/appointments', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ appointmentId: id })
     });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || 'Không hủy được lịch hẹn.');
+      return;
+    }
     load();
   }
 
@@ -54,6 +85,13 @@ export default function PatientSchedulePage() {
     }
   }
 
+  const upcoming = appointments
+    .filter(isUpcoming)
+    .sort((a, b) => (a.datetime ? new Date(a.datetime).getTime() : Infinity) - (b.datetime ? new Date(b.datetime).getTime() : Infinity));
+  const history = appointments
+    .filter((a) => !isUpcoming(a))
+    .sort((a, b) => (b.datetime ? new Date(b.datetime).getTime() : 0) - (a.datetime ? new Date(a.datetime).getTime() : 0));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -68,76 +106,33 @@ export default function PatientSchedulePage() {
         </button>
       </div>
 
+      {error && <div className='sec-card' style={{ padding: 14, color: 'var(--red)' }}>{error}</div>}
+
       <div className='sec-card' style={{ padding: 20 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Lịch Hẹn Của Bạn</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Lịch hẹn sắp tới</h2>
         {loading ? (
           <div style={{ color: 'var(--ink-soft)' }}>Đang tải lịch hẹn...</div>
-        ) : appointments.length === 0 ? (
-          <div style={{ color: 'var(--ink-soft)' }}>Bạn chưa có lịch hẹn nào.</div>
+        ) : upcoming.length === 0 ? (
+          <div style={{ color: 'var(--ink-soft)' }}>Bạn chưa có lịch hẹn sắp tới nào.</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {appointments.map((a) => (
-              <div
-                key={a.id}
-                style={{
-                  border: '1px solid var(--line)',
-                  borderRadius: 10,
-                  padding: 16,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 14.5 }}>
-                    {a.type} • Bác sĩ {a.doctor?.name || 'phụ trách'}
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
-                    Thời gian: {a.datetime ? new Date(a.datetime).toLocaleString('vi-VN') : 'Chưa định ngày'} • Địa điểm: {a.location || 'Khoa Ung Bướu'}
-                  </div>
-                  {a.reason && (
-                    <div style={{ fontSize: 12.5, color: 'var(--ink)', marginTop: 4 }}>
-                      Lý do hẹn: {a.reason}
-                    </div>
-                  )}
-                </div>
+            {upcoming.map((a) => (
+              <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} />
+            ))}
+          </div>
+        )}
+      </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span
-                    className='pill'
-                    style={{
-                      background:
-                        a.status === 'APPROVED'
-                          ? 'var(--teal-tint)'
-                          : a.status === 'REJECTED'
-                          ? 'var(--red-tint)'
-                          : 'var(--amber-tint)',
-                      color:
-                        a.status === 'APPROVED'
-                          ? 'var(--teal)'
-                          : a.status === 'REJECTED'
-                          ? 'var(--red)'
-                          : 'var(--amber)'
-                    }}
-                  >
-                    {a.status === 'APPROVED'
-                      ? 'Bác sĩ đã xác nhận'
-                      : a.status === 'REJECTED'
-                      ? 'Bị từ chối'
-                      : 'Đang chờ bác sĩ duyệt'}
-                  </span>
-                  {a.status === 'PENDING' && (
-                    <button
-                      type='button'
-                      className='ghostbtn'
-                      style={{ fontSize: 12, padding: '5px 12px', color: 'var(--red)', borderColor: 'var(--red)' }}
-                      onClick={() => cancelAppointment(a.id)}
-                    >
-                      Hủy
-                    </button>
-                  )}
-                </div>
-              </div>
+      <div className='sec-card' style={{ padding: 20 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Lịch sử khám</h2>
+        {loading ? (
+          <div style={{ color: 'var(--ink-soft)' }}>Đang tải lịch hẹn...</div>
+        ) : history.length === 0 ? (
+          <div style={{ color: 'var(--ink-soft)' }}>Chưa có lịch hẹn nào đã qua.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {history.map((a) => (
+              <AppointmentCard key={a.id} a={a} onCancel={cancelAppointment} />
             ))}
           </div>
         )}
@@ -185,6 +180,54 @@ export default function PatientSchedulePage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function AppointmentCard({ a, onCancel }: { a: any; onCancel: (id: string) => void }) {
+  const canCancel = (a.status === 'PENDING' || a.status === 'APPROVED') && (!a.datetime || new Date(a.datetime).getTime() >= Date.now());
+  return (
+    <div
+      style={{
+        border: '1px solid var(--line)',
+        borderRadius: 10,
+        padding: 16,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 10,
+      }}
+    >
+      <div>
+        <div style={{ fontWeight: 700, fontSize: 14.5 }}>
+          {a.type} • Bác sĩ {a.doctor?.name || 'phụ trách'}
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 4 }}>
+          Thời gian: {a.datetime ? new Date(a.datetime).toLocaleString('vi-VN') : 'Chưa định ngày'} • Địa điểm: {a.location || 'Khoa Ung Bướu'}
+        </div>
+        {a.reason && (
+          <div style={{ fontSize: 12.5, color: 'var(--ink)', marginTop: 4 }}>
+            Lý do hẹn: {a.reason}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span className='pill' style={STATUS_STYLE[a.status as string] || STATUS_STYLE.PENDING}>
+          {STATUS_LABEL[a.status as string] || 'Đang chờ bác sĩ duyệt'}
+        </span>
+        {canCancel && (
+          <button
+            type='button'
+            className='ghostbtn'
+            style={{ fontSize: 12, padding: '5px 12px', color: 'var(--red)', borderColor: 'var(--red)' }}
+            onClick={() => onCancel(a.id)}
+          >
+            Hủy
+          </button>
+        )}
+      </div>
     </div>
   );
 }

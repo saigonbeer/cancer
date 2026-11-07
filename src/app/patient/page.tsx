@@ -46,14 +46,6 @@ export default async function PatientDashboard() {
           </div>
           <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4 }}>Đã ghi nhận trong hồ sơ</div>
         </div>
-
-        <div className='sec-card' style={{ padding: 20 }}>
-          <div style={{ fontSize: 13, color: 'var(--ink-soft)', fontWeight: 600 }}>Đường dây hỗ trợ khẩn cấp</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--red)', marginTop: 8 }}>
-            {profile?.doctor?.user?.phone || '1900 6868'}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4 }}>Khoa Xạ trị & Ung bướu</div>
-        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20 }}>

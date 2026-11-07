@@ -112,6 +112,94 @@ function CtcaeCatalogSearch() {
   );
 }
 
+const ALERT_SEVERITY_STYLE: Record<string, React.CSSProperties> = {
+  HIGH: { background: 'var(--red-tint)', color: 'var(--red)' },
+  MEDIUM: { background: 'var(--amber-tint)', color: 'var(--amber)' },
+  LOW: { background: 'var(--bg)', color: 'var(--ink-soft)' },
+};
+const ALERT_SEVERITY_LABEL: Record<string, string> = { HIGH: 'Mức cao', MEDIUM: 'Mức trung bình', LOW: 'Mức thấp' };
+
+function AiAlertsPanel() {
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    const res = await fetch('/api/doctor/alerts', { cache: 'no-store' });
+    const data = await res.json().catch(() => ({}));
+    setAlerts((data.alerts || []).filter((a: any) => a.status === 'PENDING'));
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function decide(alertId: string, status: 'CONFIRMED' | 'DISMISSED') {
+    setError(null);
+    setBusyId(alertId);
+    const res = await fetch('/api/doctor/alerts', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alertId, status, note: noteDrafts[alertId]?.trim() || undefined }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setBusyId(null);
+    if (!res.ok) {
+      setError(data.error || 'Không xử lý được cảnh báo.');
+      return;
+    }
+    await load();
+  }
+
+  return (
+    <section className='sec-card'>
+      <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Cảnh báo AI</h2>
+        <span className='pill' style={{ background: 'var(--amber-tint)', color: 'var(--amber)' }}>Gợi ý, chờ BS xác nhận</span>
+      </div>
+      {loading ? (
+        <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>Đang tải...</div>
+      ) : alerts.length === 0 ? (
+        <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>
+          Chưa có cảnh báo nào. Khi có xu hướng bất thường, gợi ý sẽ hiển thị tại đây để bác sĩ xác nhận.
+        </div>
+      ) : (
+        <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {alerts.map((a) => (
+            <div key={a.id} style={{ border: '1px solid var(--red)', borderRadius: 10, padding: 14, background: '#fff5f5' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                <strong style={{ fontSize: 14 }}>{a.patient?.user?.name || 'Bệnh nhân'}</strong>
+                <span className='pill' style={ALERT_SEVERITY_STYLE[a.severity] || {}}>{ALERT_SEVERITY_LABEL[a.severity] || a.severity}</span>
+              </div>
+              <div style={{ fontSize: 13.5, marginTop: 6 }}>{a.message}</div>
+              <input
+                type='text'
+                value={noteDrafts[a.id] || ''}
+                onChange={(e) => setNoteDrafts((m) => ({ ...m, [a.id]: e.target.value }))}
+                placeholder='Ghi chú khi xác nhận/bỏ qua (tuỳ chọn)'
+                style={{ width: '100%', marginTop: 8, border: '1px solid var(--line)', borderRadius: 8, padding: '7px 10px', fontSize: 12.5, fontFamily: 'inherit' }}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button type='button' className='addbtn' style={{ fontSize: 12, padding: '6px 12px' }} disabled={busyId === a.id} onClick={() => decide(a.id, 'CONFIRMED')}>
+                  Xác nhận
+                </button>
+                <button type='button' className='ghostbtn' style={{ fontSize: 12, padding: '6px 12px' }} disabled={busyId === a.id} onClick={() => decide(a.id, 'DISMISSED')}>
+                  Bỏ qua
+                </button>
+              </div>
+            </div>
+          ))}
+          {error && <div style={{ color: 'var(--red)', fontSize: 13 }}>{error}</div>}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | null }) {
   const [guidelines, setGuidelines] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -124,7 +212,7 @@ function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | n
     fetch('/api/doctor/guidelines?' + params.toString())
       .then((r) => r.json())
       .then((data) => {
-        const all = (data.terms || []).flatMap((t: any) => t.guidelines.map((g: any) => ({ ...g, termName: t.term, soc: t.soc })));
+        const all = (data.terms || []).flatMap((t: any) => t.guidelines.map((g: any) => ({ ...g, termName: t.termVi || t.term, soc: t.socVi || t.soc })));
         setGuidelines(all);
       })
       .finally(() => setLoading(false));
@@ -170,6 +258,19 @@ export default function DoctorSideEffectsPage() {
   const [sheets, setSheets] = useState<Record<string, Sheet>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showGuide, setShowGuide] = useState<Record<string, boolean>>({});
+  const [detailsOpen, setDetailsOpen] = useState<Record<string, boolean>>({});
+  const [termByName, setTermByName] = useState<Record<string, any>>({});
+
+  async function toggleDetails(r: any) {
+    const next = !detailsOpen[r.id];
+    setDetailsOpen((o) => ({ ...o, [r.id]: next }));
+    if (next && r.symptom && !termByName[r.symptom]) {
+      const res = await fetch('/api/doctor/ctcae?q=' + encodeURIComponent(r.symptom));
+      const data = await res.json().catch(() => ({ terms: [] }));
+      const match = (data.terms || []).find((t: any) => t.termVi === r.symptom) || (data.terms || [])[0];
+      if (match) setTermByName((m) => ({ ...m, [r.symptom]: match }));
+    }
+  }
 
   async function loadReports() {
     setLoading(true);
@@ -241,16 +342,7 @@ export default function DoctorSideEffectsPage() {
         </div>
       </div>
 
-      {/* Cảnh báo AI: chưa có logic phát hiện, hiển thị trạng thái trống */}
-      <section className='sec-card'>
-        <div className='sec-head' style={{ justifyContent: 'space-between' }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Cảnh báo AI</h2>
-          <span className='pill' style={{ background: 'var(--amber-tint)', color: 'var(--amber)' }}>Gợi ý, chờ BS xác nhận</span>
-        </div>
-        <div style={{ padding: '16px 22px', fontSize: 14, color: 'var(--ink-soft)' }}>
-          Chưa có cảnh báo nào. Khi có xu hướng bất thường, gợi ý sẽ hiển thị tại đây để bác sĩ xác nhận.
-        </div>
-      </section>
+      <AiAlertsPanel />
 
       <CtcaeCatalogSearch />
 
@@ -297,17 +389,26 @@ export default function DoctorSideEffectsPage() {
               const resolved = r.status === 'RESOLVED';
               const open = !!openSheets[r.id];
               const s = sheets[r.id] || sheetFrom(r);
+              const isOpen = !!detailsOpen[r.id];
+              const term = r.symptom ? termByName[r.symptom] : null;
               return (
                 <div key={r.id} style={{ border: '1px solid var(--line)', borderRadius: 12, padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div
+                    onClick={() => toggleDetails(r)}
+                    style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', alignItems: 'center', cursor: 'pointer' }}
+                  >
                     <div>
                       <strong style={{ fontSize: 15 }}>{r.patient?.user?.name || 'Bệnh nhân'}</strong>
                       <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 3, fontFamily: 'ui-monospace, monospace' }}>
                         {fmtDate(r.createdAt)} · {r.symptom}
                       </div>
+                      {r.site && <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 2 }}>{r.site}</div>}
                       {r.note && <div style={{ fontSize: 13, marginTop: 4 }}>&quot;{r.note}&quot;</div>}
                     </div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                      {r.photoSignedUrl && (
+                        <span className='pill' style={{ background: 'var(--bg)', color: 'var(--ink-soft)' }}>Có ảnh đính kèm</span>
+                      )}
                       <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'}</span>
                       {r.ctcaeGrade ? (
                         <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
@@ -321,31 +422,52 @@ export default function DoctorSideEffectsPage() {
                         {resolved ? 'Đã xử trí' : 'Chờ xử trí'}
                       </span>
                       {r.monitorMore && <span className='pill' style={{ background: 'var(--purple-tint)', color: 'var(--purple)' }}>Theo dõi thêm</span>}
+                      <span style={{ fontSize: 16, color: 'var(--ink-soft)' }}>{isOpen ? '▲' : '▼'}</span>
                     </div>
                   </div>
 
-                  {r.photoSignedUrl && (
-                    <a href={r.photoSignedUrl} target='_blank' rel='noreferrer' style={{ display: 'inline-block', marginTop: 10 }}>
-                      <img src={r.photoSignedUrl} alt='Ảnh tác dụng phụ' style={{ maxWidth: 180, maxHeight: 140, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />
-                    </a>
+                  {isOpen && (
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {r.photoSignedUrl && (
+                        <a href={r.photoSignedUrl} target='_blank' rel='noreferrer' style={{ display: 'inline-block' }}>
+                          <img src={r.photoSignedUrl} alt='Ảnh tác dụng phụ' style={{ maxWidth: 260, maxHeight: 200, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />
+                        </a>
+                      )}
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Phân độ CTCAE</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {GRADES.map((g) => {
+                            const defText = term ? term[`grade${g}Vi`] : null;
+                            const selected = r.ctcaeGrade === g;
+                            return (
+                              <label
+                                key={g}
+                                style={{
+                                  display: 'flex', gap: 8, alignItems: 'flex-start', borderRadius: 8, padding: '8px 10px', fontSize: 12.5, cursor: 'pointer',
+                                  border: selected ? `2px solid ${gradeStyle(g).color as string}` : '1px solid var(--line)',
+                                  background: selected ? (gradeStyle(g).background as string) : '#fff',
+                                }}
+                              >
+                                <input
+                                  type='radio'
+                                  name={`grade-${r.id}`}
+                                  checked={selected}
+                                  onChange={() => patch(r.id, { status: r.status, ctcaeGrade: g })}
+                                  style={{ marginTop: 2 }}
+                                />
+                                <span>
+                                  <strong>Độ {g}</strong>
+                                  {defText && <span style={{ color: 'var(--ink-soft)' }}> — {defText}</span>}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
                   )}
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--ink-soft)' }}>
-                      Phân độ CTCAE
-                      <select
-                        value={r.ctcaeGrade ?? ''}
-                        onChange={(e) => patch(r.id, { status: r.status, ctcaeGrade: Number(e.target.value) })}
-                        style={{
-                          border: `1.5px solid ${r.ctcaeGrade ? (gradeStyle(r.ctcaeGrade).color as string) : 'var(--line)'}`,
-                          borderRadius: 8, padding: '6px 8px', fontSize: 13, fontWeight: 600,
-                          ...(r.ctcaeGrade ? gradeStyle(r.ctcaeGrade) : { background: '#fff' }),
-                        }}
-                      >
-                        <option value='' disabled>—</option>
-                        {GRADES.map((g) => <option key={g} value={g}>{gradeLabel(g)}</option>)}
-                      </select>
-                    </label>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <button
                         type='button'
