@@ -3,24 +3,105 @@
 import { useState } from "react";
 import CatalogTab from "@/components/CatalogTab";
 import CtcaeCatalogTab from "@/components/CtcaeCatalogTab";
+import DrugInteractionTab from "@/components/DrugInteractionTab";
+import RichCatalogTab from "@/components/RichCatalogTab";
+
+const DRUG_FIELDS = [
+  { key: "name", label: "Tên thuốc", placeholder: "Paracetamol" },
+  { key: "group", label: "Nhóm", placeholder: "Giảm đau, hạ sốt..." },
+  { key: "subGroup", label: "Nhóm phụ", placeholder: "..." },
+  { key: "abbreviation", label: "Viết tắt", placeholder: "PCM" },
+  { key: "alternateNames", label: "Tên khác", placeholder: "Acetaminophen" },
+  { key: "primarySite", label: "Vị trí nguyên phát", placeholder: "..." },
+  { key: "histology", label: "Mô bệnh học", placeholder: "..." },
+  { key: "source", label: "Nguồn", placeholder: "SEER*Rx, DDInter..." },
+  { key: "note", label: "Ghi chú", placeholder: "...", multiline: true },
+  { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn...", multiline: true },
+] as const;
+
+const DRUG_LIST_COLUMNS = [
+  { key: "name", label: "Tên thuốc" },
+  { key: "group", label: "Nhóm" },
+  { key: "source", label: "Nguồn" },
+] as const;
+
+const DRUG_IMPORT_ALIASES: Record<string, string> = {
+  "name": "name",
+  "tên thuốc": "name",
+  "group": "group",
+  "category": "group",
+  "nhóm": "group",
+  "sub-category": "subGroup",
+  "subcategory": "subGroup",
+  "nhóm phụ": "subGroup",
+  "abbreviation": "abbreviation",
+  "viết tắt": "abbreviation",
+  "alternate name": "alternateNames",
+  "alternate names": "alternateNames",
+  "tên khác": "alternateNames",
+  "primary site": "primarySite",
+  "vị trí nguyên phát": "primarySite",
+  "histology": "histology",
+  "mô bệnh học": "histology",
+  "remarks": "note",
+  "ghi chú": "note",
+  "description": "description",
+  "mô tả": "description",
+  "source": "source",
+  "nguồn": "source",
+};
+
+const REGIMEN_FIELDS = [
+  { key: "name", label: "Tên phác đồ", placeholder: "FOLFOX" },
+  { key: "histology", label: "Mô bệnh học", placeholder: "..." },
+  { key: "primarySite", label: "Vị trí nguyên phát", placeholder: "..." },
+  { key: "radiation", label: "Xạ trị kèm theo", placeholder: "..." },
+  { key: "alternateNames", label: "Tên khác", placeholder: "..." },
+  { key: "source", label: "Nguồn", placeholder: "NCCN, SEER*Rx..." },
+  { key: "remarks", label: "Ghi chú", placeholder: "...", multiline: true },
+  { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn...", multiline: true },
+] as const;
+
+const REGIMEN_LIST_COLUMNS = [
+  { key: "name", label: "Tên phác đồ" },
+  { key: "primarySite", label: "Vị trí nguyên phát" },
+  { key: "source", label: "Nguồn" },
+] as const;
+
+const REGIMEN_IMPORT_ALIASES: Record<string, string> = {
+  "name": "name",
+  "tên phác đồ": "name",
+  "regimen": "name",
+  "histology": "histology",
+  "mô bệnh học": "histology",
+  "primary site": "primarySite",
+  "vị trí nguyên phát": "primarySite",
+  "radiation": "radiation",
+  "xạ trị": "radiation",
+  "alternate name": "alternateNames",
+  "alternate names": "alternateNames",
+  "tên khác": "alternateNames",
+  "remarks": "remarks",
+  "ghi chú": "remarks",
+  "description": "description",
+  "mô tả": "description",
+  "source": "source",
+  "nguồn": "source",
+};
 
 const TABS = [
-  { id: "drugs", label: "Thuốc", api: "/api/admin/catalog/drugs", addLabel: "Thêm thuốc", fields: [
-    { key: "name", label: "Tên thuốc", placeholder: "Paracetamol" },
-    { key: "group", label: "Nhóm", placeholder: "Giảm đau..." },
-    { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
-  ] },
-  { id: "cancers", label: "Loại ung thư", api: "/api/admin/catalog/cancers", addLabel: "Thêm loại ung thư", fields: [
-    { key: "name", label: "Tên ung thư", placeholder: "Ung thư vú" },
-    { key: "stage", label: "Giai đoạn", placeholder: "I / II / III / IV" },
-    { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
-  ] },
-  { id: "ctcae", label: "Tác dụng phụ (CTCAE)", api: "", addLabel: "", fields: [] },
-  { id: "regimens", label: "Phác đồ", api: "/api/admin/catalog/regimens", addLabel: "Thêm phác đồ", fields: [
-    { key: "name", label: "Tên phác đồ", placeholder: "FOLFOX" },
-    { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
-  ] },
+  { id: "drugs", label: "Thuốc" },
+  { id: "interactions", label: "Tương tác thuốc" },
+  { id: "cancers", label: "Loại ung thư" },
+  { id: "ctcae", label: "Tác dụng phụ (CTCAE)" },
+  { id: "regimens", label: "Phác đồ" },
 ] as const;
+
+const CANCER_FIELDS = [
+  { key: "name", label: "Tên ung thư", placeholder: "Ung thư vú" },
+  { key: "stage", label: "Giai đoạn", placeholder: "I / II / III / IV" },
+  { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
+];
 
 export default function CatalogPage() {
   const [tab, setTab] = useState<typeof TABS[number]["id"]>("drugs");
@@ -60,8 +141,30 @@ export default function CatalogPage() {
 
       {active.id === "ctcae" ? (
         <CtcaeCatalogTab />
+      ) : active.id === "interactions" ? (
+        <DrugInteractionTab />
+      ) : active.id === "drugs" ? (
+        <RichCatalogTab
+          apiBase="/api/admin/catalog/drugs"
+          addLabel="Thêm thuốc"
+          fields={DRUG_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
+          listColumns={DRUG_LIST_COLUMNS as unknown as { key: string; label: string }[]}
+          searchPlaceholder="Tìm theo tên thuốc..."
+          importColumnAliases={DRUG_IMPORT_ALIASES}
+          importHint="Chấp nhận file .xlsx với các cột: Name, Group/Category, Sub-category, Abbreviation, Alternate Name, Primary Site, Histology, Remarks, Description, Source. Chỉ cần cột Tên thuốc là bắt buộc."
+        />
+      ) : active.id === "regimens" ? (
+        <RichCatalogTab
+          apiBase="/api/admin/catalog/regimens"
+          addLabel="Thêm phác đồ"
+          fields={REGIMEN_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
+          listColumns={REGIMEN_LIST_COLUMNS as unknown as { key: string; label: string }[]}
+          searchPlaceholder="Tìm theo tên phác đồ..."
+          importColumnAliases={REGIMEN_IMPORT_ALIASES}
+          importHint="Chấp nhận file .xlsx với các cột: Name, Histology, Primary Site, Radiation, Alternate Name, Remarks, Description, Source. Chỉ cần cột Tên phác đồ là bắt buộc."
+        />
       ) : (
-        <CatalogTab apiBase={active.api} fields={active.fields as unknown as { key: string; label: string; placeholder?: string }[]} addLabel={active.addLabel} />
+        <CatalogTab apiBase="/api/admin/catalog/cancers" fields={CANCER_FIELDS} addLabel="Thêm loại ung thư" />
       )}
     </>
   );

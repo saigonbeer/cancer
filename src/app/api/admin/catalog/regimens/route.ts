@@ -5,6 +5,12 @@ import { makeCatalogHandlers } from "@/lib/catalogCrud";
 const schema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  histology: z.string().optional(),
+  primarySite: z.string().optional(),
+  radiation: z.string().optional(),
+  alternateNames: z.string().optional(),
+  remarks: z.string().optional(),
+  source: z.string().optional(),
 });
 
 const h = makeCatalogHandlers(prisma.catalogRegimen, schema);
