@@ -155,6 +155,7 @@ export default function PatientRecordPage() {
           <dl className='info-grid'>
             <div className='info-item'><dt>Họ và tên</dt><dd>{profile.user?.name || 'Chưa cập nhật'}</dd></div>
             <div className='info-item'><dt>Năm sinh</dt><dd>{year ? `${year}${age !== null ? ` (${age} tuổi)` : ''}` : 'Chưa cập nhật'}</dd></div>
+            <div className='info-item'><dt>Giới tính</dt><dd>{profile.gender || 'Chưa cập nhật'}</dd></div>
             <div className='info-item'><dt>Email</dt><dd>{profile.user?.email || 'Chưa cập nhật'}</dd></div>
             <div className='info-item'><dt>Số điện thoại</dt><dd>{profile.user?.phone || 'Chưa cập nhật'}</dd></div>
             <div className='info-item'><dt>Địa chỉ</dt><dd>{profile.address || 'Chưa cập nhật'}</dd></div>

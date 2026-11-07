@@ -9,8 +9,10 @@ interface Account {
   name: string;
   dob: string | null;
   email: string | null;
+  phone: string | null;
   role: Role;
   username: string;
+  doctorProfile?: { department: string | null } | null;
 }
 
 const ROLE_LABEL: Record<Role, string> = {
@@ -35,6 +37,8 @@ export default function AdminAccountsPage() {
     name: "",
     dob: "",
     email: "",
+    phone: "",
+    department: "",
     role: "PATIENT" as Role,
     username: "",
     password: "",
@@ -68,7 +72,7 @@ export default function AdminAccountsPage() {
       setError(data.error || "Không thêm được tài khoản.");
       return;
     }
-    setDraft({ name: "", dob: "", email: "", role: "PATIENT", username: "", password: "" });
+    setDraft({ name: "", dob: "", email: "", phone: "", department: "", role: "PATIENT", username: "", password: "" });
     load();
   }
 
@@ -79,12 +83,14 @@ export default function AdminAccountsPage() {
     load();
   }
 
-  async function saveEdit(acc: Account & { password?: string }) {
+  async function saveEdit(acc: Account & { password?: string; department?: string }) {
     setError(null);
     const body: Record<string, unknown> = {
       name: acc.name,
       dob: acc.dob || undefined,
       email: acc.email || "",
+      phone: acc.phone || "",
+      department: acc.department ?? acc.doctorProfile?.department ?? "",
       role: acc.role,
       username: acc.username,
     };
@@ -140,6 +146,14 @@ export default function AdminAccountsPage() {
           <Field label="Email">
             <input value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} placeholder="email@domain.com" />
           </Field>
+          <Field label="Số điện thoại">
+            <input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} placeholder="09xxxxxxxx" />
+          </Field>
+          {draft.role === "DOCTOR" && (
+            <Field label="Khoa/Chuyên khoa">
+              <input value={draft.department} onChange={(e) => setDraft({ ...draft, department: e.target.value })} placeholder="Xạ trị - Xạ phẫu" />
+            </Field>
+          )}
           <Field label="Vai trò">
             <select
               value={draft.role}
@@ -177,7 +191,9 @@ export default function AdminAccountsPage() {
         <div style={gridHead}>
           <div>Họ và tên</div>
           <div>Năm sinh</div>
+          <div>SĐT</div>
           <div>Email</div>
+          <div>Khoa</div>
           <div>Vai trò</div>
           <div>Username</div>
           <div>Hành động</div>
@@ -191,7 +207,9 @@ export default function AdminAccountsPage() {
               <div key={acc.id} style={gridRow}>
                 <div style={{ fontWeight: 600 }}>{acc.name}</div>
                 <div style={{ color: "var(--ink-soft)" }}>{acc.dob || "—"}</div>
+                <div style={{ color: "var(--ink-soft)" }}>{acc.phone || "—"}</div>
                 <div style={{ color: "var(--ink-soft)" }}>{acc.email || "—"}</div>
+                <div style={{ color: "var(--ink-soft)" }}>{acc.role === "DOCTOR" ? acc.doctorProfile?.department || "—" : "—"}</div>
                 <div>
                   <span className="pill" style={{ background: ROLE_CLASS[acc.role] }}>
                     {ROLE_LABEL[acc.role]}
@@ -237,7 +255,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const gridHead: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1.2fr 0.8fr 1.3fr 1fr 1fr 1.2fr",
+  gridTemplateColumns: "1.1fr 0.7fr 0.9fr 1.2fr 1fr 0.8fr 0.9fr 1.2fr",
   gap: 12,
   alignItems: "center",
   padding: "12px 20px",
@@ -251,7 +269,7 @@ const gridHead: React.CSSProperties = {
 
 const gridRow: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1.2fr 0.8fr 1.3fr 1fr 1fr 1.2fr",
+  gridTemplateColumns: "1.1fr 0.7fr 0.9fr 1.2fr 1fr 0.8fr 0.9fr 1.2fr",
   gap: 12,
   alignItems: "center",
   padding: "12px 20px",
@@ -266,15 +284,26 @@ function EditRow({
 }: {
   account: Account;
   onCancel: () => void;
-  onSave: (a: Account & { password?: string }) => void;
+  onSave: (a: Account & { password?: string; department?: string }) => void;
 }) {
-  const [draft, setDraft] = useState<Account & { password?: string }>({ ...account, password: "" });
+  const [draft, setDraft] = useState<Account & { password?: string; department?: string }>({
+    ...account,
+    password: "",
+    department: account.doctorProfile?.department || "",
+  });
   return (
     <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--line-soft)" }}>
       <div style={{ ...gridRow, padding: 0, border: "none" }}>
         <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         <input value={draft.dob || ""} onChange={(e) => setDraft({ ...draft, dob: e.target.value })} />
+        <input value={draft.phone || ""} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
         <input value={draft.email || ""} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
+        <input
+          value={draft.department || ""}
+          onChange={(e) => setDraft({ ...draft, department: e.target.value })}
+          placeholder={draft.role === "DOCTOR" ? "Khoa/Chuyên khoa" : "—"}
+          disabled={draft.role !== "DOCTOR"}
+        />
         <select
           value={draft.role}
           onChange={(e) => setDraft({ ...draft, role: e.target.value as Role })}

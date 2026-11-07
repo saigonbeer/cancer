@@ -8,6 +8,8 @@ const updateSchema = z.object({
   name: z.string().min(1).optional(),
   dob: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
+  phone: z.string().optional(),
+  department: z.string().optional(),
   role: z.enum(["DOCTOR", "PATIENT", "ADMIN"]).optional(),
   username: z.string().min(3).optional(),
   password: z.string().min(6).optional(),
@@ -24,16 +26,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: parsed.error.issues[0]?.message || "Dữ liệu không hợp lệ." }, { status: 400 });
   }
 
-  const { password, email, ...rest } = parsed.data;
+  const { password, email, department, role, ...rest } = parsed.data;
   const data: Record<string, unknown> = { ...rest };
+  if (role !== undefined) data.role = role;
   if (email !== undefined) data.email = email || null;
   if (password) data.passwordHash = await hashPassword(password);
+  if (department !== undefined && role === "DOCTOR") {
+    data.doctorProfile = { upsert: { create: { department: department || null }, update: { department: department || null } } };
+  }
 
   try {
     const user = await prisma.user.update({
       where: { id },
       data,
-      select: { id: true, name: true, dob: true, email: true, role: true, username: true, createdAt: true },
+      select: {
+        id: true, name: true, dob: true, email: true, phone: true, role: true, username: true, createdAt: true,
+        doctorProfile: { select: { department: true } },
+      },
     });
     return NextResponse.json({ account: user });
   } catch {

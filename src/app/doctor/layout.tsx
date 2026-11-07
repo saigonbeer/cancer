@@ -8,6 +8,7 @@ const items = [
   { href: "/doctor/appointments", label: "Lịch hẹn" },
   { href: "/doctor/messages", label: "Liên lạc" },
   { href: "/doctor/reports", label: "Báo cáo" },
+  { href: "/doctor/profile", label: "Hồ sơ cá nhân" },
 ];
 
 export default function DoctorLayout({ children }: { children: React.ReactNode }) {

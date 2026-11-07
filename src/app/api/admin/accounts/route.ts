@@ -9,7 +9,10 @@ export async function GET() {
   if ("response" in auth) return auth.response;
 
   const users = await prisma.user.findMany({
-    select: { id: true, name: true, dob: true, email: true, role: true, username: true, createdAt: true },
+    select: {
+      id: true, name: true, dob: true, email: true, phone: true, role: true, username: true, createdAt: true,
+      doctorProfile: { select: { department: true } },
+    },
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json({ accounts: users });
@@ -19,6 +22,8 @@ const createSchema = z.object({
   name: z.string().min(1),
   dob: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
+  phone: z.string().optional(),
+  department: z.string().optional(),
   role: z.enum(["DOCTOR", "PATIENT", "ADMIN"]),
   username: z.string().min(3),
   password: z.string().min(6),
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message || "Dữ liệu không hợp lệ." }, { status: 400 });
   }
 
-  const { name, dob, email, role, username, password } = parsed.data;
+  const { name, dob, email, phone, department, role, username, password } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { username } });
   if (existing) {
@@ -47,15 +52,19 @@ export async function POST(req: NextRequest) {
       name,
       dob: dob || null,
       email: email || null,
+      phone: phone || null,
       role,
       username,
       passwordHash,
-      ...(role === "DOCTOR" ? { doctorProfile: { create: {} } } : {}),
+      ...(role === "DOCTOR" ? { doctorProfile: { create: { department: department || null } } } : {}),
       ...(role === "PATIENT"
         ? { patientProfile: { create: { patientCode: `BN-${Math.floor(1000 + Math.random() * 9000)}` } } }
         : {}),
     },
-    select: { id: true, name: true, dob: true, email: true, role: true, username: true, createdAt: true },
+    select: {
+      id: true, name: true, dob: true, email: true, phone: true, role: true, username: true, createdAt: true,
+      doctorProfile: { select: { department: true } },
+    },
   });
 
   return NextResponse.json({ account: user }, { status: 201 });
