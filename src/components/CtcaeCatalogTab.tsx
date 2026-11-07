@@ -22,35 +22,42 @@ interface CtcaeItem {
 }
 
 const fieldStyle: React.CSSProperties = {
-  width: '100%', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 10px',
-  fontSize: 13, fontFamily: 'inherit', background: '#fff', resize: 'vertical',
+  width: '100%', border: '1px solid var(--line)', borderRadius: 8, padding: '9px 11px',
+  fontSize: 13.5, fontFamily: 'inherit', background: '#fff',
 };
 
-type Draft = Pick<
-  CtcaeItem,
-  'order' | 'termVi' | 'socVi' | 'grade1Vi' | 'grade2Vi' | 'grade3Vi' | 'grade4Vi' | 'grade5Vi' | 'definitionVi' | 'navigationalNoteVi' | 'changeNoteVi'
->;
+type FormState = {
+  order: string;
+  socVi: string;
+  termVi: string;
+  grade1Vi: string;
+  grade2Vi: string;
+  grade3Vi: string;
+  grade4Vi: string;
+  grade5Vi: string;
+  definitionVi: string;
+  navigationalNoteVi: string;
+};
 
-function draftFrom(item: CtcaeItem): Draft {
-  return {
-    order: item.order,
-    termVi: item.termVi,
-    socVi: item.socVi,
-    grade1Vi: item.grade1Vi,
-    grade2Vi: item.grade2Vi,
-    grade3Vi: item.grade3Vi,
-    grade4Vi: item.grade4Vi,
-    grade5Vi: item.grade5Vi,
-    definitionVi: item.definitionVi,
-    navigationalNoteVi: item.navigationalNoteVi,
-    changeNoteVi: item.changeNoteVi,
-  };
-}
-
-const EMPTY_MANUAL = {
+const EMPTY_FORM: FormState = {
   order: '', socVi: '', termVi: '', grade1Vi: '', grade2Vi: '', grade3Vi: '', grade4Vi: '', grade5Vi: '',
   definitionVi: '', navigationalNoteVi: '',
 };
+
+function formFrom(item: CtcaeItem): FormState {
+  return {
+    order: item.order !== null ? String(item.order) : '',
+    socVi: item.socVi || '',
+    termVi: item.termVi || '',
+    grade1Vi: item.grade1Vi || '',
+    grade2Vi: item.grade2Vi || '',
+    grade3Vi: item.grade3Vi || '',
+    grade4Vi: item.grade4Vi || '',
+    grade5Vi: item.grade5Vi || '',
+    definitionVi: item.definitionVi || '',
+    navigationalNoteVi: item.navigationalNoteVi || '',
+  };
+}
 
 // Các tên cột chấp nhận trong file Excel (không phân biệt hoa/thường, khoảng trắng thừa)
 const COLUMN_ALIASES: Record<string, string> = {
@@ -84,14 +91,13 @@ export default function CtcaeCatalogTab() {
   const [soc, setSoc] = useState('');
   const [socOptions, setSocOptions] = useState<{ soc: string | null; socVi: string | null }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
 
-  const [manual, setManual] = useState(EMPTY_MANUAL);
-  const [manualError, setManualError] = useState<string | null>(null);
-  const [manualSaving, setManualSaving] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const [importRows, setImportRows] = useState<Record<string, unknown>[] | null>(null);
   const [importFileName, setImportFileName] = useState('');
@@ -100,13 +106,11 @@ export default function CtcaeCatalogTab() {
   const [importResult, setImportResult] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [clearing, setClearing] = useState(false);
-
-  async function load() {
+  async function load(p = page, qq = q, ssoc = soc) {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page) });
-    if (q.trim()) params.set('q', q.trim());
-    if (soc) params.set('soc', soc);
+    const params = new URLSearchParams({ page: String(p) });
+    if (qq.trim()) params.set('q', qq.trim());
+    if (ssoc) params.set('soc', ssoc);
     const res = await fetch('/api/admin/catalog/ctcae?' + params.toString());
     const data = await res.json();
     setItems(data.items || []);
@@ -117,47 +121,74 @@ export default function CtcaeCatalogTab() {
   }
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, soc]);
-
-  function search() {
+    load(1, q, soc);
     setPage(1);
-    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, soc]);
+
+  useEffect(() => {
+    load(page, q, soc);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  function openCreate() {
+    setForm(EMPTY_FORM);
+    setFormError(null);
+    setModalMode('create');
   }
 
   function openEdit(item: CtcaeItem) {
-    setOpenId(item.id);
-    setDraft(draftFrom(item));
-    setError(null);
+    setForm(formFrom(item));
+    setEditingId(item.id);
+    setFormError(null);
+    setModalMode('edit');
   }
 
-  async function save(id: string) {
-    if (!draft) return;
+  function closeModal() {
+    setModalMode(null);
+    setEditingId(null);
+  }
+
+  async function save() {
+    if (!form.socVi.trim() || !form.termVi.trim()) {
+      setFormError('Vui lòng nhập Nhóm SOC và Thuật ngữ.');
+      return;
+    }
     setSaving(true);
-    setError(null);
-    const res = await fetch(`/api/admin/catalog/ctcae/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(draft),
-    });
+    setFormError(null);
+    const body = {
+      order: form.order.trim() ? Number(form.order) : undefined,
+      socVi: form.socVi.trim(),
+      termVi: form.termVi.trim(),
+      grade1Vi: form.grade1Vi.trim() || undefined,
+      grade2Vi: form.grade2Vi.trim() || undefined,
+      grade3Vi: form.grade3Vi.trim() || undefined,
+      grade4Vi: form.grade4Vi.trim() || undefined,
+      grade5Vi: form.grade5Vi.trim() || undefined,
+      definitionVi: form.definitionVi.trim() || undefined,
+      navigationalNoteVi: form.navigationalNoteVi.trim() || undefined,
+    };
+    const res = modalMode === 'create'
+      ? await fetch('/api/admin/catalog/ctcae', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      : await fetch(`/api/admin/catalog/ctcae/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json().catch(() => ({}));
     setSaving(false);
     if (!res.ok) {
-      setError(data.error || 'Không lưu được.');
+      setFormError(data.error || 'Không lưu được.');
       return;
     }
-    setOpenId(null);
-    toast.success('Đã lưu thay đổi.');
-    load();
+    toast.success(modalMode === 'create' ? 'Đã thêm thuật ngữ mới.' : 'Đã lưu thay đổi.');
+    closeModal();
+    load(modalMode === 'create' ? 1 : page, q, soc);
+    if (modalMode === 'create') setPage(1);
   }
 
-  async function removeItem(id: string, label: string) {
-    const ok = await confirmFn(`Xoá thuật ngữ "${label}"?`, 'Hành động này không thể hoàn tác.');
+  async function removeItem(item: CtcaeItem) {
+    const ok = await confirmFn(`Xoá thuật ngữ "${item.termVi || item.id}"?`, 'Hành động này không thể hoàn tác.');
     if (!ok) return;
-    await fetch(`/api/admin/catalog/ctcae/${id}`, { method: 'DELETE' });
+    await fetch(`/api/admin/catalog/ctcae/${item.id}`, { method: 'DELETE' });
     toast.success('Đã xoá thuật ngữ.');
-    load();
+    load(page, q, soc);
   }
 
   async function clearAll() {
@@ -173,42 +204,7 @@ export default function CtcaeCatalogTab() {
     setClearing(false);
     setPage(1);
     toast.success('Đã xoá toàn bộ danh mục.');
-    load();
-  }
-
-  async function addManual() {
-    setManualError(null);
-    if (!manual.socVi.trim() || !manual.termVi.trim()) {
-      setManualError('Vui lòng nhập Nhóm SOC và Thuật ngữ.');
-      return;
-    }
-    setManualSaving(true);
-    const body = {
-      order: manual.order.trim() ? Number(manual.order) : undefined,
-      socVi: manual.socVi.trim(),
-      termVi: manual.termVi.trim(),
-      grade1Vi: manual.grade1Vi.trim() || undefined,
-      grade2Vi: manual.grade2Vi.trim() || undefined,
-      grade3Vi: manual.grade3Vi.trim() || undefined,
-      grade4Vi: manual.grade4Vi.trim() || undefined,
-      grade5Vi: manual.grade5Vi.trim() || undefined,
-      definitionVi: manual.definitionVi.trim() || undefined,
-      navigationalNoteVi: manual.navigationalNoteVi.trim() || undefined,
-    };
-    const res = await fetch('/api/admin/catalog/ctcae', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json().catch(() => ({}));
-    setManualSaving(false);
-    if (!res.ok) {
-      setManualError(data.error || 'Không thêm được.');
-      return;
-    }
-    setManual(EMPTY_MANUAL);
-    setPage(1);
-    load();
+    load(1, q, soc);
   }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -270,216 +266,136 @@ export default function CtcaeCatalogTab() {
       return;
     }
     setImportResult(`Đã import ${data.imported} dòng.`);
+    toast.success(`Đã import ${data.imported} dòng.`);
     setImportRows(null);
     setImportFileName('');
     if (fileInputRef.current) fileInputRef.current.value = '';
     setPage(1);
-    load();
+    load(1, q, soc);
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       <section className='sec-card'>
-        <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Tác dụng phụ (CTCAE)</h2>
-            <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4 }}>
-              {total} thuật ngữ trong danh mục.
-            </div>
-          </div>
-          <button type='button' className='ghostbtn' style={{ color: 'var(--red)' }} disabled={clearing || total === 0} onClick={clearAll}>
-            {clearing ? 'Đang xoá...' : 'Xoá toàn bộ danh mục'}
-          </button>
-        </div>
-        <div style={{ padding: '16px 22px', display: 'grid', gridTemplateColumns: '1fr 260px auto', gap: 12, alignItems: 'end' }}>
-          <div>
-            <label className='field-label'>Tìm kiếm</label>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') search(); }}
-              placeholder='Tên thuật ngữ...'
-            />
-          </div>
-          <div>
-            <label className='field-label'>Nhóm SOC</label>
-            <select value={soc} onChange={(e) => { setSoc(e.target.value); setPage(1); }} style={fieldStyle}>
-              <option value=''>Tất cả ({socOptions.length} nhóm)</option>
-              {socOptions.filter((s) => s.socVi).map((s) => (
-                <option key={s.socVi} value={s.socVi!}>{s.socVi}</option>
-              ))}
-            </select>
-          </div>
-          <button type='button' className='addbtn' style={{ height: 38 }} onClick={search}>
-            Tìm
-          </button>
-        </div>
-      </section>
-
-      <section className='sec-card'>
         <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)' }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Nhập từ Excel</h2>
-          <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4 }}>
-            File .xlsx với các cột: Thứ tự, Phân loại cơ quan - Hệ thống SOC, Thuật ngữ, Độ 1, Độ 2, Độ 3, Độ 4, Độ 5, Định nghĩa, Ghi chú điều hướng.
-          </div>
         </div>
-        <div style={{ padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+            Chấp nhận file .xlsx với các cột: Thứ tự, Phân loại cơ quan - Hệ thống SOC, Thuật ngữ, Độ 1, Độ 2, Độ 3, Độ 4, Độ 5, Định nghĩa, Ghi chú điều hướng.
+          </div>
           <input ref={fileInputRef} type='file' accept='.xlsx,.xls' onChange={handleFile} />
           {importFileName && !importError && importRows && (
-            <div style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
-              {importFileName}: tìm thấy {importRows.length} dòng hợp lệ, sẵn sàng import.
-            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--teal-deep)' }}>{importFileName}: tìm thấy {importRows.length} dòng hợp lệ, sẵn sàng import.</div>
           )}
           {importError && <div style={{ color: 'var(--red)', fontSize: 13 }}>{importError}</div>}
           {importResult && <div style={{ color: 'var(--teal-deep)', fontSize: 13 }}>{importResult}</div>}
           <div>
             <button type='button' className='addbtn' disabled={!importRows || importing} onClick={runImport}>
-              {importing ? 'Đang import...' : `Import ${importRows ? importRows.length + ' dòng' : ''}`}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className='sec-card'>
-        <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)' }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Nhập thủ công</h2>
-        </div>
-        <div style={{ padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', gap: 12 }}>
-            <div>
-              <label className='field-label'>Thứ tự</label>
-              <input value={manual.order} onChange={(e) => setManual({ ...manual, order: e.target.value })} placeholder='1' />
-            </div>
-            <div>
-              <label className='field-label'>Phân loại cơ quan - Hệ thống SOC</label>
-              <input value={manual.socVi} onChange={(e) => setManual({ ...manual, socVi: e.target.value })} />
-            </div>
-            <div>
-              <label className='field-label'>Thuật ngữ</label>
-              <input value={manual.termVi} onChange={(e) => setManual({ ...manual, termVi: e.target.value })} />
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
-            {(['grade1Vi', 'grade2Vi', 'grade3Vi', 'grade4Vi', 'grade5Vi'] as const).map((key, i) => (
-              <div key={key}>
-                <label className='field-label'>Độ {i + 1}</label>
-                <textarea rows={2} value={manual[key]} onChange={(e) => setManual({ ...manual, [key]: e.target.value })} style={fieldStyle} />
-              </div>
-            ))}
-          </div>
-          <div>
-            <label className='field-label'>Định nghĩa</label>
-            <textarea rows={2} value={manual.definitionVi} onChange={(e) => setManual({ ...manual, definitionVi: e.target.value })} style={fieldStyle} />
-          </div>
-          <div>
-            <label className='field-label'>Ghi chú điều hướng</label>
-            <textarea rows={2} value={manual.navigationalNoteVi} onChange={(e) => setManual({ ...manual, navigationalNoteVi: e.target.value })} style={fieldStyle} />
-          </div>
-          {manualError && <div style={{ color: 'var(--red)', fontSize: 13 }}>{manualError}</div>}
-          <div>
-            <button type='button' className='addbtn' disabled={manualSaving} onClick={addManual}>
-              {manualSaving ? 'Đang thêm...' : 'Thêm thuật ngữ'}
+              {importing ? 'Đang import...' : `Import${importRows ? ' ' + importRows.length + ' dòng' : ''}`}
             </button>
           </div>
         </div>
       </section>
 
       <section className='sec-card' style={{ overflow: 'hidden' }}>
-        <div
-          style={{
-            display: 'grid', gridTemplateColumns: '70px 1fr 1fr auto', gap: 12, padding: '12px 20px',
-            fontSize: 12, fontWeight: 700, letterSpacing: '0.03em', color: 'var(--ink-soft)',
-            textTransform: 'uppercase', borderBottom: '1px solid var(--line)',
-          }}
-        >
+        <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Danh sách ({total.toLocaleString('vi-VN')})</h2>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder='Tìm theo tên thuật ngữ...' style={{ ...fieldStyle, width: 200 }} />
+            <select value={soc} onChange={(e) => setSoc(e.target.value)} style={{ ...fieldStyle, width: 200 }}>
+              <option value=''>Tất cả nhóm SOC ({socOptions.length})</option>
+              {socOptions.filter((s) => s.socVi).map((s) => (
+                <option key={s.socVi} value={s.socVi!}>{s.socVi}</option>
+              ))}
+            </select>
+            <button type='button' className='ghostbtn' style={{ color: 'var(--red)' }} disabled={clearing || total === 0} onClick={clearAll}>
+              {clearing ? 'Đang xoá...' : 'Xoá toàn bộ'}
+            </button>
+            <button type='button' className='addbtn' onClick={openCreate}>Thêm thuật ngữ</button>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr auto', gap: 12, padding: '12px 20px', fontSize: 12, fontWeight: 700, letterSpacing: '0.03em', color: 'var(--ink-soft)', textTransform: 'uppercase', borderBottom: '1px solid var(--line)' }}>
           <div>Thứ tự</div>
           <div>Thuật ngữ</div>
           <div>Nhóm SOC</div>
           <div>Hành động</div>
         </div>
 
-        {loading && <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-soft)' }}>Đang tải...</div>}
-        {!loading && items.length === 0 && (
-          <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-soft)' }}>Chưa có thuật ngữ nào trong danh mục. Nhập từ Excel hoặc thêm thủ công ở trên.</div>
+        {loading ? (
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-soft)' }}>Đang tải...</div>
+        ) : items.length === 0 ? (
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-soft)' }}>Chưa có thuật ngữ nào. Nhập từ Excel hoặc bấm &quot;Thêm thuật ngữ&quot;.</div>
+        ) : (
+          items.map((item) => (
+            <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr auto', gap: 12, alignItems: 'center', padding: '12px 20px', fontSize: 13.5, borderBottom: '1px solid var(--line-soft)' }}>
+              <div style={{ color: 'var(--ink-soft)' }}>{item.order ?? '—'}</div>
+              <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {item.termVi || <em style={{ color: 'var(--amber)' }}>Chưa đặt tên</em>}
+              </div>
+              <div style={{ color: 'var(--ink-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.socVi || '—'}</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type='button' className='ghostbtn' onClick={() => openEdit(item)}>Sửa</button>
+                <button type='button' className='ghostbtn' style={{ color: 'var(--red)' }} onClick={() => removeItem(item)}>Xóa</button>
+              </div>
+            </div>
+          ))
         )}
 
-        {!loading && items.map((item) => (
-          <div key={item.id} style={{ borderBottom: '1px solid var(--line-soft)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr auto', gap: 12, alignItems: 'center', padding: '12px 20px', fontSize: 13.5 }}>
-              <div style={{ color: 'var(--ink-soft)' }}>{item.order ?? '—'}</div>
-              <div style={{ fontWeight: 600 }}>{item.termVi || <em style={{ color: 'var(--amber)' }}>Chưa đặt tên</em>}</div>
-              <div style={{ color: 'var(--ink-soft)' }}>{item.socVi || '—'}</div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button type='button' className='ghostbtn' onClick={() => (openId === item.id ? setOpenId(null) : openEdit(item))}>
-                  {openId === item.id ? 'Đóng' : 'Sửa'}
-                </button>
-                <button type='button' className='ghostbtn' style={{ color: 'var(--red)' }} onClick={() => removeItem(item.id, item.termVi || item.id)}>
-                  Xoá
-                </button>
+        {totalPages > 1 && (
+          <div style={{ padding: '14px 22px', display: 'flex', justifyContent: 'center', gap: 10, alignItems: 'center' }}>
+            <button type='button' className='ghostbtn' disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>← Trước</button>
+            <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Trang {page} / {totalPages}</span>
+            <button type='button' className='ghostbtn' disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Sau →</button>
+          </div>
+        )}
+      </section>
+
+      {modalMode && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1050, padding: 20 }}>
+          <div className='sec-card' style={{ width: 640, maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
+            <h2 style={{ fontSize: 17, fontWeight: 700, marginTop: 0 }}>{modalMode === 'create' ? 'Thêm thuật ngữ' : 'Sửa thông tin'}</h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', gap: 12 }}>
+              <div>
+                <label className='field-label'>Thứ tự</label>
+                <input value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} placeholder='1' style={fieldStyle} />
+              </div>
+              <div>
+                <label className='field-label'>Phân loại cơ quan - Hệ thống SOC</label>
+                <input value={form.socVi} onChange={(e) => setForm({ ...form, socVi: e.target.value })} style={fieldStyle} />
+              </div>
+              <div>
+                <label className='field-label'>Thuật ngữ</label>
+                <input value={form.termVi} onChange={(e) => setForm({ ...form, termVi: e.target.value })} style={fieldStyle} />
               </div>
             </div>
 
-            {openId === item.id && draft && (
-              <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 12, background: 'var(--bg)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', gap: 12 }}>
-                  <div>
-                    <label className='field-label'>Thứ tự</label>
-                    <input
-                      value={draft.order ?? ''}
-                      onChange={(e) => setDraft({ ...draft, order: e.target.value ? Number(e.target.value) : null })}
-                    />
-                  </div>
-                  <div>
-                    <label className='field-label'>Thuật ngữ</label>
-                    <input value={draft.termVi || ''} onChange={(e) => setDraft({ ...draft, termVi: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className='field-label'>Nhóm SOC</label>
-                    <input value={draft.socVi || ''} onChange={(e) => setDraft({ ...draft, socVi: e.target.value })} />
-                  </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginTop: 12 }}>
+              {(['grade1Vi', 'grade2Vi', 'grade3Vi', 'grade4Vi', 'grade5Vi'] as const).map((key, i) => (
+                <div key={key}>
+                  <label className='field-label'>Độ {i + 1}</label>
+                  <textarea rows={3} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} style={{ ...fieldStyle, resize: 'vertical' }} />
                 </div>
+              ))}
+            </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
-                  {(['grade1Vi', 'grade2Vi', 'grade3Vi', 'grade4Vi', 'grade5Vi'] as const).map((key, i) => (
-                    <div key={key}>
-                      <label className='field-label'>Độ {i + 1}</label>
-                      <textarea
-                        rows={3}
-                        value={draft[key] || ''}
-                        onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-                        style={fieldStyle}
-                      />
-                    </div>
-                  ))}
-                </div>
+            <div style={{ marginTop: 12 }}>
+              <label className='field-label'>Định nghĩa</label>
+              <textarea rows={2} value={form.definitionVi} onChange={(e) => setForm({ ...form, definitionVi: e.target.value })} style={{ ...fieldStyle, resize: 'vertical' }} />
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <label className='field-label'>Ghi chú điều hướng</label>
+              <textarea rows={2} value={form.navigationalNoteVi} onChange={(e) => setForm({ ...form, navigationalNoteVi: e.target.value })} style={{ ...fieldStyle, resize: 'vertical' }} />
+            </div>
 
-                <div>
-                  <label className='field-label'>Định nghĩa</label>
-                  <textarea rows={2} value={draft.definitionVi || ''} onChange={(e) => setDraft({ ...draft, definitionVi: e.target.value })} style={fieldStyle} />
-                </div>
-                <div>
-                  <label className='field-label'>Ghi chú điều hướng</label>
-                  <textarea rows={2} value={draft.navigationalNoteVi || ''} onChange={(e) => setDraft({ ...draft, navigationalNoteVi: e.target.value })} style={fieldStyle} />
-                </div>
-
-                {error && <div style={{ color: 'var(--red)', fontSize: 13 }}>{error}</div>}
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button type='button' className='addbtn' disabled={saving} onClick={() => save(item.id)}>
-                    {saving ? 'Đang lưu...' : 'Lưu'}
-                  </button>
-                  <button type='button' className='ghostbtn' onClick={() => setOpenId(null)}>Hủy</button>
-                </div>
-              </div>
-            )}
+            {formError && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 12 }}>{formError}</div>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+              <button type='button' className='ghostbtn' onClick={closeModal}>Hủy</button>
+              <button type='button' className='addbtn' onClick={save} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</button>
+            </div>
           </div>
-        ))}
-      </section>
-
-      {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}>
-          <button type='button' className='ghostbtn' disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Trước</button>
-          <span style={{ fontSize: 13, color: 'var(--ink-soft)' }}>Trang {page}/{totalPages}</span>
-          <button type='button' className='ghostbtn' disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Sau</button>
         </div>
       )}
     </div>
