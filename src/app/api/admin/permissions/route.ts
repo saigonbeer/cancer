@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireRole } from "@/lib/requireRole";
+import { requireModule } from "@/lib/requireRole";
 import { MODULES, DEFAULT_PERMISSIONS } from "@/lib/modules";
 
 export async function GET() {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("permissions", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const rows = await prisma.permissionMatrix.findMany();
@@ -29,7 +29,7 @@ const toggleSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("permissions", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const body = await req.json().catch(() => null);

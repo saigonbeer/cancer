@@ -384,7 +384,7 @@ export default function DoctorMedicationsPage() {
               {prescriptions.map((pr) => (
                 <div key={pr.id} style={{ padding: '16px 22px', borderBottom: '1px solid var(--line-soft)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
-                    <span style={{ fontWeight: 600 }}>Bác sĩ kê: {pr.prescribedBy || 'Bác sĩ điều trị'}</span>
+                    <span style={{ fontWeight: 600 }}>Bác sĩ kê: {pr.prescribedByDoctor?.user?.name || 'Bác sĩ điều trị'}</span>
                     <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Ngày kê: {fmtDate(pr.prescribedAt)}</span>
                   </div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>

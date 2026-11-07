@@ -14,8 +14,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Thiếu patientId' }, { status: 400 });
   }
 
-  const visits = await getPatientVisits(patientId);
-  return NextResponse.json({ visits });
+  try {
+    const visits = await getPatientVisits(patientId, auth.session.userId, auth.session.role);
+    return NextResponse.json({ visits });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 403 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
   try {
     const { appointment, ...visitData } = body;
     const docProfile = await prisma.doctorProfile.findUnique({ where: { userId: auth.session.userId }, select: { id: true } });
-    const visit = await createVisit({ ...visitData, doctorId: docProfile?.id }, auth.session.role);
+    const visit = await createVisit({ ...visitData, doctorId: docProfile?.id }, auth.session.role, auth.session.userId);
 
     // Đặt lịch tái khám: lịch được tạo cho cả bác sĩ và bệnh nhân (bệnh nhân xem ở mục Lịch hẹn).
     let scheduled = null;

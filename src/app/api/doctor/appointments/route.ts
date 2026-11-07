@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const updated = await updateAppointmentStatus(body.appointmentId, body.status, auth.session.role);
+    const updated = await updateAppointmentStatus(body.appointmentId, body.status, auth.session.role, auth.session.userId);
     return NextResponse.json({ appointment: updated });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 403 });

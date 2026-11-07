@@ -75,6 +75,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Không thể hủy lịch hẹn đã qua.' }, { status: 400 });
   }
 
-  const updated = await updateAppointmentStatus(parsed.data.appointmentId, 'CANCELLED', auth.session.role);
+  const updated = await updateAppointmentStatus(parsed.data.appointmentId, 'CANCELLED', auth.session.role, auth.session.userId);
   return NextResponse.json({ ok: true, appointment: updated });
 }

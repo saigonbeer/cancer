@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
-import { requireRole } from "@/lib/requireRole";
+import { requireModule } from "@/lib/requireRole";
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
@@ -16,7 +16,7 @@ const updateSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("accounts", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const { id } = await params;
@@ -51,7 +51,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("accounts", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const { id } = await params;

@@ -74,8 +74,9 @@ model DoctorProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   department String?
 
-  patients PatientProfile[] @relation("TreatingDoctor")
-  visits   Visit[]          @relation("VisitDoctor")
+  patients      PatientProfile[] @relation("TreatingDoctor")
+  visits        Visit[]          @relation("VisitDoctor")
+  prescriptions Prescription[]   @relation("PrescribedByDoctor")
 }
 
 model PatientProfile {
@@ -145,11 +146,12 @@ model TreatmentPlan {
 }
 
 model Prescription {
-  id          String   @id @default(cuid())
-  visitId     String
-  visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
-  prescribedBy String
-  prescribedAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  visitId        String
+  visit          Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  prescribedById String? // FK tới DoctorProfile — null nếu tài khoản bác sĩ đã bị xoá sau khi kê đơn
+  prescribedByDoctor DoctorProfile? @relation("PrescribedByDoctor", fields: [prescribedById], references: [id])
+  prescribedAt   DateTime @default(now())
 
   interactionAckAt   DateTime? // thời điểm bác sĩ xác nhận đã biết tương tác thuốc và vẫn quyết định kê
   interactionAckNote String?   // lý do bác sĩ ghi khi xác nhận kê đơn dù có tương tác
@@ -377,6 +379,7 @@ model ConversationParticipant {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt     DateTime? // thời điểm người này đọc tin nhắn gần nhất trong hội thoại — dùng để tính badge "chưa đọc"
 
   @@unique([conversationId, userId])
 }

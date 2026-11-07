@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db';
 import { assertPermission } from '@/lib/rbac';
+import { assertOwnsAppointment } from '@/lib/ownership';
 import type { Role } from '@/lib/auth';
 import type { AppointmentStatus } from '@prisma/client';
 
@@ -68,9 +69,19 @@ export async function getAppointments(userId: string, role: Role) {
 export async function updateAppointmentStatus(
   appointmentId: string,
   status: AppointmentStatus,
-  role: Role
+  role: Role,
+  userId: string
 ) {
   await assertPermission('appointments', role);
+
+  if (role === 'DOCTOR') {
+    await assertOwnsAppointment(appointmentId, userId, role);
+  } else if (role === 'PATIENT') {
+    const appointment = await prisma.appointment.findUnique({ where: { id: appointmentId }, select: { patientId: true } });
+    if (!appointment || appointment.patientId !== userId) {
+      throw new Error('Bạn không có quyền với lịch hẹn này.');
+    }
+  }
 
   return prisma.appointment.update({
     where: { id: appointmentId },

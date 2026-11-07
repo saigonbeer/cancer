@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useToast } from '@/components/UIFeedback';
 
 export default function PatientMessagesPage() {
+  const toast = useToast();
   const [doctors, setDoctors] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [activeConv, setActiveConv] = useState<any | null>(null);
@@ -48,7 +50,7 @@ export default function PatientMessagesPage() {
     try {
       const res = await fetch('/api/messages?targetUserId=' + doctorUserId);
       const data = await res.json();
-      if (data.error) { alert(data.error); return; }
+      if (data.error) { toast.error(data.error); return; }
       if (data.conversation) {
         await loadConversations();
         selectConv(data.conversation);

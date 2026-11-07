@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireRole } from "@/lib/requireRole";
+import { requireModule } from "@/lib/requireRole";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Delegate = {
@@ -13,14 +13,14 @@ type Delegate = {
 
 export function makeCatalogHandlers<T extends z.ZodRawShape>(delegate: Delegate, schema: z.ZodObject<T>) {
   async function list() {
-    const auth = await requireRole("ADMIN");
+    const auth = await requireModule("catalog", "ADMIN");
     if ("response" in auth) return auth.response;
     const items = await delegate.findMany({ orderBy: { name: "asc" } });
     return NextResponse.json({ items });
   }
 
   async function create(req: NextRequest) {
-    const auth = await requireRole("ADMIN");
+    const auth = await requireModule("catalog", "ADMIN");
     if ("response" in auth) return auth.response;
     const body = await req.json().catch(() => null);
     const parsed = schema.safeParse(body);
@@ -36,7 +36,7 @@ export function makeCatalogHandlers<T extends z.ZodRawShape>(delegate: Delegate,
   }
 
   async function update(req: NextRequest, id: string) {
-    const auth = await requireRole("ADMIN");
+    const auth = await requireModule("catalog", "ADMIN");
     if ("response" in auth) return auth.response;
     const body = await req.json().catch(() => null);
     const parsed = schema.partial().safeParse(body);
@@ -52,7 +52,7 @@ export function makeCatalogHandlers<T extends z.ZodRawShape>(delegate: Delegate,
   }
 
   async function remove(id: string) {
-    const auth = await requireRole("ADMIN");
+    const auth = await requireModule("catalog", "ADMIN");
     if ("response" in auth) return auth.response;
     try {
       await delegate.delete({ where: { id } });

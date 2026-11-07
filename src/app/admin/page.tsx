@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast, useConfirm } from "@/components/UIFeedback";
 
 type Role = "DOCTOR" | "PATIENT" | "ADMIN";
 
@@ -28,6 +29,8 @@ const ROLE_CLASS: Record<Role, string> = {
 };
 
 export default function AdminAccountsPage() {
+  const toast = useToast();
+  const confirmFn = useConfirm();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,13 +76,16 @@ export default function AdminAccountsPage() {
       return;
     }
     setDraft({ name: "", dob: "", email: "", phone: "", department: "", role: "PATIENT", username: "", password: "" });
+    toast.success("Đã thêm tài khoản.");
     load();
   }
 
   async function removeAccount(id: string) {
     const acc = accounts.find((a) => a.id === id);
-    if (!confirm(`Xác nhận xóa tài khoản "${acc?.name || id}"? Hành động này không thể hoàn tác.`)) return;
+    const ok = await confirmFn(`Xác nhận xóa tài khoản "${acc?.name || id}"?`, "Hành động này không thể hoàn tác.");
+    if (!ok) return;
     await fetch(`/api/admin/accounts/${id}`, { method: "DELETE" });
+    toast.success("Đã xóa tài khoản.");
     load();
   }
 
@@ -106,6 +112,7 @@ export default function AdminAccountsPage() {
       return;
     }
     setEditingId(null);
+    toast.success("Đã lưu thay đổi.");
     load();
   }
 

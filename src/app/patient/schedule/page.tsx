@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useToast, useConfirm } from '@/components/UIFeedback';
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: 'Đang chờ bác sĩ duyệt',
@@ -27,6 +28,8 @@ function isUpcoming(a: any) {
 }
 
 export default function PatientSchedulePage() {
+  const toast = useToast();
+  const confirmFn = useConfirm();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +53,8 @@ export default function PatientSchedulePage() {
   }, []);
 
   async function cancelAppointment(id: string) {
-    if (!confirm('Bạn có chắc muốn hủy lịch hẹn này?')) return;
+    const ok = await confirmFn('Hủy lịch hẹn này?');
+    if (!ok) return;
     setError(null);
     const res = await fetch('/api/patient/appointments', {
       method: 'DELETE',
@@ -62,6 +66,7 @@ export default function PatientSchedulePage() {
       setError(data.error || 'Không hủy được lịch hẹn.');
       return;
     }
+    toast.success('Đã hủy lịch hẹn.');
     load();
   }
 
@@ -78,6 +83,7 @@ export default function PatientSchedulePage() {
         setShowModal(false);
         setDatetime('');
         setReason('');
+        toast.success('Đã gửi yêu cầu đặt lịch hẹn.');
         load();
       }
     } finally {

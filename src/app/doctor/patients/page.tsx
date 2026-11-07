@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import { useToast, useConfirm } from '@/components/UIFeedback';
 
 type MainTab = 'record' | 'accounts';
 type RecordTab = 'first' | 'followup' | 'side';
@@ -212,6 +213,8 @@ function VisitSummary({ v }: { v: any }) {
 }
 
 export default function DoctorPatientsPage() {
+  const toast = useToast();
+  const confirmFn = useConfirm();
   const [mainTab, setMainTab] = useState<MainTab>('record');
   const [recordTab, setRecordTab] = useState<RecordTab>('first');
 
@@ -412,17 +415,22 @@ export default function DoctorPatientsPage() {
       return;
     }
     setAccountModal(null);
+    toast.success(accountModal === 'create' ? 'Đã thêm bệnh nhân.' : 'Đã lưu thay đổi.');
     const list = await loadPatients();
     if (accountModal === 'create' && data.patient?.id) setSelectedId(data.patient.id);
     if (accountModal === 'edit' && list.some((p: any) => p.id === f.id)) setSelectedId(f.id);
   }
 
   async function deleteAccount(p: any) {
-    if (!window.confirm('Xóa bệnh nhân ' + p.user?.name + '? Toàn bộ hồ sơ bệnh án sẽ bị xóa.')) return;
+    const ok = await confirmFn('Xóa bệnh nhân ' + (p.user?.name || '') + '?', 'Toàn bộ hồ sơ bệnh án sẽ bị xóa. Hành động này không thể hoàn tác.');
+    if (!ok) return;
     const res = await fetch('/api/doctor/patients/' + p.id, { method: 'DELETE' });
     if (res.ok) {
       if (selectedId === p.id) setSelectedId('');
+      toast.success('Đã xóa bệnh nhân.');
       loadPatients();
+    } else {
+      toast.error('Không xóa được bệnh nhân.');
     }
   }
 

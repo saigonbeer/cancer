@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireRole } from '@/lib/requireRole';
+import { requireModule } from '@/lib/requireRole';
 import { prisma } from '@/lib/db';
 
 const PAGE_SIZE = 30;
@@ -19,7 +19,7 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const auth = await requireRole('ADMIN');
+  const auth = await requireModule('catalog', 'ADMIN');
   if ('response' in auth) return auth.response;
 
   const { searchParams } = new URL(req.url);
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireRole('ADMIN');
+  const auth = await requireModule('catalog', 'ADMIN');
   if ('response' in auth) return auth.response;
 
   const body = await req.json().catch(() => null);
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE() {
-  const auth = await requireRole('ADMIN');
+  const auth = await requireModule('catalog', 'ADMIN');
   if ('response' in auth) return auth.response;
 
   const result = await prisma.ctcaeTerm.deleteMany({});

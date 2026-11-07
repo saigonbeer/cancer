@@ -9,13 +9,17 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const patientId = searchParams.get('patientId');
 
-  if (!patientId) {
-    const prescriptions = await getPrescriptionsByDoctor(auth.session.userId);
-    return NextResponse.json({ prescriptions });
-  }
+  try {
+    if (!patientId) {
+      const prescriptions = await getPrescriptionsByDoctor(auth.session.userId);
+      return NextResponse.json({ prescriptions });
+    }
 
-  const prescriptions = await getPrescriptionsByPatient(patientId);
-  return NextResponse.json({ prescriptions });
+    const prescriptions = await getPrescriptionsByPatient(patientId, auth.session.userId, auth.session.role);
+    return NextResponse.json({ prescriptions });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 403 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -31,9 +35,9 @@ export async function POST(req: NextRequest) {
     const ack = body.ackInteractions ? { confirmed: true, note: typeof body.ackNote === 'string' ? body.ackNote : undefined } : undefined;
     const result = await createPrescription(
       body.visitId,
-      auth.session.name || 'Bác sĩ điều trị',
       body.items,
       auth.session.role,
+      auth.session.userId,
       ack
     );
     return NextResponse.json(result, { status: result.needsAck ? 200 : 201 });

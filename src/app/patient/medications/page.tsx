@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useToast } from '@/components/UIFeedback';
 
 type DoseStatus = 'TAKEN' | 'MISSED' | null;
 
@@ -80,6 +81,7 @@ const thStyle: React.CSSProperties = {
 const tdStyle: React.CSSProperties = { padding: '12px 14px', borderBottom: '1px solid var(--line-soft)', fontSize: 13.5, verticalAlign: 'middle' };
 
 export default function PatientMedicationsPage() {
+  const toast = useToast();
   const [view, setView] = useState<MedicationView>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -113,8 +115,10 @@ export default function PatientMedicationsPage() {
     setSaving(null);
     if (!res.ok) {
       setError('Không ghi nhận được. Vui lòng thử lại.');
+      toast.error('Không ghi nhận được. Vui lòng thử lại.');
       return;
     }
+    toast.success(status === 'TAKEN' ? 'Đã ghi nhận: đã uống.' : 'Đã ghi nhận: bỏ lỡ liều.');
     await load();
   }
 

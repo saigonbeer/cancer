@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useToast, useConfirm } from '@/components/UIFeedback';
 
 interface CtcaeItem {
   id: string;
@@ -73,6 +74,8 @@ function normalizeHeader(h: string): string {
 }
 
 export default function CtcaeCatalogTab() {
+  const toast = useToast();
+  const confirmFn = useConfirm();
   const [items, setItems] = useState<CtcaeItem[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -145,22 +148,31 @@ export default function CtcaeCatalogTab() {
       return;
     }
     setOpenId(null);
+    toast.success('Đã lưu thay đổi.');
     load();
   }
 
   async function removeItem(id: string, label: string) {
-    if (!confirm(`Xoá thuật ngữ "${label}"? Hành động này không thể hoàn tác.`)) return;
+    const ok = await confirmFn(`Xoá thuật ngữ "${label}"?`, 'Hành động này không thể hoàn tác.');
+    if (!ok) return;
     await fetch(`/api/admin/catalog/ctcae/${id}`, { method: 'DELETE' });
+    toast.success('Đã xoá thuật ngữ.');
     load();
   }
 
   async function clearAll() {
-    if (!confirm(`Xoá TOÀN BỘ ${total} thuật ngữ trong danh mục Triệu chứng? Hành động này không thể hoàn tác và sẽ xoá luôn các hướng dẫn xử trí liên kết.`)) return;
-    if (!confirm('Xác nhận lần nữa: xoá sạch toàn bộ danh mục CTCAE?')) return;
+    const ok1 = await confirmFn(
+      `Xoá TOÀN BỘ ${total} thuật ngữ trong danh mục Triệu chứng?`,
+      'Hành động này không thể hoàn tác và sẽ xoá luôn các hướng dẫn xử trí liên kết.'
+    );
+    if (!ok1) return;
+    const ok2 = await confirmFn('Xác nhận lần nữa: xoá sạch toàn bộ danh mục CTCAE?');
+    if (!ok2) return;
     setClearing(true);
     await fetch('/api/admin/catalog/ctcae', { method: 'DELETE' });
     setClearing(false);
     setPage(1);
+    toast.success('Đã xoá toàn bộ danh mục.');
     load();
   }
 

@@ -97,11 +97,39 @@ export async function getConversationMessages(conversationId: string, userId: st
   });
   if (!participant) throw new Error('Bạn không thuộc cuộc hội thoại này.');
 
+  // Mở hội thoại để đọc tin nhắn = đánh dấu đã đọc tới thời điểm hiện tại.
+  await prisma.conversationParticipant.update({
+    where: { id: participant.id },
+    data: { lastReadAt: new Date() },
+  });
+
   return prisma.message.findMany({
     where: { conversationId },
     include: { sender: { select: { id: true, name: true, role: true } } },
     orderBy: { createdAt: 'asc' }
   });
+}
+
+/** Số tin nhắn chưa đọc: tin của người khác gửi sau lần đọc gần nhất của mình trong mỗi hội thoại. */
+export async function getUnreadMessageCount(userId: string): Promise<number> {
+  const participations = await prisma.conversationParticipant.findMany({
+    where: { userId },
+    select: { conversationId: true, lastReadAt: true },
+  });
+  if (participations.length === 0) return 0;
+
+  const counts = await Promise.all(
+    participations.map((p) =>
+      prisma.message.count({
+        where: {
+          conversationId: p.conversationId,
+          senderId: { not: userId },
+          createdAt: { gt: p.lastReadAt ?? new Date(0) },
+        },
+      })
+    )
+  );
+  return counts.reduce((a, b) => a + b, 0);
 }
 
 export async function getDoctorChatablePatients(doctorUserId: string) {

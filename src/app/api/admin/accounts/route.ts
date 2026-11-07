@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
-import { requireRole } from "@/lib/requireRole";
+import { requireModule } from "@/lib/requireRole";
 
 export async function GET() {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("accounts", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const users = await prisma.user.findMany({
@@ -30,7 +30,7 @@ const createSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const auth = await requireRole("ADMIN");
+  const auth = await requireModule("accounts", "ADMIN");
   if ("response" in auth) return auth.response;
 
   const body = await req.json().catch(() => null);

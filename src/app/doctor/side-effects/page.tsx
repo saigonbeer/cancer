@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { gradeStyle, gradeLabel } from '@/lib/ctcaeGrade';
+import { useToast } from '@/components/UIFeedback';
 
 const GRADES = [1, 2, 3, 4, 5];
 const DECISIONS = [
@@ -120,6 +121,7 @@ const ALERT_SEVERITY_STYLE: Record<string, React.CSSProperties> = {
 const ALERT_SEVERITY_LABEL: Record<string, string> = { HIGH: 'Mức cao', MEDIUM: 'Mức trung bình', LOW: 'Mức thấp' };
 
 function AiAlertsPanel() {
+  const toast = useToast();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
@@ -150,8 +152,10 @@ function AiAlertsPanel() {
     setBusyId(null);
     if (!res.ok) {
       setError(data.error || 'Không xử lý được cảnh báo.');
+      toast.error(data.error || 'Không xử lý được cảnh báo.');
       return;
     }
+    toast.success(status === 'CONFIRMED' ? 'Đã xác nhận cảnh báo.' : 'Đã bỏ qua cảnh báo.');
     await load();
   }
 
@@ -252,6 +256,7 @@ function GuidelinePanel({ symptom, grade }: { symptom: string; grade: number | n
 }
 
 export default function DoctorSideEffectsPage() {
+  const toast = useToast();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openSheets, setOpenSheets] = useState<Record<string, boolean>>({});
@@ -260,6 +265,7 @@ export default function DoctorSideEffectsPage() {
   const [showGuide, setShowGuide] = useState<Record<string, boolean>>({});
   const [detailsOpen, setDetailsOpen] = useState<Record<string, boolean>>({});
   const [termByName, setTermByName] = useState<Record<string, any>>({});
+  const [visibleCount, setVisibleCount] = useState(20);
 
   async function toggleDetails(r: any) {
     const next = !detailsOpen[r.id];
@@ -310,7 +316,10 @@ export default function DoctorSideEffectsPage() {
       return;
     }
     const ok = await patch(r.id, { sheet: s });
-    if (ok) setOpenSheets((o) => ({ ...o, [r.id]: false }));
+    if (ok) {
+      setOpenSheets((o) => ({ ...o, [r.id]: false }));
+      toast.success('Đã lưu phiếu xử trí.');
+    }
   }
 
   // Nhóm báo cáo theo bệnh nhân để hiển thị ô theo dõi.
@@ -385,7 +394,7 @@ export default function DoctorSideEffectsPage() {
           <div style={{ color: 'var(--ink-soft)', padding: 22 }}>Hiện không có báo cáo tác dụng phụ nào.</div>
         ) : (
           <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {reports.map((r) => {
+            {reports.slice(0, visibleCount).map((r) => {
               const resolved = r.status === 'RESOLVED';
               const open = !!openSheets[r.id];
               const s = sheets[r.id] || sheetFrom(r);
@@ -401,19 +410,16 @@ export default function DoctorSideEffectsPage() {
                       <strong style={{ fontSize: 15 }}>{r.patient?.user?.name || 'Bệnh nhân'}</strong>
                       <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 3, fontFamily: 'ui-monospace, monospace' }}>
                         {fmtDate(r.createdAt)} · {r.symptom}
+                        {r.photoSignedUrl && <span title='Có ảnh đính kèm'> · 📷</span>}
                       </div>
                       {r.site && <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 2 }}>{r.site}</div>}
                       {r.note && <div style={{ fontSize: 13, marginTop: 4 }}>&quot;{r.note}&quot;</div>}
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                      {r.photoSignedUrl && (
-                        <span className='pill' style={{ background: 'var(--bg)', color: 'var(--ink-soft)' }}>Có ảnh đính kèm</span>
-                      )}
-                      <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'}</span>
                       {r.ctcaeGrade ? (
                         <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
                       ) : (
-                        <span className='pill' style={{ background: 'var(--bg)', color: 'var(--ink-soft)' }}>Chưa phân độ CTCAE</span>
+                        <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'} (tự đánh giá)</span>
                       )}
                       <span
                         className='pill'
@@ -568,6 +574,13 @@ export default function DoctorSideEffectsPage() {
                 </div>
               );
             })}
+            {visibleCount < reports.length && (
+              <div style={{ textAlign: 'center' }}>
+                <button type='button' className='ghostbtn' onClick={() => setVisibleCount((n) => n + 20)}>
+                  Tải thêm ({reports.length - visibleCount} báo cáo còn lại)
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>

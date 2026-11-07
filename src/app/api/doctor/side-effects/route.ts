@@ -17,6 +17,8 @@ export async function GET() {
   const auth = await requireRole('DOCTOR', 'ADMIN');
   if ('response' in auth) return auth.response;
 
+  // Lấy đủ toàn bộ báo cáo (không giới hạn take/skip) vì khối "Bệnh nhân đang giám sát"
+  // cần tính số liệu chính xác trên toàn bộ dữ liệu — phân trang chỉ áp dụng ở phần hiển thị danh sách.
   const doctor = await prisma.doctorProfile.findUnique({ where: { userId: auth.session.userId } });
   const reports = await getSideEffectReports({ doctorId: doctor?.id });
   return NextResponse.json({ reports: await withPhotoUrls(reports) });

@@ -26,6 +26,7 @@ export default function PatientSideEffectsPage() {
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [groups, setGroups] = useState<string[]>([]);
   const [group, setGroup] = useState('');
   const [locations, setLocations] = useState<{ id: string; termVi: string; socVi: string | null }[]>([]);
@@ -218,17 +219,22 @@ export default function PatientSideEffectsPage() {
             <div style={{ padding: 22, color: 'var(--ink-soft)' }}>Bạn chưa báo cáo tác dụng phụ nào.</div>
           )}
           <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {reports.map((r) => {
+            {reports.slice(0, visibleCount).map((r) => {
               const resolved = r.status === 'RESOLVED';
               return (
                 <div key={r.id} style={{ border: '1px solid var(--line-soft)', borderRadius: 10, padding: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{r.symptom}</div>
-                    <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'}</span>
+                    {r.ctcaeGrade ? (
+                      <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
+                    ) : (
+                      <span className='pill' style={severityStyle(r.severity)}>{r.severity || 'Nhẹ'} (tự đánh giá)</span>
+                    )}
                   </div>
                   {r.site && <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 2 }}>{r.site}</div>}
                   <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4, fontFamily: 'ui-monospace, monospace' }}>
                     {fmtDate(r.createdAt)}
+                    {r.photoSignedUrl && <span title='Có ảnh đính kèm'> · 📷</span>}
                   </div>
                   {r.note && <div style={{ fontSize: 13.5, marginTop: 6 }}>&quot;{r.note}&quot;</div>}
                   {r.photoSignedUrl && (
@@ -236,8 +242,7 @@ export default function PatientSideEffectsPage() {
                       <img src={r.photoSignedUrl} alt='Ảnh đã gửi' style={{ maxWidth: 180, maxHeight: 140, borderRadius: 8, border: '1px solid var(--line)', objectFit: 'cover' }} />
                     </a>
                   )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
-                    <span className='pill' style={gradeStyle(r.ctcaeGrade)}>{gradeLabel(r.ctcaeGrade)}</span>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
                     <span
                       className='pill'
                       style={resolved ? { background: 'var(--teal-tint)', color: 'var(--teal-deep)' } : { background: 'var(--bg)', color: 'var(--ink-soft)' }}
@@ -248,6 +253,13 @@ export default function PatientSideEffectsPage() {
                 </div>
               );
             })}
+            {visibleCount < reports.length && (
+              <div style={{ textAlign: 'center' }}>
+                <button type='button' className='ghostbtn' onClick={() => setVisibleCount((n) => n + 20)}>
+                  Tải thêm ({reports.length - visibleCount} báo cáo còn lại)
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </div>

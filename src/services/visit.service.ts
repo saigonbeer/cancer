@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db';
 import { assertPermission } from '@/lib/rbac';
+import { assertOwnsPatient } from '@/lib/ownership';
 import type { Role } from '@/lib/auth';
 
 export async function createVisit(
@@ -30,9 +31,11 @@ export async function createVisit(
       hormoneData?: any;
     };
   },
-  role: Role
+  role: Role,
+  doctorUserId: string
 ) {
   await assertPermission('record', role);
+  await assertOwnsPatient(data.patientId, doctorUserId, role);
 
   const visit = await prisma.visit.create({
     data: {
@@ -64,7 +67,8 @@ export async function createVisit(
   return visit;
 }
 
-export async function getPatientVisits(patientId: string) {
+export async function getPatientVisits(patientId: string, doctorUserId: string, role: Role) {
+  await assertOwnsPatient(patientId, doctorUserId, role);
   return prisma.visit.findMany({
     where: { patientId },
     include: {
