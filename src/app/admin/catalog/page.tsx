@@ -97,23 +97,32 @@ const TABS = [
 ] as const;
 
 const CANCER_FIELDS = [
+  { key: "order", label: "Thứ tự", placeholder: "1" },
   { key: "name", label: "Tên ung thư", placeholder: "Ung thư vú" },
   { key: "stage", label: "Giai đoạn", placeholder: "I / II / III / IV" },
   { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn...", multiline: true },
+  { key: "group", label: "Nhóm", placeholder: "Tuyến vú, Tiêu hóa..." },
 ] as const;
 
 const CANCER_LIST_COLUMNS = [
+  { key: "order", label: "Thứ tự" },
   { key: "name", label: "Tên ung thư" },
+  { key: "group", label: "Nhóm" },
   { key: "stage", label: "Giai đoạn" },
 ] as const;
 
 const CANCER_IMPORT_ALIASES: Record<string, string> = {
+  "order": "order",
+  "thứ tự": "order",
   "name": "name",
   "tên ung thư": "name",
   "stage": "stage",
   "giai đoạn": "stage",
   "description": "description",
   "mô tả": "description",
+  "group": "group",
+  "nhóm": "group",
+  "nhóm (tham khảo)": "group",
 };
 
 export default function CatalogPage() {
@@ -158,6 +167,7 @@ export default function CatalogPage() {
         <DrugInteractionTab />
       ) : active.id === "drugs" ? (
         <RichCatalogTab
+          key="drugs"
           apiBase="/api/admin/catalog/drugs"
           addLabel="Thêm thuốc"
           fields={DRUG_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
@@ -168,6 +178,7 @@ export default function CatalogPage() {
         />
       ) : active.id === "regimens" ? (
         <RichCatalogTab
+          key="regimens"
           apiBase="/api/admin/catalog/regimens"
           addLabel="Thêm phác đồ"
           fields={REGIMEN_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
@@ -178,13 +189,14 @@ export default function CatalogPage() {
         />
       ) : (
         <RichCatalogTab
+          key="cancers"
           apiBase="/api/admin/catalog/cancers"
           addLabel="Thêm loại ung thư"
           fields={CANCER_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
           listColumns={CANCER_LIST_COLUMNS as unknown as { key: string; label: string }[]}
           searchPlaceholder="Tìm theo tên loại ung thư..."
           importColumnAliases={CANCER_IMPORT_ALIASES}
-          importHint="Chấp nhận file .xlsx với các cột: Name, Stage, Description. Chỉ cần cột Tên ung thư là bắt buộc."
+          importHint="Chấp nhận file .xlsx với các cột: Thứ tự, Tên ung thư, Giai đoạn, Mô tả, Nhóm. Chỉ cần cột Tên ung thư là bắt buộc."
         />
       )}
     </>

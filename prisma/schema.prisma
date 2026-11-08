@@ -226,9 +226,11 @@ model DrugInteraction {
 
 model CatalogCancerType {
   id          String  @id @default(cuid())
+  order       Int?
   name        String  @unique
   stage       String?
   description String?
+  group       String? // nhóm/vị trí giải phẫu tham khảo, ví dụ "Đầu - mặt - cổ"
 
   visits Visit[]
 }
