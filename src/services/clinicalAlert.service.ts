@@ -86,17 +86,18 @@ export async function syncPatientAlerts(patientId: string) {
   const candidates = evaluateAlerts(reports);
   const candidateTypes = candidates.map((c) => c.type);
 
-  await prisma.clinicalAlert.deleteMany({
-    where: { patientId, type: { notIn: candidateTypes.length ? candidateTypes : ['__none__'] } },
-  });
-
-  for (const c of candidates) {
-    await prisma.clinicalAlert.upsert({
-      where: { patientId_type: { patientId, type: c.type } },
-      create: { patientId, type: c.type, severity: c.severity, message: c.message },
-      update: { message: c.message, severity: c.severity },
-    });
-  }
+  await Promise.all([
+    prisma.clinicalAlert.deleteMany({
+      where: { patientId, type: { notIn: candidateTypes.length ? candidateTypes : ['__none__'] } },
+    }),
+    ...candidates.map((c) =>
+      prisma.clinicalAlert.upsert({
+        where: { patientId_type: { patientId, type: c.type } },
+        create: { patientId, type: c.type, severity: c.severity, message: c.message },
+        update: { message: c.message, severity: c.severity },
+      })
+    ),
+  ]);
 }
 
 export async function getPatientAlerts(patientId: string) {
@@ -112,7 +113,7 @@ export async function getActiveAlertsForDoctor(doctorId: string) {
     select: { patientId: true },
   });
 
-  for (const p of patients) await syncPatientAlerts(p.patientId);
+  await Promise.all(patients.map((p) => syncPatientAlerts(p.patientId)));
 
   return prisma.clinicalAlert.findMany({
     where: { patient: { doctorId } },
