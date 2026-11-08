@@ -95,6 +95,8 @@ model PatientProfile {
   sideEffectReports  SideEffectReport[]
   doseLogs           DoseLog[]
   clinicalAlerts     ClinicalAlert[]
+
+  @@index([doctorId])
 }
 
 model Visit {
@@ -121,6 +123,10 @@ model Visit {
   prescriptions  Prescription[]
 
   createdAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([cancerTypeId])
 }
 
 model TreatmentPlan {
@@ -159,6 +165,9 @@ model Prescription {
   interactionAckNote String?   // lý do bác sĩ ghi khi xác nhận kê đơn dù có tương tác
 
   items PrescriptionItem[]
+
+  @@index([visitId])
+  @@index([prescribedById])
 }
 
 model PrescriptionItem {
@@ -191,6 +200,7 @@ model DoseLog {
   recordedAt         DateTime         @default(now())
 
   @@unique([prescriptionItemId, scheduledAt])
+  @@index([patientId])
 }
 
 model CatalogDrug {
@@ -338,6 +348,8 @@ model SideEffectReport {
   managedAt       DateTime?
   note       String?
   createdAt  DateTime     @default(now())
+
+  @@index([patientId])
 }
 
 // Cảnh báo sinh ra từ bộ luật rule-based (tần suất báo cáo, leo thang mức độ, độ CTCAE nặng chưa xử trí...).
@@ -370,6 +382,9 @@ model Appointment {
   reason    String?
   status    AppointmentStatus @default(PENDING)
   createdAt DateTime          @default(now())
+
+  @@index([patientId])
+  @@index([doctorId])
 }
 
 model Conversation {
@@ -388,6 +403,7 @@ model ConversationParticipant {
   lastReadAt     DateTime? // thời điểm người này đọc tin nhắn gần nhất trong hội thoại — dùng để tính badge "chưa đọc"
 
   @@unique([conversationId, userId])
+  @@index([userId])
 }
 
 model Message {
@@ -398,6 +414,8 @@ model Message {
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   content        String
   createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
 }
 
 model Notification {
@@ -416,6 +434,8 @@ model NotificationRecipient {
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   readAt         DateTime?
+
+  @@index([userId])
 }
 
 model PermissionMatrix {
