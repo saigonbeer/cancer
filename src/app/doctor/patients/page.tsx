@@ -299,6 +299,10 @@ export default function DoctorPatientsPage() {
   const [apptFirst, setApptFirst] = useState(emptyAppt());
   const [apptFollow, setApptFollow] = useState(emptyAppt());
 
+  const [pendingRxAck, setPendingRxAck] = useState<{ visitId: string; items: any[]; interactions: any[] } | null>(null);
+  const [ackNote, setAckNote] = useState('');
+  const [ackSaving, setAckSaving] = useState(false);
+
   const [query, setQuery] = useState('');
   const [accountModal, setAccountModal] = useState<'create' | 'edit' | null>(null);
   const [accountForm, setAccountForm] = useState<any>(emptyAccount);
@@ -412,6 +416,8 @@ export default function DoctorPatientsPage() {
     }
 
     const items = collectDrugs(methods);
+    const scheduled = data.appointment ? ' Đã đặt lịch tái khám cho bệnh nhân.' : '';
+
     if (items.length > 0) {
       const rx = await fetch('/api/doctor/medications', {
         method: 'POST',
@@ -419,9 +425,23 @@ export default function DoctorPatientsPage() {
         body: JSON.stringify({ visitId: data.visit.id, items }),
       });
       const rxData = await rx.json().catch(() => ({}));
+      if (rx.ok && rxData.needsAck) {
+        // Phát hiện tương tác thuốc: KHÔNG được coi là đã lưu đơn — chờ bác sĩ xác nhận trước khi lưu.
+        setPendingRxAck({ visitId: data.visit.id, items, interactions: rxData.interactions || [] });
+        setAckNote('');
+        setMessage((type === 'FIRST' ? 'Đã lưu khám lần đầu.' : 'Đã lưu lượt tái khám.') + scheduled + ' Phát hiện tương tác thuốc — cần xác nhận để lưu đơn thuốc (xem hộp thoại).');
+        if (type === 'FIRST') {
+          setFirst(emptyFirst());
+          setApptFirst(emptyAppt());
+        } else {
+          setFollow(emptyFollow());
+          setApptFollow(emptyAppt());
+        }
+        loadRecord(selected.id);
+        return;
+      }
       if (rx.ok && rxData.interactions?.length) setWarnings(rxData.interactions);
     }
-    const scheduled = data.appointment ? ' Đã đặt lịch tái khám cho bệnh nhân.' : '';
     setMessage((type === 'FIRST' ? 'Đã lưu khám lần đầu.' : 'Đã lưu lượt tái khám.') + scheduled);
     if (type === 'FIRST') {
       setFirst(emptyFirst());
@@ -431,6 +451,41 @@ export default function DoctorPatientsPage() {
       setApptFollow(emptyAppt());
     }
     loadRecord(selected.id);
+  }
+
+  async function confirmRxAck() {
+    if (!pendingRxAck || ackSaving) return;
+    setAckSaving(true);
+    try {
+      const res = await fetch('/api/doctor/medications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitId: pendingRxAck.visitId,
+          items: pendingRxAck.items,
+          ackInteractions: true,
+          ackNote: ackNote.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error || 'Không lưu được đơn thuốc.');
+        return;
+      }
+      setWarnings(pendingRxAck.interactions);
+      setPendingRxAck(null);
+      setAckNote('');
+      toast.success('Đã lưu đơn thuốc (đã xác nhận tương tác thuốc).');
+      if (selected) loadRecord(selected.id);
+    } finally {
+      setAckSaving(false);
+    }
+  }
+
+  function cancelRxAck() {
+    setPendingRxAck(null);
+    setAckNote('');
+    toast.error('Chưa lưu đơn thuốc do có tương tác thuốc chưa được xác nhận.');
   }
 
   function openCreateAccount() {
@@ -771,6 +826,32 @@ export default function DoctorPatientsPage() {
             </>
           )}
         </>
+      )}
+
+      {pendingRxAck && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 110, padding: 20 }}>
+          <div className='sec-card' style={{ width: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 0, color: 'var(--red)' }}>⚠ Phát hiện tương tác thuốc</h2>
+            <div style={{ fontSize: 13.5, color: 'var(--ink-soft)', marginBottom: 14 }}>
+              Đơn thuốc trong lượt khám này <strong>chưa được lưu</strong>. Bác sĩ cần xác nhận đã biết các tương tác dưới đây để tiếp tục lưu đơn, hoặc hủy để chỉnh lại thuốc.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+              {pendingRxAck.interactions.map((w: any, i: number) => (
+                <div key={i} style={{ background: 'var(--red-tint)', border: '1px solid var(--red)', borderRadius: 8, padding: 12, fontSize: 13 }}>
+                  <strong>{w.drugA?.name}</strong> với <strong>{w.drugB?.name}</strong>: {w.description} (Mức độ: {w.severity})
+                </div>
+              ))}
+            </div>
+            <label className='field-label'>Lý do vẫn kê đơn dù có tương tác (tùy chọn)</label>
+            <textarea rows={3} value={ackNote} onChange={(e) => setAckNote(e.target.value)} placeholder='Ví dụ: đã theo dõi sát, giảm liều...' />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button type='button' className='ghostbtn' onClick={cancelRxAck}>Hủy, không lưu đơn</button>
+              <button type='button' className='addbtn' style={{ background: 'var(--red)' }} onClick={confirmRxAck} disabled={ackSaving}>
+                {ackSaving ? 'Đang lưu...' : 'Xác nhận kê đơn dù có tương tác'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {accountModal && (
