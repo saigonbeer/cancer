@@ -37,7 +37,7 @@ const emptyFollow = () => ({
   examination: '', labResults: '', diagnosis: '', nextPlan: '', note: '', methods: emptyMethods(),
 });
 
-const emptyAppt = () => ({ datetime: '', location: 'Khoa Ung Bướu - Tầng 3' });
+const emptyAppt = () => ({ datetime: '', location: 'Phòng ..., Khoa Xạ trị & Xạ phẫu/Tầng Hầm B2' });
 
 const emptyAccount = {
   id: '', name: '', dob: '', gender: '', phone: '', email: '', address: '',

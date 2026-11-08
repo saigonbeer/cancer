@@ -78,7 +78,7 @@ export default function DoctorAppointmentsPage() {
                     {a.patient?.name} ({a.type})
                   </div>
                   <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4 }}>
-                    Thời gian: {a.datetime ? new Date(a.datetime).toLocaleString('vi-VN') : 'Chưa định ngày'} • Địa điểm: {a.location || 'Khoa Ung Bướu'}
+                    Thời gian: {a.datetime ? new Date(a.datetime).toLocaleString('vi-VN') : 'Chưa định ngày'} • Địa điểm: {a.location || 'Khoa Xạ trị & Xạ phẫu/Tầng Hầm B2'}
                   </div>
                   {a.reason && (
                     <div style={{ fontSize: 12.5, color: 'var(--ink)', marginTop: 4 }}>

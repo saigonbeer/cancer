@@ -23,7 +23,7 @@ export async function createAppointment(
       doctorId: data.doctorId,
       type: data.type,
       datetime: data.datetime,
-      location: data.location || 'Khoa Ung Bướu - Tầng 3',
+      location: data.location || 'Phòng ..., Khoa Xạ trị & Xạ phẫu/Tầng Hầm B2',
       reason: data.reason,
       status: 'PENDING'
     },
