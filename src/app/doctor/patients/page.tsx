@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useToast, useConfirm } from '@/components/UIFeedback';
-import { CancerTypePicker, RegimenSuggestInput, type CancerTypeOption } from '@/components/CatalogPicker';
+import { CancerTypePicker, RegimenSuggestInput, DrugNameSuggestInput, type CancerTypeOption } from '@/components/CatalogPicker';
 
 type MainTab = 'record' | 'accounts';
 type RecordTab = 'first' | 'followup' | 'side';
@@ -138,7 +138,7 @@ function MethodsEditor({ value, onChange }: { value: MethodsState; onChange: (v:
                         patch(m.key, { drugs: cur.drugs.map((x: any, j: number) => (j === idx ? { ...x, [field]: v } : x)) });
                       return (
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr 0.8fr auto', gap: 8, alignItems: 'center' }}>
-                          <input type='text' placeholder='Tên thuốc' value={d.drugName} onChange={(e) => setDrug('drugName', e.target.value)} />
+                          <DrugNameSuggestInput placeholder='Tên thuốc' value={d.drugName} onChange={(v) => setDrug('drugName', v)} />
                           <input type='text' placeholder='Liều lượng' value={d.dose} onChange={(e) => setDrug('dose', e.target.value)} />
                           <input type='text' placeholder='Tần suất' value={d.frequency} onChange={(e) => setDrug('frequency', e.target.value)} />
                           <input type='text' placeholder='Số lượng' value={d.quantity} onChange={(e) => setDrug('quantity', e.target.value)} />
@@ -215,6 +215,59 @@ function VisitSummary({ v }: { v: any }) {
         </div>
       )}
     </div>
+  );
+}
+
+function PrescriptionAdherenceCard({ patientId }: { patientId: string }) {
+  const [data, setData] = useState<{ activeItems: any[]; adherence: { taken: number; expected: number; percent: number | null } } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setData(null);
+    fetch(`/api/doctor/patients/${patientId}/adherence`)
+      .then((r) => r.json())
+      .then((d) => { if (alive) setData(d); })
+      .catch(() => { if (alive) setData({ activeItems: [], adherence: { taken: 0, expected: 0, percent: null } }); });
+    return () => { alive = false; };
+  }, [patientId]);
+
+  if (!data) return null;
+  const { activeItems, adherence } = data;
+  const pct = adherence.percent;
+  const tone = pct === null ? { bg: 'var(--bg)', color: 'var(--ink-soft)' }
+    : pct >= 80 ? { bg: 'var(--teal-tint)', color: 'var(--teal-deep)' }
+    : pct >= 50 ? { bg: 'var(--amber-tint)', color: 'var(--amber)' }
+    : { bg: 'var(--red-tint)', color: 'var(--red)' };
+
+  return (
+    <section className='sec-card'>
+      <div className='sec-head' style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Đơn thuốc &amp; Tuân thủ uống thuốc</h2>
+        <span className='pill' style={{ background: tone.bg, color: tone.color }}>
+          {pct === null ? 'Chưa có dữ liệu tuân thủ' : `Tuân thủ 7 ngày: ${pct}% (${adherence.taken}/${adherence.expected} liều)`}
+        </span>
+      </div>
+      <div style={{ padding: '18px 22px' }}>
+        {activeItems.length === 0 ? (
+          <div style={{ color: 'var(--ink-soft)', fontSize: 13.5 }}>Hiện không có thuốc nào đang trong thời gian sử dụng.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {activeItems.map((it: any) => (
+              <div key={it.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', borderBottom: '1px solid var(--line-soft)', paddingBottom: 8 }}>
+                <div>
+                  <strong>{it.drugName}</strong>
+                  {it.dose && <span> — {it.dose} {it.unit || ''}</span>}
+                  {it.frequency && <span> · {it.frequency}</span>}
+                </div>
+                <div style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
+                  {it.totalQuantity ? `Đã dùng ${it.takenQuantity}/${it.totalQuantity}` : `${it.takenQuantity} liều đã ghi nhận`}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -587,13 +640,16 @@ export default function DoctorPatientsPage() {
               )}
 
               {recordTab === 'first' && (firstVisit ? (
-                <section className='sec-card'>
-                  <div className='sec-head' style={{ justifyContent: 'space-between' }}>
-                    <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Khám lần đầu</h2>
-                    <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Đã lưu ngày {fmtDate(firstVisit.visitDate)}</span>
-                  </div>
-                  <div style={{ padding: '18px 22px' }}><VisitSummary v={firstVisit} /></div>
-                </section>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <section className='sec-card'>
+                    <div className='sec-head' style={{ justifyContent: 'space-between' }}>
+                      <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Khám lần đầu</h2>
+                      <span style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>Đã lưu ngày {fmtDate(firstVisit.visitDate)}</span>
+                    </div>
+                    <div style={{ padding: '18px 22px' }}><VisitSummary v={firstVisit} /></div>
+                  </section>
+                  <PrescriptionAdherenceCard patientId={selected.id} />
+                </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                   <Section n={1} title='Tiền sử'>

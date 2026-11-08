@@ -117,3 +117,50 @@ export function RegimenSuggestInput({ label, value, onChange }: { label: string;
     </div>
   );
 }
+
+/** Ô nhập tên thuốc có gợi ý từ danh mục Thuốc (admin) — vẫn lưu dạng text tự do, chỉ gợi ý để dùng đúng tên chuẩn. Không có label riêng, dùng để chèn thẳng vào lưới đơn thuốc hiện có. */
+export function DrugNameSuggestInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [options, setOptions] = useState<{ id: string; name: string; group: string | null }[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (value.trim().length < 2) {
+      setOptions([]);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      const res = await fetch('/api/doctor/medications/search?q=' + encodeURIComponent(value.trim()));
+      const data = await res.json().catch(() => ({ drugs: [] }));
+      setOptions(data.drugs || []);
+    }, 250);
+    return () => clearTimeout(handle);
+  }, [value]);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder={placeholder || 'Tên thuốc'}
+      />
+      {open && options.length > 0 && (
+        <div style={{ position: 'absolute', zIndex: 20, top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid var(--line)', borderRadius: 8, marginTop: 4, maxHeight: 200, overflowY: 'auto', boxShadow: '0 8px 20px rgba(0,0,0,0.12)' }}>
+          {options.map((o) => (
+            <div
+              key={o.id}
+              onClick={() => { onChange(o.name); setOpen(false); }}
+              onMouseDown={(e) => e.preventDefault()}
+              style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13 }}
+            >
+              <strong>{o.name}</strong>
+              {o.group && <span style={{ color: 'var(--ink-soft)', marginLeft: 6 }}>· {o.group}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

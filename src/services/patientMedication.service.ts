@@ -10,6 +10,65 @@ async function patientProfileId(userId: string) {
   return profile?.id ?? null;
 }
 
+/** Đơn hiện hành + tuân thủ 7 ngày gần nhất, theo patientId trực tiếp — dùng cho cả trang bệnh nhân và màn hồ sơ của bác sĩ. */
+export async function getPatientAdherenceSummary(patientId: string) {
+  const now = new Date();
+  const today = startOfDay(now);
+  const weekStart = new Date(today.getTime() - 6 * DAY_MS);
+
+  const [prescriptions, logs] = await Promise.all([
+    prisma.prescription.findMany({
+      where: { visit: { patientId } },
+      include: { items: true },
+      orderBy: { prescribedAt: 'desc' },
+    }),
+    prisma.doseLog.findMany({
+      where: { patientId },
+      orderBy: { scheduledAt: 'desc' },
+      take: 1000,
+    }),
+  ]);
+
+  const activeItems = prescriptions.flatMap((pr) =>
+    pr.items
+      .filter((it) => isActiveOn(pr.prescribedAt, it.duration, today))
+      .map((it) => {
+        const takenLogs = logs.filter((l) => l.prescriptionItemId === it.id && l.status === 'TAKEN').length;
+        const perDose = leadingNumber(it.dose) ?? 1;
+        return {
+          id: it.id,
+          drugName: it.drugName,
+          dose: it.dose,
+          unit: it.unit,
+          frequency: it.frequency,
+          duration: it.duration,
+          quantity: it.quantity,
+          takenQuantity: takenLogs * perDose,
+          totalQuantity: leadingNumber(it.quantity),
+        };
+      })
+  );
+
+  let expected = 0;
+  for (let d = weekStart; d.getTime() <= today.getTime(); d = new Date(d.getTime() + DAY_MS)) {
+    for (const pr of prescriptions) {
+      for (const it of pr.items) {
+        if (!isActiveOn(pr.prescribedAt, it.duration, d)) continue;
+        for (const time of timesOf(it.reminderTimes)) {
+          if (atTime(d, time).getTime() <= now.getTime()) expected++;
+        }
+      }
+    }
+  }
+  const weekLogs = logs.filter((l) => l.scheduledAt.getTime() >= weekStart.getTime());
+  const taken = Math.min(weekLogs.filter((l) => l.status === 'TAKEN').length, expected);
+
+  return {
+    activeItems,
+    adherence: { taken, expected, percent: expected > 0 ? Math.round((taken / expected) * 100) : null },
+  };
+}
+
 /** Tổng hợp dữ liệu cho trang thuốc của bệnh nhân: đơn hiện hành, liều hôm nay, tuân thủ và lịch sử. */
 export async function getPatientMedicationView(userId: string) {
   const patientId = await patientProfileId(userId);
