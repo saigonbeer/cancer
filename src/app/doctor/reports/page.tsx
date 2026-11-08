@@ -64,16 +64,27 @@ export default function DoctorReportsPage() {
           </div>
 
           <div className='sec-card' style={{ padding: 22 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 14px 0' }}>Phân bố Bệnh lý & Giai đoạn Ung thư</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 14px 0' }}>Phân bố bệnh nhân theo Loại ung thư</h2>
+            <div style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginBottom: 12 }}>
+              Tính theo lượt khám lần đầu đã gán Loại ung thư trong danh mục chuẩn.
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {(!stats.stages || stats.stages.length === 0) && (
+                <div style={{ fontSize: 13.5, color: 'var(--ink-soft)' }}>Chưa có lượt khám nào gán Loại ung thư theo danh mục.</div>
+              )}
               {stats.stages?.map((s: any, idx: number) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--line-soft)' }}>
-                  <span style={{ fontSize: 14, fontWeight: 600 }}>{s.name}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600 }}>{s.name}{s.stage ? ` · ${s.stage}` : ''}</span>
                   <span className='pill' style={{ background: 'var(--teal-tint)', color: 'var(--teal)' }}>
-                    Giai đoạn {s.stage || 'I-IV'}
+                    {s.patientCount} bệnh nhân
                   </span>
                 </div>
               ))}
+              {stats.firstVisitsWithoutCancerType > 0 && (
+                <div style={{ fontSize: 12.5, color: 'var(--amber)', marginTop: 8 }}>
+                  {stats.firstVisitsWithoutCancerType} lượt khám lần đầu chưa gán Loại ung thư theo danh mục.
+                </div>
+              )}
             </div>
           </div>
         </div>

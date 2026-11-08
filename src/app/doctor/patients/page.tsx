@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useToast, useConfirm } from '@/components/UIFeedback';
+import { CancerTypePicker, RegimenSuggestInput, type CancerTypeOption } from '@/components/CatalogPicker';
 
 type MainTab = 'record' | 'accounts';
 type RecordTab = 'first' | 'followup' | 'side';
@@ -29,7 +30,7 @@ const emptyFirst = () => ({
   detectedAt: '', symptoms: '', priorTreatment: '', result: '',
   ecog: '', height: '', weight: '', local: '',
   gpb: '', ctmri: '', otherLab: '',
-  diagnosis: '', progress: '', nextPlan: '', methods: emptyMethods(),
+  diagnosis: '', cancerType: null as CancerTypeOption | null, progress: '', nextPlan: '', methods: emptyMethods(),
 });
 
 const emptyFollow = () => ({
@@ -119,9 +120,13 @@ function MethodsEditor({ value, onChange }: { value: MethodsState; onChange: (v:
             </label>
             {cur.on && (
               <div style={{ padding: 16, borderTop: '1px solid var(--line-soft)', background: 'var(--bg)', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {m.fields.map(([k, label]) => (
-                  <Line key={k} label={label} value={cur.data[k] || ''} onChange={(v) => patch(m.key, { data: { ...cur.data, [k]: v } })} />
-                ))}
+                {m.fields.map(([k, label]) =>
+                  k === 'regimen' ? (
+                    <RegimenSuggestInput key={k} label={label} value={cur.data[k] || ''} onChange={(v) => patch(m.key, { data: { ...cur.data, [k]: v } })} />
+                  ) : (
+                    <Line key={k} label={label} value={cur.data[k] || ''} onChange={(v) => patch(m.key, { data: { ...cur.data, [k]: v } })} />
+                  )
+                )}
                 {m.key === 'radio' && (
                   <Check label='Có kèm hóa chất' checked={!!cur.data.withChemo} onChange={(v) => patch(m.key, { data: { ...cur.data, withChemo: v } })} />
                 )}
@@ -176,6 +181,7 @@ function VisitSummary({ v }: { v: any }) {
   const tags = METHODS.filter((m) => plan?.[m.key + 'On']).map((m) => m.label);
   const rows: Array<[string, string | null | undefined]> = [
     ['Tiền sử', v.history], ['Bệnh sử', v.illness], ['Khám', v.examination], ['Xét nghiệm', v.labResults],
+    ['Loại ung thư', v.cancerType ? `${v.cancerType.name}${v.cancerType.stage ? ' · ' + v.cancerType.stage : ''}` : null],
     ['Chẩn đoán', v.diagnosis], ['Diễn biến & kết quả', v.progress], ['Hướng điều trị tiếp theo', v.nextPlan], ['Ghi chú', v.note],
   ];
   const items = (v.prescriptions || []).flatMap((p: any) => p.items || []);
@@ -318,6 +324,7 @@ export default function DoctorPatientsPage() {
         f.otherLab && 'Xét nghiệm khác: ' + f.otherLab,
       ].filter(Boolean).join('\n'),
       diagnosis: f.diagnosis,
+      cancerTypeId: f.cancerType?.id,
       progress: f.progress,
       nextPlan: f.nextPlan,
     };
@@ -618,7 +625,8 @@ export default function DoctorPatientsPage() {
                     <Area label='Xét nghiệm khác' value={first.otherLab} onChange={(v) => setFirst({ ...first, otherLab: v })} />
                   </Section>
                   <Section n={5} title='Chẩn đoán'>
-                    <Area label='Chẩn đoán xác định' value={first.diagnosis} onChange={(v) => setFirst({ ...first, diagnosis: v })} />
+                    <CancerTypePicker label='Loại ung thư (theo danh mục chuẩn)' value={first.cancerType} onSelect={(v) => setFirst({ ...first, cancerType: v })} />
+                    <Area label='Chẩn đoán xác định (chi tiết)' value={first.diagnosis} onChange={(v) => setFirst({ ...first, diagnosis: v })} />
                   </Section>
                   <Section n={6} title='Phương pháp điều trị'>
                     <MethodsEditor value={first.methods} onChange={(v) => setFirst({ ...first, methods: v })} />

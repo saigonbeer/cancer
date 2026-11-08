@@ -111,6 +111,8 @@ model Visit {
   examination String? // khám
   labResults  String? // xét nghiệm
   diagnosis   String?
+  cancerTypeId String? // tham chiếu danh mục Loại ung thư — để thống kê/báo cáo theo đúng danh mục chuẩn, diagnosis vẫn giữ mô tả chi tiết dạng text
+  cancerType   CatalogCancerType? @relation(fields: [cancerTypeId], references: [id])
   progress    String? // diễn biến và kết quả điều trị
   nextPlan    String? // hướng điều trị tiếp theo
   note        String? // ghi chú thêm (tái khám)
@@ -227,6 +229,8 @@ model CatalogCancerType {
   name        String  @unique
   stage       String?
   description String?
+
+  visits Visit[]
 }
 
 model CatalogSymptom {

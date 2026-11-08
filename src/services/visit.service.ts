@@ -13,6 +13,7 @@ export async function createVisit(
     examination?: string;
     labResults?: string;
     diagnosis?: string;
+    cancerTypeId?: string;
     progress?: string;
     nextPlan?: string;
     note?: string;
@@ -47,6 +48,7 @@ export async function createVisit(
       examination: data.examination,
       labResults: data.labResults,
       diagnosis: data.diagnosis,
+      cancerTypeId: data.cancerTypeId || null,
       progress: data.progress,
       nextPlan: data.nextPlan,
       note: data.note,
@@ -60,7 +62,8 @@ export async function createVisit(
     },
     include: {
       treatmentPlans: true,
-      prescriptions: { include: { items: true } }
+      prescriptions: { include: { items: true } },
+      cancerType: true
     }
   });
 
@@ -73,7 +76,8 @@ export async function getPatientVisits(patientId: string, doctorUserId: string, 
     where: { patientId },
     include: {
       treatmentPlans: true,
-      prescriptions: { include: { items: true } }
+      prescriptions: { include: { items: true } },
+      cancerType: true
     },
     orderBy: { visitDate: 'desc' }
   });
