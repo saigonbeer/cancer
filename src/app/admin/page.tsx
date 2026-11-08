@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useToast, useConfirm } from "@/components/UIFeedback";
 
 type Role = "DOCTOR" | "PATIENT" | "ADMIN";
@@ -28,29 +28,40 @@ const ROLE_CLASS: Record<Role, string> = {
   ADMIN: "var(--purple-tint)",
 };
 
+const fieldStyle: React.CSSProperties = {
+  width: "100%", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", fontSize: 13.5, fontFamily: "inherit", background: "#fff",
+};
+
+const EMPTY_FORM = {
+  name: "", dob: "", email: "", phone: "", department: "",
+  role: "PATIENT" as Role, username: "", password: "",
+};
+type FormState = typeof EMPTY_FORM;
+
+function formFrom(acc: Account): FormState {
+  return {
+    name: acc.name, dob: acc.dob || "", email: acc.email || "", phone: acc.phone || "",
+    department: acc.doctorProfile?.department || "", role: acc.role, username: acc.username, password: "",
+  };
+}
+
 export default function AdminAccountsPage() {
   const toast = useToast();
   const confirmFn = useConfirm();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
-  const [draft, setDraft] = useState({
-    name: "",
-    dob: "",
-    email: "",
-    phone: "",
-    department: "",
-    role: "PATIENT" as Role,
-    username: "",
-    password: "",
-  });
+  const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   async function load() {
     setLoading(true);
     const res = await fetch("/api/admin/accounts");
-    const data = await res.json();
+    const data = await res.json().catch(() => ({ accounts: [] }));
     setAccounts(data.accounts || []);
     setLoading(false);
   }
@@ -59,60 +70,68 @@ export default function AdminAccountsPage() {
     load();
   }, []);
 
-  async function addAccount() {
-    setError(null);
-    if (!draft.name.trim() || !draft.username.trim() || !draft.password.trim()) {
-      setError("Vui lòng nhập Họ tên, Username và Mật khẩu.");
-      return;
-    }
-    const res = await fetch("/api/admin/accounts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(draft),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Không thêm được tài khoản.");
-      return;
-    }
-    setDraft({ name: "", dob: "", email: "", phone: "", department: "", role: "PATIENT", username: "", password: "" });
-    toast.success("Đã thêm tài khoản.");
-    load();
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return accounts;
+    return accounts.filter(
+      (a) => a.name.toLowerCase().includes(q) || a.username.toLowerCase().includes(q) || (a.email || "").toLowerCase().includes(q)
+    );
+  }, [accounts, search]);
+
+  function openCreate() {
+    setForm(EMPTY_FORM);
+    setFormError(null);
+    setModalMode("create");
   }
 
-  async function removeAccount(id: string) {
-    const acc = accounts.find((a) => a.id === id);
-    const ok = await confirmFn(`Xác nhận xóa tài khoản "${acc?.name || id}"?`, "Hành động này không thể hoàn tác.");
-    if (!ok) return;
-    await fetch(`/api/admin/accounts/${id}`, { method: "DELETE" });
-    toast.success("Đã xóa tài khoản.");
-    load();
+  function openEdit(acc: Account) {
+    setForm(formFrom(acc));
+    setEditingId(acc.id);
+    setFormError(null);
+    setModalMode("edit");
   }
 
-  async function saveEdit(acc: Account & { password?: string; department?: string }) {
-    setError(null);
-    const body: Record<string, unknown> = {
-      name: acc.name,
-      dob: acc.dob || undefined,
-      email: acc.email || "",
-      phone: acc.phone || "",
-      department: acc.department ?? acc.doctorProfile?.department ?? "",
-      role: acc.role,
-      username: acc.username,
-    };
-    if (acc.password && acc.password.trim()) body.password = acc.password.trim();
-    const res = await fetch(`/api/admin/accounts/${acc.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Không lưu được thay đổi.");
-      return;
-    }
+  function closeModal() {
+    setModalMode(null);
     setEditingId(null);
-    toast.success("Đã lưu thay đổi.");
+  }
+
+  async function save() {
+    setFormError(null);
+    if (!form.name.trim() || !form.username.trim() || (modalMode === "create" && !form.password.trim())) {
+      setFormError("Vui lòng nhập Họ tên, Username và Mật khẩu.");
+      return;
+    }
+    setSaving(true);
+    const body: Record<string, unknown> = {
+      name: form.name, dob: form.dob || undefined, email: form.email || "", phone: form.phone || "",
+      department: form.department, role: form.role, username: form.username,
+    };
+    if (form.password.trim()) body.password = form.password.trim();
+
+    const res = modalMode === "create"
+      ? await fetch("/api/admin/accounts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      : await fetch(`/api/admin/accounts/${editingId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    setSaving(false);
+    if (!res.ok) {
+      setFormError(data.error || "Không lưu được.");
+      return;
+    }
+    toast.success(modalMode === "create" ? "Đã thêm tài khoản." : "Đã lưu thay đổi.");
+    closeModal();
+    load();
+  }
+
+  async function removeAccount(acc: Account) {
+    const ok = await confirmFn(`Xác nhận xóa tài khoản "${acc.name}"?`, "Hành động này không thể hoàn tác.");
+    if (!ok) return;
+    const res = await fetch(`/api/admin/accounts/${acc.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      toast.error("Không xóa được tài khoản.");
+      return;
+    }
+    toast.success("Đã xóa tài khoản.");
     load();
   }
 
@@ -139,105 +158,102 @@ export default function AdminAccountsPage() {
         </a>
       </div>
 
-      <section className="sec-card">
-        <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--line-soft)" }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Thêm tài khoản mới</h2>
-        </div>
-        <div style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>
-          <Field label="Họ và tên">
-            <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Nguyễn Văn A" />
-          </Field>
-          <Field label="Năm sinh">
-            <input value={draft.dob} onChange={(e) => setDraft({ ...draft, dob: e.target.value })} placeholder="19.." />
-          </Field>
-          <Field label="Email">
-            <input value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} placeholder="email@domain.com" />
-          </Field>
-          <Field label="Số điện thoại">
-            <input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} placeholder="09xxxxxxxx" />
-          </Field>
-          {draft.role === "DOCTOR" && (
-            <Field label="Khoa/Chuyên khoa">
-              <input value={draft.department} onChange={(e) => setDraft({ ...draft, department: e.target.value })} placeholder="Xạ trị - Xạ phẫu" />
-            </Field>
-          )}
-          <Field label="Vai trò">
-            <select
-              value={draft.role}
-              onChange={(e) => setDraft({ ...draft, role: e.target.value as Role })}
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)" }}
-            >
-              <option value="DOCTOR">Bác sĩ</option>
-              <option value="PATIENT">Bệnh nhân</option>
-              <option value="ADMIN">Quản trị viên</option>
-            </select>
-          </Field>
-          <Field label="Username">
-            <input value={draft.username} onChange={(e) => setDraft({ ...draft, username: e.target.value })} placeholder="username" />
-          </Field>
-          <div style={{ display: "flex", gap: 8, alignItems: "end" }}>
-            <div style={{ flex: 1 }}>
-              <Field label="Mật khẩu">
-                <input
-                  type="password"
-                  value={draft.password}
-                  onChange={(e) => setDraft({ ...draft, password: e.target.value })}
-                  placeholder="••••••"
-                />
-              </Field>
-            </div>
-            <button type="button" className="addbtn" style={{ height: 38 }} onClick={addAccount}>
-              Thêm
-            </button>
+      <section className="sec-card" style={{ overflow: "hidden" }}>
+        <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--line-soft)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Danh sách ({filtered.length.toLocaleString("vi-VN")})</h2>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm theo tên, username, email..." style={{ ...fieldStyle, width: 240 }} />
+            <button type="button" className="addbtn" onClick={openCreate}>Thêm tài khoản</button>
           </div>
         </div>
-        {error && <div style={{ padding: "0 22px 16px", color: "var(--red)", fontSize: 13 }}>{error}</div>}
-      </section>
 
-      <section className="sec-card" style={{ overflow: "hidden" }}>
-        <div style={gridHead}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.9fr 1fr 1fr auto", gap: 12, padding: "12px 20px", fontSize: 12, fontWeight: 700, letterSpacing: "0.03em", color: "var(--ink-soft)", textTransform: "uppercase", borderBottom: "1px solid var(--line)" }}>
           <div>Họ và tên</div>
-          <div>Năm sinh</div>
-          <div>SĐT</div>
-          <div>Email</div>
-          <div>Khoa</div>
           <div>Vai trò</div>
-          <div>Username</div>
+          <div>Khoa / Username</div>
+          <div>Liên hệ</div>
           <div>Hành động</div>
         </div>
-        {loading && <div style={{ padding: 24, textAlign: "center", color: "var(--ink-soft)" }}>Đang tải...</div>}
-        {!loading &&
-          accounts.map((acc) =>
-            editingId === acc.id ? (
-              <EditRow key={acc.id} account={acc} onCancel={() => setEditingId(null)} onSave={saveEdit} />
-            ) : (
-              <div key={acc.id} style={gridRow}>
-                <div style={{ fontWeight: 600 }}>{acc.name}</div>
-                <div style={{ color: "var(--ink-soft)" }}>{acc.dob || "—"}</div>
-                <div style={{ color: "var(--ink-soft)" }}>{acc.phone || "—"}</div>
-                <div style={{ color: "var(--ink-soft)" }}>{acc.email || "—"}</div>
-                <div style={{ color: "var(--ink-soft)" }}>{acc.role === "DOCTOR" ? acc.doctorProfile?.department || "—" : "—"}</div>
-                <div>
-                  <span className="pill" style={{ background: ROLE_CLASS[acc.role] }}>
-                    {ROLE_LABEL[acc.role]}
-                  </span>
-                </div>
-                <div style={{ color: "var(--ink-soft)" }}>{acc.username}</div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button type="button" className="ghostbtn" onClick={() => setEditingId(acc.id)}>
-                    Sửa
-                  </button>
-                  <button type="button" className="ghostbtn" style={{ color: "var(--red)" }} onClick={() => removeAccount(acc.id)}>
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            )
-          )}
-        {!loading && accounts.length === 0 && (
+
+        {loading ? (
+          <div style={{ padding: 24, textAlign: "center", color: "var(--ink-soft)" }}>Đang tải...</div>
+        ) : filtered.length === 0 ? (
           <div style={{ padding: 28, textAlign: "center", color: "var(--ink-soft)", fontSize: 14 }}>Chưa có tài khoản nào.</div>
+        ) : (
+          filtered.map((acc) => (
+            <div key={acc.id} style={{ display: "grid", gridTemplateColumns: "1.3fr 0.9fr 1fr 1fr auto", gap: 12, alignItems: "center", padding: "12px 20px", fontSize: 13.5, borderBottom: "1px solid var(--line-soft)" }}>
+              <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{acc.name}</div>
+              <div>
+                <span className="pill" style={{ background: ROLE_CLASS[acc.role] }}>{ROLE_LABEL[acc.role]}</span>
+              </div>
+              <div style={{ color: "var(--ink-soft)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {acc.role === "DOCTOR" && acc.doctorProfile?.department ? `${acc.doctorProfile.department} · ` : ""}
+                {acc.username}
+              </div>
+              <div style={{ color: "var(--ink-soft)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {acc.phone || acc.email || "—"}
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button type="button" className="ghostbtn" onClick={() => openEdit(acc)}>Sửa</button>
+                <button type="button" className="ghostbtn" style={{ color: "var(--red)" }} onClick={() => removeAccount(acc)}>Xóa</button>
+              </div>
+            </div>
+          ))
         )}
       </section>
+
+      {modalMode && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1050, padding: 20 }}>
+          <div className="sec-card" style={{ width: 560, maxWidth: "100%", maxHeight: "90vh", overflowY: "auto", padding: 24 }}>
+            <h2 style={{ fontSize: 17, fontWeight: 700, marginTop: 0 }}>{modalMode === "create" ? "Thêm tài khoản" : "Sửa tài khoản"}</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label className="field-label">Họ và tên</label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nguyễn Văn A" style={fieldStyle} />
+              </div>
+              <div>
+                <label className="field-label">Năm sinh</label>
+                <input value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} placeholder="19.." style={fieldStyle} />
+              </div>
+              <div>
+                <label className="field-label">Email</label>
+                <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@domain.com" style={fieldStyle} />
+              </div>
+              <div>
+                <label className="field-label">Số điện thoại</label>
+                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="09xxxxxxxx" style={fieldStyle} />
+              </div>
+              <div>
+                <label className="field-label">Vai trò</label>
+                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as Role })} style={fieldStyle}>
+                  <option value="DOCTOR">Bác sĩ</option>
+                  <option value="PATIENT">Bệnh nhân</option>
+                  <option value="ADMIN">Quản trị viên</option>
+                </select>
+              </div>
+              {form.role === "DOCTOR" && (
+                <div>
+                  <label className="field-label">Khoa / Chuyên khoa</label>
+                  <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Xạ trị - Xạ phẫu" style={fieldStyle} />
+                </div>
+              )}
+              <div>
+                <label className="field-label">Username</label>
+                <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="username" style={fieldStyle} />
+              </div>
+              <div>
+                <label className="field-label">{modalMode === "create" ? "Mật khẩu" : "Mật khẩu mới (để trống nếu không đổi)"}</label>
+                <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="••••••" style={fieldStyle} />
+              </div>
+            </div>
+            {formError && <div style={{ color: "var(--red)", fontSize: 13, marginTop: 12 }}>{formError}</div>}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 18 }}>
+              <button type="button" className="ghostbtn" onClick={closeModal}>Hủy</button>
+              <button type="button" className="addbtn" onClick={save} disabled={saving}>{saving ? "Đang lưu..." : "Lưu"}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -247,100 +263,6 @@ function Stat({ label, value, color }: { label: string; value: number; color?: s
     <div className="sec-card" style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
       <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink-soft)" }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 700, color: color || "var(--ink)" }}>{value}</div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="field-label">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-const gridHead: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1.1fr 0.7fr 0.9fr 1.2fr 1fr 0.8fr 0.9fr 1.2fr",
-  gap: 12,
-  alignItems: "center",
-  padding: "12px 20px",
-  fontSize: 12,
-  fontWeight: 700,
-  letterSpacing: "0.03em",
-  color: "var(--ink-soft)",
-  textTransform: "uppercase",
-  borderBottom: "1px solid var(--line)",
-};
-
-const gridRow: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1.1fr 0.7fr 0.9fr 1.2fr 1fr 0.8fr 0.9fr 1.2fr",
-  gap: 12,
-  alignItems: "center",
-  padding: "12px 20px",
-  fontSize: 13.5,
-  borderBottom: "1px solid var(--line-soft)",
-};
-
-function EditRow({
-  account,
-  onCancel,
-  onSave,
-}: {
-  account: Account;
-  onCancel: () => void;
-  onSave: (a: Account & { password?: string; department?: string }) => void;
-}) {
-  const [draft, setDraft] = useState<Account & { password?: string; department?: string }>({
-    ...account,
-    password: "",
-    department: account.doctorProfile?.department || "",
-  });
-  return (
-    <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--line-soft)" }}>
-      <div style={{ ...gridRow, padding: 0, border: "none" }}>
-        <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-        <input value={draft.dob || ""} onChange={(e) => setDraft({ ...draft, dob: e.target.value })} />
-        <input value={draft.phone || ""} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
-        <input value={draft.email || ""} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
-        <input
-          value={draft.department || ""}
-          onChange={(e) => setDraft({ ...draft, department: e.target.value })}
-          placeholder={draft.role === "DOCTOR" ? "Khoa/Chuyên khoa" : "—"}
-          disabled={draft.role !== "DOCTOR"}
-        />
-        <select
-          value={draft.role}
-          onChange={(e) => setDraft({ ...draft, role: e.target.value as Role })}
-          style={{ padding: "7px 10px", borderRadius: 7, border: "1px solid var(--line)" }}
-        >
-          <option value="DOCTOR">Bác sĩ</option>
-          <option value="PATIENT">Bệnh nhân</option>
-          <option value="ADMIN">Quản trị viên</option>
-        </select>
-        <input value={draft.username} onChange={(e) => setDraft({ ...draft, username: e.target.value })} />
-        <div style={{ display: "flex", gap: 8 }}>
-          <button type="button" className="ghostbtn" onClick={() => onSave(draft)}>
-            Xong
-          </button>
-          <button type="button" className="ghostbtn" onClick={onCancel}>
-            Hủy
-          </button>
-        </div>
-      </div>
-      <div style={{ marginTop: 10, display: "flex", alignItems: "end", gap: 8, maxWidth: 260 }}>
-        <div style={{ flex: 1 }}>
-          <label className="field-label">Mật khẩu mới (để trống nếu không đổi)</label>
-          <input
-            type="password"
-            value={draft.password}
-            onChange={(e) => setDraft({ ...draft, password: e.target.value })}
-            placeholder="••••••"
-          />
-        </div>
-      </div>
     </div>
   );
 }
