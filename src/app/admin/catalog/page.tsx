@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import CatalogTab from "@/components/CatalogTab";
 import CtcaeCatalogTab from "@/components/CtcaeCatalogTab";
 import DrugInteractionTab from "@/components/DrugInteractionTab";
 import RichCatalogTab from "@/components/RichCatalogTab";
@@ -100,8 +99,22 @@ const TABS = [
 const CANCER_FIELDS = [
   { key: "name", label: "Tên ung thư", placeholder: "Ung thư vú" },
   { key: "stage", label: "Giai đoạn", placeholder: "I / II / III / IV" },
-  { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn..." },
-];
+  { key: "description", label: "Mô tả", placeholder: "Mô tả ngắn...", multiline: true },
+] as const;
+
+const CANCER_LIST_COLUMNS = [
+  { key: "name", label: "Tên ung thư" },
+  { key: "stage", label: "Giai đoạn" },
+] as const;
+
+const CANCER_IMPORT_ALIASES: Record<string, string> = {
+  "name": "name",
+  "tên ung thư": "name",
+  "stage": "stage",
+  "giai đoạn": "stage",
+  "description": "description",
+  "mô tả": "description",
+};
 
 export default function CatalogPage() {
   const [tab, setTab] = useState<typeof TABS[number]["id"]>("drugs");
@@ -164,7 +177,15 @@ export default function CatalogPage() {
           importHint="Chấp nhận file .xlsx với các cột: Name, Histology, Primary Site, Radiation, Alternate Name, Remarks, Description, Source. Chỉ cần cột Tên phác đồ là bắt buộc."
         />
       ) : (
-        <CatalogTab apiBase="/api/admin/catalog/cancers" fields={CANCER_FIELDS} addLabel="Thêm loại ung thư" />
+        <RichCatalogTab
+          apiBase="/api/admin/catalog/cancers"
+          addLabel="Thêm loại ung thư"
+          fields={CANCER_FIELDS as unknown as { key: string; label: string; placeholder?: string; multiline?: boolean }[]}
+          listColumns={CANCER_LIST_COLUMNS as unknown as { key: string; label: string }[]}
+          searchPlaceholder="Tìm theo tên loại ung thư..."
+          importColumnAliases={CANCER_IMPORT_ALIASES}
+          importHint="Chấp nhận file .xlsx với các cột: Name, Stage, Description. Chỉ cần cột Tên ung thư là bắt buộc."
+        />
       )}
     </>
   );
